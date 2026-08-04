@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vidhi, evaluation metrics</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: #f2f2f2;
+    background: #000;
+    display: flex;
+  }
+
+  #sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: #0a0a0a;
+    border-right: 1px solid #222;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0.75rem;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+  #app-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    padding: 0.4rem 0.5rem 1rem 0.5rem;
+    letter-spacing: 0.02em;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: #e4e4e4;
+    cursor: default;
+    border: 1px solid transparent;
+  }
+  .sidebar-item.book {
+    background: #171717;
+    border-color: #2a2a2a;
+    margin-bottom: 0.4rem;
+  }
+  .sidebar-item .book-sub {
+    display: block;
+    font-size: 0.72rem;
+    color: #888;
+    margin-top: 0.15rem;
+  }
+  button.sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    background: transparent;
+    color: #e4e4e4;
+    border: 1px solid #2a2a2a;
+    cursor: pointer;
+    margin-bottom: 0.4rem;
+  }
+  button.sidebar-btn:hover:not(:disabled) { background: #1a1a1a; }
+  button.sidebar-btn:disabled { color: #666; cursor: not-allowed; }
+  button.sidebar-btn.active { background: #1f1f1f; border-color: #3a3a3a; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-footnote {
+    font-size: 0.72rem;
+    color: #666;
+    padding: 0.5rem 0.6rem;
+    line-height: 1.4;
+  }
+
+  #main {
+    flex: 1;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 1.5rem 2rem 3rem 2rem;
+  }
+  h1 { font-size: 1.4rem; margin: 0 0 0.25rem 0; color: #fff; }
+  .subtitle { font-size: 0.85rem; color: #999; margin-bottom: 1.5rem; }
+  h2 {
+    font-size: 1.05rem;
+    color: #fff;
+    margin: 2rem 0 0.75rem 0;
+    border-bottom: 1px solid #262626;
+    padding-bottom: 0.4rem;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  th, td {
+    border: 1px solid #2a2a2a;
+    padding: 0.45rem 0.65rem;
+    text-align: left;
+  }
+  th { background: #131313; color: #ddd; }
+  td { color: #e4e4e4; }
+  td.na { color: #666; font-style: italic; }
+  .section-note { font-size: 0.78rem; color: #888; margin: 0.4rem 0 1rem 0; }
+  pre {
+    background: #101010;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    color: #ddd;
+  }
+  .loading { color: #888; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="app-name">Vidhi</div>
+
+  <div class="sidebar-item book">
+    Bharat's GST Smart Guide, 3rd ed.
+  </div>
+
+  <button class="sidebar-btn" disabled title="Multiple documents are not supported yet">+ New doc</button>
+  <button class="sidebar-btn" onclick="window.location.href='/'">Chat</button>
+  <button class="sidebar-btn active" id="nav-metrics">Metrics</button>
+
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-footnote">
+    Each query is handled independently. There is no conversation memory or history.
+  </div>
+</div>
+
+<div id="main">
+  <h1>Evaluation metrics</h1>
+  <div class="subtitle">Ablation configs A/B/C/D, measured on the dev split. See README for methodology.</div>
+  <div id="content" class="loading">Loading metrics...</div>
+</div>
+
+<script>
+(function () {
+  const CONFIG_NAMES = ["A_vanilla", "B_hybrid", "C_dspy", "D_optimized"];
+  const content = document.getElementById("content");
+
+  function fmt(x, digits) {
+    if (x === null || x === undefined) return null;
+    if (typeof x === "number" && Number.isNaN(x)) return null;
+    if (typeof x !== "number") return x;
+    return x.toFixed(digits === undefined ? 3 : digits);
+  }
+
+  function cell(x, digits) {
+    const v = fmt(x, digits);
+    return v === null ? '<td class="na">TBD</td>' : `<td>${v}</td>`;
+  }
+
+  function renderRetrievalTable(configs) {
+    const rows = ["recall_at_5", "recall_at_10", "mrr_at_10", "citation_validity_rate",
+      "abstention_accuracy", "false_abstention_rate", "answer_page_overlap"];
+    let html = "<table><thead><tr><th>Metric</th>";
+    for (const name of CONFIG_NAMES) html += `<th>${name}</th>`;
+    html += "</tr></thead><tbody>";
+    for (const row of rows) {
+      html += `<tr><td>${row}</td>`;
+      for (const name of CONFIG_NAMES) {
+        const g1 = configs[name] && configs[name].group1_retrieval;
+        html += cell(g1 ? g1[row] : null);
+      }
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+    return html;
+  }
+
+  function renderRagasTable(configs) {
+    const rows = ["faithfulness", "answer_relevancy", "context_precision", "context_recall"];
+    let html = "<table><thead><tr><th>Metric</th>";
+    for (const name of CONFIG_NAMES) html += `<th>${name}</th>`;
+    html += "</tr></thead><tbody>";
+    for (const row of rows) {
+      html += `<tr><td>${row}</td>`;
+      for (const name of CONFIG_NAMES) {
+        const g2 = configs[name] && configs[name].group2_ragas;
+        html += cell(g2 ? g2[row] : null);
+      }
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+    return html;
+  }
+
+  function renderLatencyTable(configs) {
+    let html = "<table><thead><tr><th>Metric</th>";
+    for (const name of CONFIG_NAMES) html += `<th>${name}</th>`;
+    html += "</tr></thead><tbody>";
+
+    const topRows = [
+      ["mode", (l) => l.mode],
+      ["ttft p50 (ms)", (l) => fmt(l.ttft_p50_ms, 1)],
+      ["ttft p95 (ms)", (l) => fmt(l.ttft_p95_ms, 1)],
+      ["total p50 (ms)", (l) => fmt(l.total_p50_ms, 1)],
+      ["total p95 (ms)", (l) => fmt(l.total_p95_ms, 1)],
+      ["tokens/sec", (l) => fmt(l.tokens_per_second_mean, 2)],
+      ["input tokens (mean)", (l) => fmt(l.input_tokens_mean, 1)],
+      ["output tokens (mean)", (l) => fmt(l.output_tokens_mean, 1)],
+    ];
+    for (const [label, getter] of topRows) {
+      html += `<tr><td>${label}</td>`;
+      for (const name of CONFIG_NAMES) {
+        const l = configs[name] && configs[name].latency;
+        const v = l ? getter(l) : null;
+        html += v === null || v === undefined ? '<td class="na">TBD</td>' : `<td>${v}</td>`;
+      }
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+
+    html += '<div class="section-note">Per stage latency, mean ms (p95 in parentheses)</div>';
+    const stages = ["route", "embed_query", "retrieval", "rerank", "generation", "groundedness_check", "citation_validation"];
+    html += "<table><thead><tr><th>Stage</th>";
+    for (const name of CONFIG_NAMES) html += `<th>${name}</th>`;
+    html += "</tr></thead><tbody>";
+    for (const stage of stages) {
+      html += `<tr><td>${stage}</td>`;
+      for (const name of CONFIG_NAMES) {
+        const l = configs[name] && configs[name].latency;
+        const mean = l && l.per_stage_mean_ms ? l.per_stage_mean_ms[stage] : null;
+        const p95 = l && l.per_stage_p95_ms ? l.per_stage_p95_ms[stage] : null;
+        if (mean === null || mean === undefined) {
+          html += '<td class="na">TBD</td>';
+        } else {
+          html += `<td>${fmt(mean, 1)} (${fmt(p95, 1)})</td>`;
+        }
+      }
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+    return html;
+  }
+
+  function renderOptimizer(optimizer) {
+    if (!optimizer) {
+      return '<div class="section-note">No optimizer run recorded yet.</div>';
+    }
+    let html = `<div class="section-note">
+      auto=${optimizer.auto || "TBD"}, trainset size ${optimizer.trainset_size || "TBD"},
+      estimated requests ${optimizer.estimated_requests || "TBD"}, run at ${optimizer.timestamp || "TBD"}
+    </div>`;
+    html += "<h2>Original instruction</h2><pre>" + (optimizer.original_instruction || "TBD") + "</pre>";
+    html += "<h2>Winning instruction</h2><pre>" + (optimizer.winning_instruction || "TBD") + "</pre>";
+    html += `<div class="section-note">Demo count: ${optimizer.demo_count === undefined ? "TBD" : optimizer.demo_count}</div>`;
+
+    if (optimizer.score_curve && optimizer.score_curve.length > 0) {
+      html += "<table><thead><tr><th>Trial</th><th>Minibatch score</th><th>Full eval score</th></tr></thead><tbody>";
+      for (const row of optimizer.score_curve) {
+        html += `<tr><td>${row.trial}</td>${cell(row.mb_score, 2)}${cell(row.full_eval_score, 2)}</tr>`;
+      }
+      html += "</tbody></table>";
+    }
+    return html;
+  }
+
+  async function load() {
+    try {
+      const res = await fetch("/metrics");
+      const data = await res.json();
+      const configs = data.configs || {};
+
+      let html = "<h2>Group 1, retrieval (deterministic)</h2>" + renderRetrievalTable(configs);
+      html += "<h2>Group 2, RAGAS (LLM judged)</h2>" + renderRagasTable(configs);
+      html += "<h2>Group 3, production and latency</h2>" + renderLatencyTable(configs);
+      html += "<h2>Optimizer, MIPROv2</h2>" + renderOptimizer(data.optimizer);
+
+      content.className = "";
+      content.innerHTML = html;
+    } catch (err) {
+      content.textContent = "Failed to load metrics: " + err.message;
+      console.error(err);
+    }
+  }
+
+  load();
+})();
+</script>
+
+</body>
+</html>

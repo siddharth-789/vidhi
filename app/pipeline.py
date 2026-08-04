@@ -171,8 +171,18 @@ async def _embed_question(
 
 
 async def _generate_plain(
-    context: str, question: str, task_client: genai.Client, task_model: str
+    context: str,
+    question: str,
+    task_client: genai.Client,
+    task_model: str,
+    usage_holder: dict[str, int],
 ) -> AsyncIterator[str]:
+    """Yield answer token text as it streams. usage_holder is owned by the caller, a
+    fresh dict per call, and is filled from the last streamed chunk's usage_metadata,
+    which Gemini's streaming API reports cumulatively, so the final chunk carries the
+    request's true totals.
+    """
+
     prompt = _PLAIN_PROMPT_TEMPLATE.format(context=context, question=question)
     try:
         stream = await task_client.aio.models.generate_content_stream(
@@ -181,6 +191,9 @@ async def _generate_plain(
         async for chunk in stream:
             if chunk.text:
                 yield chunk.text
+            if chunk.usage_metadata:
+                usage_holder["input"] = chunk.usage_metadata.prompt_token_count or 0
+                usage_holder["output"] = chunk.usage_metadata.candidates_token_count or 0
     except Exception as exc:  # noqa: BLE001 - mapped to LLMError for the caller to handle
         raise LLMError(f"plain generation failed: {exc}") from exc
 
@@ -206,11 +219,18 @@ async def _generate_dspy(
     rag_program: RAGProgram,
     task_lm: dspy.LM,
     result_holder: dict[str, dspy.Prediction],
+    usage_holder: dict[str, int],
 ) -> AsyncIterator[str]:
     """Yield answer token text as it streams, and stash the final Prediction into
     result_holder, since an async generator's return value cannot itself be
     observed by the caller's async for loop. result_holder is owned by the caller,
-    a fresh dict per call, so concurrent requests never share state."""
+    a fresh dict per call, so concurrent requests never share state.
+
+    usage_holder is filled from task_lm.history after the call, dspy.LM (via litellm)
+    records a usage dict with prompt_tokens and completion_tokens per call. The router
+    call also appends to this same history when use_dspy is set, so only the last
+    entry, the answer predictor's call, is read here.
+    """
 
     stream_program = dspy.streamify(
         rag_program,
@@ -229,6 +249,15 @@ async def _generate_dspy(
 
     if "prediction" not in result_holder:
         raise LLMError("dspy generation produced no final prediction")
+
+    if task_lm.history:
+        usage = task_lm.history[-1].get("usage") or {}
+        usage_holder["input"] = usage.get("prompt_tokens", 0) or 0
+        usage_holder["output"] = usage.get("completion_tokens", 0) or 0
+        # litellm's usage accounting is unreliable for both the streamify path (has
+        # been observed to report completion_tokens correctly but prompt_tokens as 0)
+        # and cache hits (has been observed to report an empty usage dict entirely).
+        # Known limitation, not fixed here: see README section 9.
 
 
 async def answer_question(
@@ -316,7 +345,18 @@ async def answer_question(
             candidates = candidates[: pipeline_config.final_k]
 
         trace.record_stage(
-            "retrieval", {"candidate_count": len(candidates), "degraded": trace.degraded}
+            "retrieval",
+            {
+                "candidate_count": len(candidates),
+                "degraded": trace.degraded,
+                # Full chunk content, unlike the SSE facing RetrievalEvent below,
+                # which the API contract in CLAUDE.md section 12.3 deliberately caps
+                # to a slim per candidate summary with no content field. Trace.stages
+                # is never sent over SSE, so it is the right place for eval/run_eval.py
+                # to read real context text for RAGAS from, instead of substituting
+                # heading_path, which is not the actual retrieved text.
+                "context_texts": [c.content for c in candidates],
+            },
         )
         yield RetrievalEvent(
             candidates=[_candidate_to_dict(c) for c in candidates[:12]],
@@ -328,6 +368,7 @@ async def answer_question(
         context = _build_context(candidates)
         answer_text = ""
         citations: list[int] = []
+        usage_holder: dict[str, int] = {}
 
         with StageTimer(trace, "generation"):
             if pipeline_config.use_dspy:
@@ -339,7 +380,7 @@ async def answer_question(
                     rag_program = RAGProgram()
                 result_holder: dict[str, dspy.Prediction] = {}
                 async for token_text in _generate_dspy(
-                    context, question, rag_program, task_lm, result_holder
+                    context, question, rag_program, task_lm, result_holder, usage_holder
                 ):
                     answer_text += token_text
                     yield TokenEvent(text=token_text)
@@ -349,11 +390,14 @@ async def answer_question(
                     citations = [int(p) for p in prediction.citations]
             else:
                 async for token_text in _generate_plain(
-                    context, question, task_client, config.task_model
+                    context, question, task_client, config.task_model, usage_holder
                 ):
                     answer_text += token_text
                     yield TokenEvent(text=token_text)
                 citations = _extract_plain_citations(answer_text)
+
+        trace.tokens["input"] = usage_holder.get("input", 0)
+        trace.tokens["output"] = usage_holder.get("output", 0)
 
         with StageTimer(trace, "citation_validation"):
             valid_citations, any_dropped = validate_citations(citations, candidates)

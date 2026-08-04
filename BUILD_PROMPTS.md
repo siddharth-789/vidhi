@@ -162,32 +162,86 @@ currently identical to `C_dspy`'s, only the retrieval and generation path differ
 table above. This is a real finding to report as-is in the README, not something to
 paper over.
 
-## Left for the next session
+## Status as of 2026-08-05, everything below this line is newer than the block above
 
-- RAGAS (group 2: faithfulness, answer relevancy, context precision, context recall) is
-  wired and smoke tested (`python -m eval.metrics_ragas` passes against a synthetic
-  sample) but not yet run against the real saved results. Two attempts today hit the
-  judge key's daily quota then the per minute ceiling; the `RunConfig(max_workers=2)` fix
-  above should let a modest `--ragas-n` (10 to 20) actually complete. Use
-  `python -m eval.backfill_ragas --configs A_vanilla,B_hybrid,C_dspy,D_optimized
-  --ragas-n 10`, it reads the already saved `eval/results/{config}_*.json` files and
-  fills in `group2_ragas` without re-spending task key quota.
-- Latency and production metrics (`eval/metrics_latency.py`, group 3) not yet run. Needs
-  the API actually running locally or deployed first (`uvicorn app.api:app`), since it
-  measures real `/ask` requests.
-- Deployment to Cloud Run and the cold start measurement. Needs GCP project setup,
-  Artifact Registry, Workload Identity Federation or a service account key, and Supabase
-  secrets in GitHub, none of which can be done from the coding session alone.
-- The README currently has the section 4 config table and section 6 optimizer section
-  fillable from the numbers above; sections 5 (latency) and the deploy URL in section 3
-  stay `TBD` until the two items above happen.
-- Consider widening C_dspy and D_optimized to the full 55 question dev split once there
-  is a full day's fresh quota and no other quota-consuming task competing for it.
+RAGAS, latency, and token tracking are done. Deployment is still not done, see the end
+of this section. Bugs found and fixed today:
+
+- `app/pipeline.py`, `trace.tokens` was defined in the dataclass and threaded through
+  every event, but nothing ever wrote to it, so every `/ask` response reported
+  `tokens: {}`. Fixed: `_generate_plain` reads `usage_metadata` off the last streamed
+  Gemini chunk (confirmed empirically to carry cumulative totals), `_generate_dspy`
+  reads `task_lm.history[-1]["usage"]` after the call. Known residual gap, not fixed:
+  `dspy.LM` via litellm reports `completion_tokens` correctly but `prompt_tokens` as 0
+  for calls made through `dspy.streamify`, affects configs C and D only, documented in
+  the README section 9 rather than chased further.
+- `eval/run_eval.py`, `context_texts` was populated from `RetrievalEvent.candidates[].
+  heading_path`, not the actual retrieved chunk content, because the SSE contract in
+  CLAUDE.md section 12.3 deliberately keeps `RetrievalEvent` slim with no content
+  field. This silently fed RAGAS a heading string like "Chapter 3: Levy and Collection
+  of Tax..." instead of the real excerpt, which is why an early RAGAS attempt scored
+  `faithfulness: 0.05` and `context_recall: 0.0` on real answers, a data bug, not a
+  real finding. Fixed: `app/pipeline.py` now records full chunk content into
+  `trace.stages["retrieval"]["context_texts"]` (never sent over SSE, so the slim API
+  contract is untouched), and `run_eval.py` reads it back via `app.db.get_trace` after
+  each question, the same path `GET /trace/{request_id}` already exposes.
+  Consequence: all four configs (A, B, C, D) were re-run at n=20 to get correct traces
+  before RAGAS could be trusted, this is why the config table numbers changed slightly
+  from the 2026-08-04 block above (which used the buggy A at n=55 and B at n=55).
+- `eval/metrics_ragas.py`, fixing this required three iterations, documented in full in
+  the README section 9's RAGAS note, because ragas's own concurrency control
+  (`RunConfig.max_workers`) does not control the actual 429 recovery, that lives inside
+  `langchain_google_genai`'s tenacity retry wrapper, which retries after a fixed short
+  delay regardless of the server's suggested `retry_delay`. Every batched or
+  concurrent shape (`max_workers` from 16 down to 1, `--ragas-n` from 20 down to 3)
+  either stalled indefinitely or made only a few sub-evaluations of progress per 20
+  minutes. It also does not compose with being called repeatedly from inside our own
+  running event loop: `ragas.evaluate` calls `asyncio.run()` internally and the second
+  call crashed with "pop from an empty deque" even with `nest_asyncio` applied. Working
+  fix: one metric against one row per call, each dispatched via `asyncio.to_thread` (a
+  fresh thread has no running loop), with an explicit `asyncio.sleep` between calls
+  that sits entirely outside ragas's and langchain's retry logic. Slow, but the only
+  shape observed to reliably finish. `python -m eval.backfill_ragas` now runs this way
+  by default, no flag needed.
+- `eval/metrics_latency.py`'s default question ("What is the GST rate for cotton
+  textiles?") triggered abstention on some configs, which measures the pre generation
+  guardrail path, not the intended full generation and groundedness path. Not a code
+  bug, just a bad default for a latency probe; the actual runs used
+  `--question "What is the time limit for claiming input tax credit?"`, a real
+  in-scope lookup, instead.
+
+RAGAS ran on 5 questions per config (`--ragas-n 5`), small on purpose given the pacing
+constraint above; some individual metrics lost all retries on one row at that sample
+size and are reported as `n/a` in the README rather than a fabricated number, see the
+config table's footnote. Latency ran with 5 warm requests per config against a locally
+running `uvicorn app.api:app` instance, not deployed. Real numbers for both are in
+`README.md` sections 4 and 5 now, no more `TBD` there except the paid tier cost
+estimate and the cold start row.
+
+## Still left, deployment only
+
+- Deployment to Cloud Run and the cold start measurement. Needs a GCP project, Artifact
+  Registry repository, Workload Identity Federation or a service account key, and
+  Supabase secrets configured in GitHub or by hand on the Cloud Run service (the
+  workflow's env var and secret flags were deliberately removed per your instruction,
+  those are now managed by hand in the console, see the comment left in
+  `.github/workflows/deploy.yml`'s deploy step). None of this can be done from a coding
+  session alone.
+- Once deployed, `python -m eval.metrics_latency cold --url <service-url> --n 5
+  --wait-seconds 900` measures cold start, kept separate from the warm numbers per
+  CLAUDE.md section 13.6.
+- Consider widening the config table to the full 55 question dev split, and RAGAS to
+  a larger sample, once there is a full day's fresh quota and no deploy or other
+  quota-consuming task competing for it.
+- The estimated cost per thousand queries row in README section 5 needs the current
+  AI Studio price for `gemini-3.1-flash-lite`, deliberately not hardcoded, see
+  `eval/metrics_latency.py`'s `estimate_cost_per_thousand`.
 
 ## Quota discipline, still applies
 
 The 500 requests per day per key ceiling and the 15 requests per minute ceiling are both
-real and both bit this session. `.env` has multiple `GEMINI_API_KEY_TASK` candidates,
-only one uncommented at a time; rotate manually and re-run with `--resume` rather than
-restarting a config from question 1. Judge key exhaustion can be worked around the same
-way, point `GEMINI_API_KEY_JUDGE` at an unused task key.
+real and both bit this session, again, on both the task and judge keys. `.env` has
+multiple `GEMINI_API_KEY_TASK` candidates, only one uncommented at a time; rotate
+manually and re-run with `--resume` rather than restarting a config from question 1.
+Judge key exhaustion can be worked around the same way, point `GEMINI_API_KEY_JUDGE` at
+an unused task key.

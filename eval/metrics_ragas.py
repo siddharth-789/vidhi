@@ -36,6 +36,7 @@ async def compute_ragas_metrics(
     rows: list[RagasRow],
     config: Config,
     include_context_metrics: bool = True,
+    seconds_between_calls: float = 5.0,
 ) -> dict[str, float]:
     """Computes faithfulness, answer relevancy, and optionally context precision and
     context recall, using JUDGE_MODEL and GEMINI_API_KEY_JUDGE.
@@ -43,6 +44,19 @@ async def compute_ragas_metrics(
     include_context_metrics is False when the caller already has cached context
     precision and recall for this retrieval configuration and only needs the
     generation dependent metrics recomputed.
+
+    Runs one metric against one row per ragas.evaluate call, with an explicit sleep
+    between calls, rather than handing ragas a batch to fan out internally. This was
+    forced by observed behavior, not a style choice: ragas's RunConfig max_workers
+    controls how many judge calls it fires concurrently, but the actual 429 recovery
+    is handled by langchain_google_genai's own tenacity retry wrapper underneath,
+    which retries after a short fixed delay regardless of the server's suggested
+    retry_delay (sometimes 59s on this project's free tier). The result, verified by
+    running this against the live API multiple times, is every combination of
+    max_workers from 16 down to 1 either stalls indefinitely or makes only a few
+    sub-evaluations of progress per 20 minutes, because the wrapper keeps re-triggering
+    the same 429 before the quota window actually clears. Explicit sleeps here are
+    outside that retry wrapper entirely and reliably let the per minute window clear.
     """
 
     if not rows:
@@ -50,6 +64,8 @@ async def compute_ragas_metrics(
     if not config.gemini_api_key_judge:
         logger.warning("GEMINI_API_KEY_JUDGE is not set, skipping RAGAS metrics")
         return {}
+
+    import asyncio
 
     from datasets import Dataset
     from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
@@ -61,15 +77,6 @@ async def compute_ragas_metrics(
         faithfulness,
     )
     from ragas.run_config import RunConfig
-
-    dataset = Dataset.from_dict(
-        {
-            "question": [r.question for r in rows],
-            "answer": [r.answer for r in rows],
-            "contexts": [r.contexts for r in rows],
-            "ground_truth": [r.ground_truth for r in rows],
-        }
-    )
 
     judge_llm = ChatGoogleGenerativeAI(
         model=config.judge_model, google_api_key=config.gemini_api_key_judge
@@ -84,33 +91,51 @@ async def compute_ragas_metrics(
     if include_context_metrics:
         metrics += [context_precision, context_recall]
 
-    # ragas defaults to max_workers=16, which fires far more concurrent judge calls
-    # than the Gemini free tier's 15 requests per minute ceiling can absorb. Left at
-    # the default, every row's worth of sub-calls fires at once, all hit 429, and
-    # ragas's own retry layer keeps retrying the same burst rather than backing off to
-    # a rate the API accepts, so the run barely progresses. max_workers=2 keeps calls
-    # trickling through at a pace the per minute quota tolerates.
-    run_config = RunConfig(max_workers=2, max_retries=20, max_wait=90)
+    run_config = RunConfig(max_workers=1, max_retries=3, max_wait=30)
 
-    result = evaluate(
-        dataset,
-        metrics=metrics,
-        llm=judge_llm,
-        embeddings=judge_embeddings,
-        run_config=run_config,
-    )
+    def _evaluate_one_row_one_metric(row: RagasRow, metric) -> float | None:
+        # ragas.evaluate calls asyncio.run() internally (see ragas/executor.py), which
+        # cannot be called from inside an already-running event loop, even with
+        # nest_asyncio applied, observed to crash with "pop from an empty deque" on the
+        # second call in this coroutine. Running it in a worker thread via
+        # asyncio.to_thread below gives it a fresh thread with no running loop, which is
+        # what actually made repeated calls reliable. time.sleep, not asyncio.sleep, is
+        # used for pacing because this whole function runs inside that worker thread.
+        dataset = Dataset.from_dict(
+            {
+                "question": [row.question],
+                "answer": [row.answer],
+                "contexts": [row.contexts],
+                "ground_truth": [row.ground_truth],
+            }
+        )
+        try:
+            result = evaluate(
+                dataset,
+                metrics=[metric],
+                llm=judge_llm,
+                embeddings=judge_embeddings,
+                run_config=run_config,
+            )
+        except Exception as exc:  # noqa: BLE001 - one bad row must not lose the rest
+            logger.warning("ragas metric %s failed for one row, skipping: %s", metric.name, exc)
+            return None
 
-    # EvaluationResult has no __contains__, and its __getitem__ takes a metric name
-    # (not a row index), so `metric_name in result` silently falls back to Python's
-    # iteration protocol and raises KeyError on the first row instead of behaving like
-    # a dict membership check. result.scores is a list of per-row dicts; its first
-    # row's keys are the metric names actually present.
-    present_metrics = result.scores[0].keys() if result.scores else []
-    scores: dict[str, float] = {}
-    for metric_name in present_metrics:
-        values = [row[metric_name] for row in result.scores if row.get(metric_name) is not None]
-        scores[metric_name] = sum(values) / len(values) if values else 0.0
-    return scores
+        if result.scores:
+            return result.scores[0].get(metric.name)
+        return None
+
+    per_metric_scores: dict[str, list[float]] = {}
+    for row in rows:
+        for metric in metrics:
+            value = await asyncio.to_thread(_evaluate_one_row_one_metric, row, metric)
+            if value is not None:
+                per_metric_scores.setdefault(metric.name, []).append(value)
+            await asyncio.sleep(seconds_between_calls)
+
+    return {
+        name: sum(values) / len(values) for name, values in per_metric_scores.items() if values
+    }
 
 
 if __name__ == "__main__":

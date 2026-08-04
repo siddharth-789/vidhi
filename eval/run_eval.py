@@ -101,6 +101,7 @@ async def _run_one_question(
     tokens: dict[str, int] = {}
     error: str | None = None
 
+    request_id = None
     async for event in answer_question(
         example.question, pipeline_config, config, pool, task_client, task_lm, judge_lm,
         compiled_rag_program,
@@ -108,7 +109,6 @@ async def _run_one_question(
         if isinstance(event, RetrievalEvent):
             degraded = degraded or event.degraded
             retrieved_spans = [(c["page_start"], c["page_end"]) for c in event.candidates]
-            context_texts = [c.get("heading_path") or "" for c in event.candidates]
         elif isinstance(event, DoneEvent):
             abstained = event.abstained
             degraded = degraded or event.degraded
@@ -117,10 +117,27 @@ async def _run_one_question(
             grounded = event.grounded
             latency_ms = event.latency_ms
             tokens = event.tokens
+            request_id = event.request_id
         elif isinstance(event, ErrorEvent):
             error = event.message
         else:
             route = getattr(event, "route", route)
+
+    # RetrievalEvent's candidates are deliberately slim per the SSE contract in
+    # CLAUDE.md section 12.3, no content field, so the real retrieved chunk text for
+    # RAGAS is read back from the persisted trace's stages, the same place
+    # GET /trace/{request_id} would expose it. A trace write failure must never fail
+    # the request per section 7 step 9, so a missing trace here just leaves
+    # context_texts empty rather than raising.
+    if request_id is not None:
+        import uuid
+
+        from app.db import get_trace
+
+        trace_row = await get_trace(pool, uuid.UUID(request_id))
+        if trace_row is not None:
+            stages = trace_row["stages"] or {}
+            context_texts = stages.get("retrieval", {}).get("context_texts", [])
 
     return PerQuestionRecord(
         example_id=example.id,

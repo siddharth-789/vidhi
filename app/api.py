@@ -7,6 +7,7 @@ all before the first request, per section 12.1.
 
 from __future__ import annotations
 
+import glob
 import json
 import logging
 import os
@@ -309,6 +310,65 @@ async def get_configs() -> JSONResponse:
             for name, cfg in CONFIGS.items()
         }
     )
+
+
+_RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "eval", "results")
+
+
+def _latest_result_file(config_name: str) -> str | None:
+    matches = sorted(glob.glob(os.path.join(_RESULTS_DIR, f"{config_name}_*.json")))
+    return matches[-1] if matches else None
+
+
+def _nan_to_none(value: Any) -> Any:
+    if isinstance(value, float) and value != value:
+        return None
+    if isinstance(value, dict):
+        return {k: _nan_to_none(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_nan_to_none(v) for v in value]
+    return value
+
+
+def _load_json(path: str) -> Any:
+    with open(path, "r", encoding="utf-8") as f:
+        return _nan_to_none(json.load(f))
+
+
+@app.get("/metrics")
+async def get_metrics() -> JSONResponse:
+    configs: dict[str, Any] = {}
+    for name in CONFIGS:
+        config_entry: dict[str, Any] = {}
+
+        result_path = _latest_result_file(name)
+        if result_path is not None:
+            try:
+                data = _load_json(result_path)
+                config_entry["group1_retrieval"] = data.get("group1_retrieval")
+                config_entry["group2_ragas"] = data.get("group2_ragas")
+                config_entry["n"] = data.get("n")
+            except (OSError, json.JSONDecodeError) as exc:
+                logger.warning("failed to read eval result %s: %s", result_path, exc)
+
+        latency_path = os.path.join(_RESULTS_DIR, f"latency_{name}.json")
+        if os.path.exists(latency_path):
+            try:
+                config_entry["latency"] = _load_json(latency_path)
+            except (OSError, json.JSONDecodeError) as exc:
+                logger.warning("failed to read latency result %s: %s", latency_path, exc)
+
+        configs[name] = config_entry or None
+
+    optimizer: Any = None
+    optimize_log_path = os.path.join(_RESULTS_DIR, "optimize_log.json")
+    if os.path.exists(optimize_log_path):
+        try:
+            optimizer = _load_json(optimize_log_path)
+        except (OSError, json.JSONDecodeError) as exc:
+            logger.warning("failed to read optimize log %s: %s", optimize_log_path, exc)
+
+    return JSONResponse(content={"configs": configs, "optimizer": optimizer})
 
 
 @app.get("/", response_class=HTMLResponse)
