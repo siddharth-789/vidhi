@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bharat's GST Smart Guide, RAG assistant</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    color: #1a1a1a;
+    background: #fafafa;
+  }
+  header h1 { font-size: 1.3rem; margin-bottom: 0.2rem; }
+  .disclaimer, .memory-note {
+    font-size: 0.85rem;
+    color: #555;
+    background: #f0f0f0;
+    border-left: 3px solid #999;
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+  }
+  .config-row { display: flex; gap: 0.5rem; align-items: center; margin: 1rem 0; }
+  select { padding: 0.3rem; font-size: 0.9rem; }
+  textarea {
+    width: 100%;
+    min-height: 4rem;
+    font-size: 1rem;
+    padding: 0.5rem;
+    font-family: inherit;
+  }
+  .submit-row { display: flex; justify-content: flex-end; margin-top: 0.5rem; }
+  button {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+  }
+  button:disabled { background: #999; cursor: not-allowed; }
+  #status-line { font-size: 0.9rem; color: #444; margin: 0.75rem 0; }
+  #answer {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    padding: 0.75rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 2rem;
+  }
+  .pill {
+    display: inline-block;
+    background: #e6e6e6;
+    border-radius: 10px;
+    padding: 0.1rem 0.6rem;
+    margin: 0.2rem 0.2rem 0 0;
+    font-size: 0.8rem;
+  }
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .badge.verified { background: #d4edda; color: #155724; }
+  .badge.unsupported { background: #fff3cd; color: #856404; }
+  .badge.not-verified { background: #e2e3e5; color: #383d41; }
+  .degraded-notice {
+    font-size: 0.85rem;
+    background: #fde2e2;
+    color: #8a1f1f;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+  }
+  .error-box {
+    font-size: 0.9rem;
+    background: #fde2e2;
+    color: #8a1f1f;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    margin-top: 0.75rem;
+  }
+  details { margin-top: 1rem; font-size: 0.85rem; }
+  summary { cursor: pointer; font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; font-size: 0.8rem; }
+  th, td { border: 1px solid #ddd; padding: 0.3rem 0.5rem; text-align: left; }
+  tr.survived { background: #eafbea; }
+  .inspect-section { margin-top: 0.75rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Bharat's GST Smart Guide, RAG assistant</h1>
+  <div class="disclaimer">
+    Answers are informational, generated from a single reference manual, and are not
+    professional tax advice.
+  </div>
+  <div class="memory-note">
+    Each query is handled independently. There is no conversation memory or history.
+  </div>
+</header>
+
+<div class="config-row">
+  <label for="config-select">Ablation config:</label>
+  <select id="config-select"></select>
+</div>
+
+<textarea id="question" placeholder="Ask a question about GST law, e.g. What is the time limit for claiming input tax credit?"></textarea>
+<div class="submit-row">
+  <button id="submit-btn">Ask</button>
+</div>
+
+<div id="status-line" role="status" aria-live="polite"></div>
+
+<div id="answer" role="status" aria-live="polite"></div>
+
+<div id="citations-row"></div>
+<div id="grounding-badge"></div>
+<div id="degraded-notice"></div>
+<div id="error-box"></div>
+
+<details id="inspect">
+  <summary>Inspect</summary>
+  <div class="inspect-section">
+    <strong>Route:</strong> <span id="inspect-route">-</span>
+    <div><strong>Sub queries:</strong> <span id="inspect-subqueries">-</span></div>
+  </div>
+  <div class="inspect-section">
+    <strong>Candidates</strong>
+    <table id="candidates-table">
+      <thead>
+        <tr>
+          <th>Pages</th><th>Heading</th><th>Dense rank</th><th>Sparse rank</th>
+          <th>Fusion score</th><th>Rerank score</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="inspect-section">
+    <strong>Latency per stage (ms)</strong>
+    <table id="latency-table">
+      <thead><tr><th>Stage</th><th>ms</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="inspect-section">
+    <strong>Tokens:</strong> <span id="inspect-tokens">-</span>
+  </div>
+  <div class="inspect-section">
+    <strong>Active instruction (from /program):</strong>
+    <pre id="inspect-instruction" style="white-space: pre-wrap; font-size: 0.75rem;">-</pre>
+  </div>
+  <div class="inspect-section">
+    <strong>Request ID:</strong> <span id="inspect-request-id">-</span>
+  </div>
+</details>
+
+<script>
+(function () {
+  const questionEl = document.getElementById("question");
+  const submitBtn = document.getElementById("submit-btn");
+  const configSelect = document.getElementById("config-select");
+  const statusLine = document.getElementById("status-line");
+  const answerEl = document.getElementById("answer");
+  const citationsRow = document.getElementById("citations-row");
+  const groundingBadge = document.getElementById("grounding-badge");
+  const degradedNotice = document.getElementById("degraded-notice");
+  const errorBox = document.getElementById("error-box");
+  const inspectRoute = document.getElementById("inspect-route");
+  const inspectSubqueries = document.getElementById("inspect-subqueries");
+  const candidatesTbody = document.querySelector("#candidates-table tbody");
+  const latencyTbody = document.querySelector("#latency-table tbody");
+  const inspectTokens = document.getElementById("inspect-tokens");
+  const inspectInstruction = document.getElementById("inspect-instruction");
+  const inspectRequestId = document.getElementById("inspect-request-id");
+
+  let startTime = 0;
+
+  async function loadConfigs() {
+    try {
+      const res = await fetch("/configs");
+      const configs = await res.json();
+      const names = Object.keys(configs);
+      configSelect.innerHTML = names.map((n) => `<option value="${n}">${n}</option>`).join("");
+      if (names.includes("D_optimized")) {
+        configSelect.value = "D_optimized";
+      }
+    } catch (err) {
+      console.error("failed to load configs", err);
+    }
+  }
+
+  async function loadProgram() {
+    try {
+      const res = await fetch("/program");
+      const data = await res.json();
+      inspectInstruction.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      console.error("failed to load program", err);
+    }
+  }
+
+  function resetRegions() {
+    statusLine.textContent = "";
+    answerEl.textContent = "";
+    citationsRow.innerHTML = "";
+    groundingBadge.innerHTML = "";
+    degradedNotice.innerHTML = "";
+    errorBox.innerHTML = "";
+    inspectRoute.textContent = "-";
+    inspectSubqueries.textContent = "-";
+    candidatesTbody.innerHTML = "";
+    latencyTbody.innerHTML = "";
+    inspectTokens.textContent = "-";
+    inspectRequestId.textContent = "-";
+  }
+
+  function setStatus(label) {
+    const elapsed = Math.round(performance.now() - startTime);
+    statusLine.textContent = `${label}... ${elapsed}ms`;
+  }
+
+  function renderCandidates(candidates, survivedUids) {
+    candidatesTbody.innerHTML = "";
+    for (const c of candidates) {
+      const tr = document.createElement("tr");
+      if (survivedUids && survivedUids.has(c.chunk_uid)) {
+        tr.classList.add("survived");
+      }
+      const pages = c.page_start === c.page_end ? `${c.page_start}` : `${c.page_start}-${c.page_end}`;
+      tr.innerHTML = `
+        <td>${pages}</td>
+        <td>${c.heading_path || ""}</td>
+        <td>${c.dense_rank === null || c.dense_rank === undefined ? "-" : c.dense_rank}</td>
+        <td>${c.sparse_rank === null || c.sparse_rank === undefined ? "-" : c.sparse_rank}</td>
+        <td>${c.fusion_score !== undefined ? c.fusion_score.toFixed(4) : "-"}</td>
+        <td>${c.rerank_score === null || c.rerank_score === undefined ? "-" : c.rerank_score.toFixed(3)}</td>
+      `;
+      candidatesTbody.appendChild(tr);
+    }
+  }
+
+  function renderLatency(latencyMs) {
+    latencyTbody.innerHTML = "";
+    for (const [stage, ms] of Object.entries(latencyMs || {})) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${stage}</td><td>${Math.round(ms)}</td>`;
+      latencyTbody.appendChild(tr);
+    }
+  }
+
+  function renderGroundingBadge(grounded, unsupportedClaims) {
+    let cls = "not-verified";
+    let label = "Not verified";
+    if (grounded === true) {
+      cls = "verified";
+      label = "Verified";
+    } else if (grounded === false) {
+      cls = "unsupported";
+      label = "Unsupported claims found";
+    }
+    let html = `<span class="badge ${cls}">${label}</span>`;
+    if (unsupportedClaims && unsupportedClaims.length > 0) {
+      html += "<ul>" + unsupportedClaims.map((c) => `<li>${c}</li>`).join("") + "</ul>";
+    }
+    groundingBadge.innerHTML = html;
+  }
+
+  async function submitQuestion() {
+    const question = questionEl.value.trim();
+    if (!question) return;
+
+    resetRegions();
+    submitBtn.disabled = true;
+    startTime = performance.now();
+    setStatus("routing");
+
+    let survivedUids = new Set();
+    let lastCandidates = [];
+
+    try {
+      const response = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: question, config: configSelect.value }),
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        errorBox.innerHTML = `<div class="error-box">Error: ${body.error || response.statusText} (request_id: ${body.request_id || "unknown"})</div>`;
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let frameEnd;
+        while ((frameEnd = buffer.indexOf("\n\n")) !== -1) {
+          const frame = buffer.slice(0, frameEnd);
+          buffer = buffer.slice(frameEnd + 2);
+
+          if (!frame || frame.startsWith(":")) {
+            continue;
+          }
+
+          let eventName = null;
+          let dataLine = null;
+          for (const line of frame.split("\n")) {
+            if (line.startsWith("event:")) {
+              eventName = line.slice(6).trim();
+            } else if (line.startsWith("data:")) {
+              dataLine = line.slice(5).trim();
+            }
+          }
+          if (dataLine === null) continue;
+
+          let payload;
+          try {
+            payload = JSON.parse(dataLine);
+          } catch (err) {
+            console.warn("malformed SSE frame, skipping", frame, err);
+            continue;
+          }
+
+          if (eventName === "route") {
+            setStatus("retrieving");
+            inspectRoute.textContent = payload.route;
+            inspectSubqueries.textContent = (payload.sub_queries || []).join(", ") || "(none)";
+          } else if (eventName === "retrieval") {
+            setStatus(payload.degraded ? "reranking (degraded)" : "reranking");
+            lastCandidates = payload.candidates || [];
+            renderCandidates(lastCandidates, survivedUids);
+          } else if (eventName === "token") {
+            setStatus("generating");
+            answerEl.textContent += payload.text;
+          } else if (eventName === "done") {
+            setStatus("verified");
+            statusLine.textContent = `done, ${Math.round(performance.now() - startTime)}ms`;
+            // done.answer is the source of truth. Token events may have streamed
+            // nothing for a DSPy config, per CLAUDE.md section 17: a short or
+            // ChainOfThought-produced answer can arrive as zero StreamResponse
+            // chunks before the final Prediction. Always resync here rather than
+            // trusting whatever token text happened to stream.
+            answerEl.textContent = payload.answer;
+            survivedUids = new Set((payload.citations || []).map(String));
+            renderCandidates(lastCandidates, survivedUids);
+            renderLatency(payload.latency_ms);
+            inspectTokens.textContent = JSON.stringify(payload.tokens || {});
+            inspectRequestId.textContent = payload.request_id;
+
+            citationsRow.innerHTML = (payload.citations || [])
+              .map((p) => `<span class="pill">p. ${p}</span>`)
+              .join("");
+
+            renderGroundingBadge(payload.grounded, payload.unsupported_claims);
+
+            if (payload.degraded) {
+              degradedNotice.innerHTML = `<div class="degraded-notice">Degraded: one or more stages fell back during this request.</div>`;
+            }
+          } else if (eventName === "error") {
+            errorBox.innerHTML = `<div class="error-box">Error: ${payload.message} (request_id: ${payload.request_id})</div>`;
+          }
+        }
+      }
+    } catch (err) {
+      errorBox.innerHTML = `<div class="error-box">Connection error: ${err.message}</div>`;
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+
+  questionEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      submitQuestion();
+    }
+  });
+
+  submitBtn.addEventListener("click", submitQuestion);
+
+  loadConfigs();
+  loadProgram();
+})();
+</script>
+
+</body>
+</html>

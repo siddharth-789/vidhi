@@ -1,0 +1,122 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "artifacts/**"
+      - "requirements.txt"
+      - "Dockerfile"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGION: asia-south1
+  SERVICE: rag
+  REPOSITORY: rag-images
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Resolve image tags
+        id: vars
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          IMAGE_BASE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}
+          echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
+          echo "image_sha=$IMAGE_BASE:$SHA_SHORT" >> "$GITHUB_OUTPUT"
+          echo "image_latest=$IMAGE_BASE:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        run: |
+          docker build \
+            --build-arg GIT_SHA=${{ steps.vars.outputs.sha_short }} \
+            -t ${{ steps.vars.outputs.image_sha }} \
+            -t ${{ steps.vars.outputs.image_latest }} \
+            .
+
+      - name: Push image
+        run: |
+          docker push ${{ steps.vars.outputs.image_sha }}
+          docker push ${{ steps.vars.outputs.image_latest }}
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        run: |
+          # Env vars and secrets are managed by hand on the Cloud Run service in the
+          # GCP console, deliberately, per user instruction. This deviates from
+          # CLAUDE.md section 13.3, which calls for the workflow file to be the single
+          # source of truth: gcloud run deploy without --set-env-vars or --set-secrets
+          # here leaves whatever is already configured on the service untouched, it
+          # does not wipe it, so console-set values persist across deploys as long as
+          # this step never adds those flags back.
+          gcloud run deploy ${{ env.SERVICE }} \
+            --image=${{ steps.vars.outputs.image_sha }} \
+            --region=${{ env.REGION }} \
+            --memory=512Mi \
+            --cpu=1 \
+            --cpu-boost \
+            --concurrency=20 \
+            --min-instances=0 \
+            --max-instances=3 \
+            --timeout=120 \
+            --ingress=all \
+            --allow-unauthenticated \
+            --quiet
+
+          URL=$(gcloud run services describe ${{ env.SERVICE }} --region=${{ env.REGION }} --format="value(status.url)")
+          echo "service_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test
+        run: |
+          URL=${{ steps.deploy.outputs.service_url }}
+          RESPONSE=$(curl -sf "$URL/healthz")
+          echo "$RESPONSE"
+
+          CHUNK_COUNT=$(echo "$RESPONSE" | jq -r '.chunk_count')
+          COMMIT=$(echo "$RESPONSE" | jq -r '.git_commit')
+          TASK_MODEL=$(echo "$RESPONSE" | jq -r '.task_model')
+          JUDGE_MODEL=$(echo "$RESPONSE" | jq -r '.judge_model')
+
+          if [ "$CHUNK_COUNT" -le 0 ]; then
+            echo "smoke test failed: chunk_count is $CHUNK_COUNT"
+            exit 1
+          fi
+          if [ "$COMMIT" != "${{ steps.vars.outputs.sha_short }}" ]; then
+            echo "smoke test failed: deployed commit $COMMIT does not match built commit ${{ steps.vars.outputs.sha_short }}"
+            exit 1
+          fi
+          if [ -z "$TASK_MODEL" ] || [ "$TASK_MODEL" = "null" ] || [ -z "$JUDGE_MODEL" ] || [ "$JUDGE_MODEL" = "null" ]; then
+            echo "smoke test failed: model IDs are empty"
+            exit 1
+          fi
+
+      - name: Print service URL
+        run: |
+          echo "### Deployed service" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.deploy.outputs.service_url }}" >> "$GITHUB_STEP_SUMMARY"

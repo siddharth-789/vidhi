@@ -1,0 +1,11 @@
+# Ingestion and evaluation only. NEVER copied into the serving image, see .dockerignore
+# and CLAUDE.md section 13.1.
+-r requirements.txt
+
+pymupdf==1.25.1
+tiktoken==0.9.0
+ragas==0.2.10
+langchain-google-genai==2.0.7
+optuna==4.9.0
+pandas==2.2.3
+numpy==1.26.4

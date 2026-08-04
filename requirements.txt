@@ -1,0 +1,14 @@
+# tiktoken arrives as a transitive dependency of dspy, via litellm, which uses it purely
+# as a text tokenizer with no model weights. This mirrors the langchain-core-via-ragas
+# carve-out in CLAUDE.md section 2. It is a small pure Python and Rust package, not one
+# of the heavy libraries (torch, transformers, sentence-transformers) that section 13.1
+# actually cares about excluding from the serving image.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+asyncpg==0.30.0
+pgvector==0.3.6
+google-genai==1.3.0
+dspy==3.2.1
+python-dotenv==1.0.1
+httpx==0.28.1
