@@ -4,8 +4,8 @@ Run with: python scripts/check_dspy_stream.py
 Requires GEMINI_API_KEY_TASK in the environment or .env file.
 
 Findings from running this against gemini-3.1-flash-lite via dspy 3.2.1 and litellm,
-recorded here because section 8 of CLAUDE.md requires reporting the observed behaviour
-rather than assuming the streaming API surface:
+recorded here so app/pipeline.py's streaming code is built on observed behavior
+rather than an assumed API surface:
 
 1. dspy.streamify plus dspy.streaming.StreamListener is the correct current API. No
    stream=True argument is needed on dspy.LM, streamify wires that up internally.
@@ -44,6 +44,9 @@ class AnswerBriefly(dspy.Signature):
 
 
 async def main() -> None:
+    """Stream a trivial two-field DSPy signature end to end and print each chunk
+    as it arrives."""
+
     load_dotenv()
     api_key = os.environ["GEMINI_API_KEY_TASK"]
     model_name = os.environ.get("TASK_MODEL", "gemini-3.1-flash-lite")

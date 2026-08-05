@@ -1,7 +1,7 @@
-"""Trace object accumulated across the query path, see CLAUDE.md section 7 and the
-traces table in sql/schema.sql.
+"""Trace object accumulated across one question's journey through the pipeline,
+mirroring the vidhi.traces table in sql/schema.sql.
 
-Every stage of the query path writes timing into this object, see CLAUDE.md section 2.
+Every stage of the query path writes its timing into this object as it runs.
 StageTimer is a small context manager so app/pipeline.py can wrap each stage without
 repeating perf_counter bookkeeping at every call site.
 """
@@ -16,6 +16,8 @@ from typing import Any
 
 @dataclass
 class Trace:
+    """Everything known about one question, accumulated stage by stage as it's answered."""
+
     request_id: uuid.UUID
     query: str
     route: str | None = None
@@ -33,9 +35,13 @@ class Trace:
     error: str | None = None
 
     def record_stage(self, name: str, payload: Any) -> None:
+        """Stash arbitrary debug data for one stage, e.g. full retrieved chunk text."""
+
         self.stages[name] = payload
 
     def to_db_row(self) -> dict[str, Any]:
+        """Full serialization for the persisted vidhi.traces row."""
+
         return {
             "request_id": self.request_id,
             "query": self.query,
@@ -53,6 +59,8 @@ class Trace:
         }
 
     def to_response_dict(self) -> dict[str, Any]:
+        """Slimmer, client-facing serialization used in the SSE done event."""
+
         return {
             "request_id": str(self.request_id),
             "answer": self.answer,
@@ -97,6 +105,8 @@ class StageTimer:
 
 
 def new_trace(query: str) -> Trace:
+    """Create a fresh Trace with a new random request id."""
+
     return Trace(request_id=uuid.uuid4(), query=query)
 
 

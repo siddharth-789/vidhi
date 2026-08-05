@@ -69,9 +69,7 @@ jobs:
         id: deploy
         run: |
           # Env vars and secrets are managed by hand on the Cloud Run service in the
-          # GCP console, deliberately, per user instruction. This deviates from
-          # CLAUDE.md section 13.3, which calls for the workflow file to be the single
-          # source of truth: gcloud run deploy without --set-env-vars or --set-secrets
+          # GCP console. gcloud run deploy without --set-env-vars or --set-secrets
           # here leaves whatever is already configured on the service untouched, it
           # does not wipe it, so console-set values persist across deploys as long as
           # this step never adds those flags back.

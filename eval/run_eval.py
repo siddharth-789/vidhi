@@ -1,14 +1,14 @@
 """Runs one or more named pipeline configurations against the dev split and writes a
-full results file plus a markdown comparison table, see CLAUDE.md section 10.
+full results file plus a markdown comparison table.
 
 This harness calls app.pipeline.answer_question directly, the same production code
-path the API uses, per CLAUDE.md section 7: evaluation must exercise production code,
-not a parallel reimplementation.
+path the API uses, so evaluation always exercises production code, not a parallel
+reimplementation.
 
 Group 1 (deterministic retrieval and citation metrics) always runs on the full dev
 split. Group 2 (RAGAS) defaults to a subset of dev questions, sized by --ragas-n, and
 is skipped entirely with --skip-ragas. Context precision and context recall are cached
-per retrieval configuration, since B, C, and D share retrieval, per section 10.
+per retrieval configuration, since configs B, C, and D share the same retrieval setup.
 
 Run standalone with:
     python -m eval.run_eval --configs A_vanilla --split dev --n 5
@@ -123,12 +123,11 @@ async def _run_one_question(
         else:
             route = getattr(event, "route", route)
 
-    # RetrievalEvent's candidates are deliberately slim per the SSE contract in
-    # CLAUDE.md section 12.3, no content field, so the real retrieved chunk text for
-    # RAGAS is read back from the persisted trace's stages, the same place
-    # GET /trace/{request_id} would expose it. A trace write failure must never fail
-    # the request per section 7 step 9, so a missing trace here just leaves
-    # context_texts empty rather than raising.
+    # RetrievalEvent's candidates are deliberately slim (no content field, to keep the
+    # SSE payload small), so the real retrieved chunk text for RAGAS is read back from
+    # the persisted trace's stages, the same place GET /trace/{request_id} exposes it.
+    # A trace write failure must never fail the request, so a missing trace here just
+    # leaves context_texts empty rather than raising.
     if request_id is not None:
         import uuid
 
@@ -159,68 +158,17 @@ async def _run_one_question(
     )
 
 
-def _checkpoint_path(config_name: str, split: str) -> Path:
-    """Stable (non timestamped) per config, per split checkpoint path, so a run
-    interrupted by key rotation or a quota exhaustion mid run can resume instead of
-    restarting from question 1. Distinct from the timestamped eval/results/{config}_
-    {timestamp}.json final output, which is written once a run's records are complete.
-    """
-
-    return Path("eval/results") / f".checkpoint_{config_name}_{split}.jsonl"
-
-
-def _load_checkpoint(config_name: str, split: str) -> dict[str, "PerQuestionRecord"]:
-    path = _checkpoint_path(config_name, split)
-    if not path.exists():
-        return {}
-
-    done: dict[str, PerQuestionRecord] = {}
-    with path.open(encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            payload = json.loads(line)
-            payload["retrieved_page_spans"] = [
-                tuple(span) for span in payload["retrieved_page_spans"]
-            ]
-            done[payload["example_id"]] = PerQuestionRecord(**payload)
-    return done
-
-
-def _append_checkpoint(config_name: str, split: str, record: "PerQuestionRecord") -> None:
-    path = _checkpoint_path(config_name, split)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(record.__dict__) + "\n")
-
-
-def _clear_checkpoint(config_name: str, split: str) -> None:
-    path = _checkpoint_path(config_name, split)
-    if path.exists():
-        path.unlink()
-
-
 async def run_config(
     config_name: str,
     examples: list[EvalExample],
     ragas_n: int,
     skip_ragas: bool,
     ragas_cache: dict[str, dict[str, float]],
-    split: str,
-    resume: bool,
 ) -> dict[str, Any]:
+    """Run one pipeline config over every example and compute both metric groups."""
+
     pipeline_config = CONFIGS[config_name]
     app_config = get_config()
-
-    done_records = _load_checkpoint(config_name, split) if resume else {}
-    if done_records:
-        logger.info(
-            "resuming %s: %d of %d questions already checkpointed",
-            config_name,
-            len(done_records),
-            len(examples),
-        )
 
     pool = await create_pool(app_config.database_url)
     task_client = build_client(app_config.gemini_api_key_task)
@@ -251,17 +199,11 @@ async def run_config(
     try:
         records = []
         for example in examples:
-            cached = done_records.get(example.id)
-            if cached is not None:
-                records.append(cached)
-                continue
-
             record = await _run_one_question(
                 example, pipeline_config, app_config, pool, task_client, task_lm, judge_lm,
                 compiled_rag_program,
             )
             records.append(record)
-            _append_checkpoint(config_name, split, record)
             logger.info(
                 "%s: %s -> abstained=%s degraded=%s citations=%s",
                 config_name,
@@ -270,8 +212,6 @@ async def run_config(
                 record.degraded,
                 record.citations,
             )
-
-        _clear_checkpoint(config_name, split)
 
         retrieval_records = [
             QuestionRecord(
@@ -352,12 +292,6 @@ async def main() -> None:
     parser.add_argument("--ragas-n", type=int, default=25)
     parser.add_argument("--skip-ragas", action="store_true")
     parser.add_argument("--trainset", default="data/trainset.csv")
-    parser.add_argument(
-        "--resume",
-        action="store_true",
-        help="skip questions already checkpointed from a prior interrupted run of "
-        "the same config and split",
-    )
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
@@ -388,7 +322,6 @@ async def main() -> None:
         logger.info("running config %s on %d %s questions", config_name, len(examples), args.split)
         result = await run_config(
             config_name, examples, args.ragas_n, args.skip_ragas, ragas_cache,
-            args.split, args.resume,
         )
         result["model_ids"] = {
             "task_model": app_config.task_model,

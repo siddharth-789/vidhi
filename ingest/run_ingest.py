@@ -1,8 +1,6 @@
 """Orchestrate extract, chunk, and embed, each skippable, with per stage timing.
 
-Run standalone with: python -m ingest.run_ingest [--skip-extract] [--skip-chunk]
-                                                    [--skip-embed]
-                                                    [--pdf path/to/manual.pdf]
+Run standalone with: python -m ingest.run_ingest [--skip-extract] [--skip-chunk] [--skip-embed] [--pdf path/to/manual.pdf]
 """
 
 from __future__ import annotations
@@ -17,6 +15,8 @@ from ingest import extract as extract_stage
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line flags for which ingestion stages to run and where files live."""
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pdf", default="data/manual.pdf")
     parser.add_argument("--pages", default="data/pages.jsonl")
@@ -28,6 +28,9 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Run extract, chunk, and embed in order, skipping any stage that was requested
+    to be skipped, and print how long each stage took."""
+
     args = parse_args()
 
     if not args.skip_extract:

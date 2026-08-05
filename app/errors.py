@@ -1,7 +1,7 @@
-"""Typed exceptions for the query and ingestion paths, see CLAUDE.md section 11.
+"""Typed exceptions used across the query and ingestion paths.
 
-Every handler that catches one of these must log and either degrade gracefully or
-re raise. Never a bare except or an except Exception: pass.
+Every handler that catches one of these logs it and either degrades gracefully or
+re-raises. There is never a bare except or a silently swallowed exception.
 """
 
 from __future__ import annotations

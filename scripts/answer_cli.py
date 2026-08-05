@@ -1,11 +1,11 @@
-"""Command line entry point for the query path, see CLAUDE.md Phase 2 checkpoint.
+"""Command line entry point for the query path: ask one question, see the full trace.
 
 Run with: python -m scripts.answer_cli "some question" --config D_optimized
 
 Prints the streamed answer as it arrives, then the full trace as formatted JSON, so
-the Phase 2 checkpoint can be verified: that citations point at correct pages, that an
-out of scope question abstains without calling the generation model, and that the
-same chunk appears in both the dense and sparse candidate lists for a lookup question.
+you can eyeball whether citations point at correct pages, whether an out-of-scope
+question abstains without calling the generation model, and whether the same chunk
+appears in both the dense and sparse candidate lists for a lookup question.
 """
 
 from __future__ import annotations
@@ -29,6 +29,9 @@ logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
+    """Answer one question through the real pipeline and print the streamed answer
+    followed by the full trace as JSON."""
+
     parser = argparse.ArgumentParser(description="Answer one question and print the full trace.")
     parser.add_argument("question", help="The question to ask")
     parser.add_argument(

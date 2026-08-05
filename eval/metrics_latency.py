@@ -1,16 +1,16 @@
-"""Production and latency metrics, see CLAUDE.md section 10 group 3 and section 13.6.
+"""Production and latency metrics: how fast the service actually responds, end to end.
 
-This group exists to make an honest case about serving on a free tier. Warm and cold
-measurements are always kept in separate result sets, never blended, per section 10
-and section 13.6, because a blended p95 describes nothing real.
+Warm and cold measurements are always kept in separate result sets, never blended,
+because a blended p95 describes nothing real: cold start only happens after the
+service has been idle long enough to scale to zero.
 
 Run standalone with:
     python -m eval.metrics_latency warm --url http://localhost:8000 --n 10
     python -m eval.metrics_latency cold --url https://<service-url> --n 5 --wait-seconds 900
 
 Cold mode is a manual measurement tool. It does not force Cloud Run to scale to zero,
-it assumes the caller has waited out the idle window (min instances is 0, see section
-13.2) or passes --wait-seconds to sleep first.
+it assumes the caller has waited out the idle window (or passes --wait-seconds to
+sleep first).
 """
 
 from __future__ import annotations
@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class RequestTiming:
+    """Timing and token counts for one /ask request."""
+
     time_to_first_byte_ms: float
     time_to_first_token_ms: float | None
     total_wall_clock_ms: float
@@ -38,6 +40,8 @@ class RequestTiming:
 
 
 def percentile(values: list[float], p: float) -> float:
+    """Linear-interpolation percentile of a list of values."""
+
     if not values:
         return 0.0
     ordered = sorted(values)
@@ -54,7 +58,7 @@ async def time_one_request(
 ) -> RequestTiming:
     """Issue one /ask request and measure time to first byte, time to first token,
     and total wall clock by consuming the SSE stream exactly as app/static/index.html
-    does, see CLAUDE.md section 12.3.
+    does.
     """
 
     start = time.perf_counter()
@@ -115,6 +119,8 @@ async def time_one_request(
 
 @dataclass
 class LatencyReport:
+    """Aggregated latency stats (percentiles, per-stage breakdown) over N requests."""
+
     mode: str
     n: int
     ttft_p50_ms: float
@@ -128,6 +134,8 @@ class LatencyReport:
     output_tokens_mean: float
 
     def to_dict(self) -> dict:
+        """Serialize the report to a plain dict for JSON output."""
+
         return {
             "mode": self.mode,
             "n": self.n,
@@ -144,6 +152,8 @@ class LatencyReport:
 
 
 def summarize(mode: str, timings: list[RequestTiming]) -> LatencyReport:
+    """Aggregate a list of per-request timings into percentiles and per-stage stats."""
+
     ttfts = [t.time_to_first_token_ms for t in timings if t.time_to_first_token_ms is not None]
     totals = [t.total_wall_clock_ms for t in timings]
 
@@ -186,6 +196,8 @@ def summarize(mode: str, timings: list[RequestTiming]) -> LatencyReport:
 
 
 async def run_warm(base_url: str, n: int, question: str, config_name: str) -> LatencyReport:
+    """Fire N requests back to back against an already-warm instance."""
+
     timings = []
     async with httpx.AsyncClient(timeout=120.0) as client:
         for i in range(n):
@@ -198,9 +210,9 @@ async def run_warm(base_url: str, n: int, question: str, config_name: str) -> La
 async def run_cold(
     base_url: str, n: int, question: str, config_name: str, wait_seconds: float
 ) -> LatencyReport:
-    """Measures cold start by waiting wait_seconds before each request, so the
-    instance has a chance to scale to zero (min instances is 0, see section 13.2).
-    Reported separately from warm numbers, never blended, per section 13.6.
+    """Measure cold start by waiting wait_seconds before each request, so the
+    instance has a chance to scale to zero. Reported separately from warm numbers,
+    never blended.
     """
 
     timings = []
@@ -221,11 +233,11 @@ def estimate_cost_per_thousand(
     input_price_per_million: float,
     output_price_per_million: float,
 ) -> float:
-    """Estimated cost per thousand queries at a published paid tier rate.
+    """Estimated cost per thousand queries at a published paid-tier rate.
 
     Prices are passed in explicitly rather than hardcoded, since a rate baked into
-    code goes stale silently, see CLAUDE.md section 2 on avoiding scattered magic
-    numbers. Callers should pass the rate from the current AI Studio pricing page.
+    code goes stale silently. Callers should pass the rate from the current AI
+    Studio pricing page.
     """
 
     cost_per_query = (

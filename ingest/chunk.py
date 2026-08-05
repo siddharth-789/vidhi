@@ -4,8 +4,8 @@ Run standalone with: python -m ingest.chunk [path/to/pages.jsonl]
 Reads data/pages.jsonl, writes data/chunks.jsonl, prints a distribution summary.
 
 Heading detection is tuned to this specific manual's structure, confirmed by reading
-a sample of pages directly rather than assumed from the general regex categories in
-CLAUDE.md section 6. In this document:
+a sample of pages directly rather than assumed from a generic regex list. In this
+document:
 
 - A real chapter start is a standalone line "Chapter N" followed within a few lines
   by a standalone line "Synopsis". This distinguishes it from the table of contents,
@@ -61,10 +61,14 @@ _CHAPTER_START_LOOKAHEAD_LINES = 10
 
 
 def count_tokens(text: str) -> int:
+    """Count tokens using tiktoken's cl100k_base encoding, purely as a size proxy."""
+
     return len(_ENCODING.encode(text))
 
 
 def _strip_boilerplate_lines(text: str) -> str:
+    """Remove running headers, footers, and bare page-number lines from a page's text."""
+
     lines = text.split("\n")
     kept = []
     for line in lines:
@@ -143,11 +147,16 @@ def _extract_heading_breadcrumb(text: str) -> str | None:
 
 
 def _make_chunk_uid(chapter: str, page_start: int, content: str) -> str:
+    """Deterministic id from chapter, starting page, and content, so a rerun upserts
+    instead of duplicating rows."""
+
     basis = f"{chapter}|{page_start}|{content[:200]}"
     return hashlib.sha256(basis.encode("utf-8")).hexdigest()[:32]
 
 
 def build_chunks(pages: list[dict]) -> list[dict]:
+    """Group pages into chapters, then pack each chapter into token-bounded chunks."""
+
     annotated_pages = _assign_chapters(pages)
 
     chunks: list[dict] = []
@@ -238,6 +247,8 @@ def _pack_chapter(chapter: str, page_texts: list[tuple[int, str, str]]) -> list[
 
 
 def write_chunks_jsonl(chunks: list[dict], out_path: Path) -> None:
+    """Write one JSON object per chunk to out_path."""
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as f:
         for chunk in chunks:
@@ -245,6 +256,8 @@ def write_chunks_jsonl(chunks: list[dict], out_path: Path) -> None:
 
 
 def print_summary(chunks: list[dict]) -> None:
+    """Print chunk count, token count percentiles, and chunks per chapter."""
+
     token_counts = [c["token_count"] for c in chunks]
     per_chapter = Counter(c["chapter"] for c in chunks)
 
@@ -259,6 +272,8 @@ def print_summary(chunks: list[dict]) -> None:
 
 
 def load_pages(path: Path) -> list[dict]:
+    """Read pages.jsonl into a list of dicts, one per line."""
+
     pages = []
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -267,6 +282,8 @@ def load_pages(path: Path) -> list[dict]:
 
 
 def main(pages_path_arg: str | None = None, out_path_arg: str | None = None) -> None:
+    """Chunk pages.jsonl into chunks.jsonl and print a distribution summary."""
+
     pages_path = Path(pages_path_arg or "data/pages.jsonl")
     out_path = Path(out_path_arg or "data/chunks.jsonl")
 

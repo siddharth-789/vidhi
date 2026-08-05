@@ -1,8 +1,10 @@
-"""The single query path, see CLAUDE.md section 7.
+"""The single query path: route, retrieve, rerank, generate, verify, one question in,
+one streamed answer out.
 
 answer_question is consumed by both app/api.py and the evaluation harness, so
-evaluation exercises production code rather than a parallel reimplementation. Stages
-run in the order specified in section 7. PipelineConfig selects the ablation variant.
+evaluation always exercises the exact same code the live API runs, not a parallel
+reimplementation. PipelineConfig selects which stages are turned on, which is what
+lets the four ablation configs (A/B/C/D) share this one function.
 """
 
 from __future__ import annotations
@@ -48,11 +50,14 @@ Answer:"""
 
 @dataclass(frozen=True)
 class PipelineConfig:
+    """Selects which pipeline stages run, so the four ablation configs (A/B/C/D) can
+    share one code path and differ only in these flags."""
+
     name: str
-    use_hybrid: bool
-    use_rerank: bool
-    use_dspy: bool
-    use_compiled: bool
+    use_hybrid: bool  # False means dense-only retrieval, no keyword search
+    use_rerank: bool  # whether the LLM reranker runs on the fused candidates
+    use_dspy: bool  # DSPy routing + ChainOfThought generation vs a hand-written prompt
+    use_compiled: bool  # load the MIPROv2-compiled program instead of a fresh one
     dense_k: int = 30
     sparse_k: int = 30
     fusion_k: int = 12
@@ -77,23 +82,31 @@ CONFIGS: dict[str, PipelineConfig] = {
 
 @dataclass(frozen=True)
 class RouteEvent:
+    """Emitted once routing decides which path the question takes."""
+
     route: str
     sub_queries: list[str]
 
 
 @dataclass(frozen=True)
 class RetrievalEvent:
+    """Emitted once retrieval (and rerank, if enabled) has picked the final candidates."""
+
     candidates: list[dict[str, Any]]
     degraded: bool
 
 
 @dataclass(frozen=True)
 class TokenEvent:
+    """One chunk of streamed answer text."""
+
     text: str
 
 
 @dataclass(frozen=True)
 class DoneEvent:
+    """The final event for a request: the full answer plus all its metadata."""
+
     request_id: str
     answer: str
     citations: list[int]
@@ -107,6 +120,8 @@ class DoneEvent:
 
 @dataclass(frozen=True)
 class ErrorEvent:
+    """Emitted instead of DoneEvent when the request could not be completed."""
+
     request_id: str
     code: str
     message: str
@@ -116,6 +131,8 @@ PipelineEvent = Union[RouteEvent, RetrievalEvent, TokenEvent, DoneEvent, ErrorEv
 
 
 def _candidate_to_dict(candidate: Candidate) -> dict[str, Any]:
+    """Slim a Candidate down to what's safe to send over SSE (no raw chunk text)."""
+
     return {
         "chunk_uid": candidate.chunk_uid,
         "page_start": candidate.page_start,
@@ -129,6 +146,8 @@ def _candidate_to_dict(candidate: Candidate) -> dict[str, Any]:
 
 
 def _build_context(candidates: list[Candidate]) -> str:
+    """Join retrieved chunks into labeled [Page N] text blocks for the generation prompt."""
+
     blocks = []
     for c in candidates:
         page_label = (
@@ -140,10 +159,9 @@ def _build_context(candidates: list[Candidate]) -> str:
     return "\n\n".join(blocks)
 
 
-async def _route_question(
-    question: str, use_dspy: bool, task_lm: dspy.LM | None
-) -> tuple[str, list[str]]:
-    """Route the question. Defaults to lookup on any router failure, see section 11."""
+async def _route_question(question: str, use_dspy: bool, task_lm: dspy.LM | None) -> tuple[str, list[str]]:
+    """Classify the question into a route. Defaults to lookup on any router failure,
+    so a broken router degrades the experience rather than aborting the request."""
 
     if not use_dspy:
         return "lookup", []
@@ -158,9 +176,10 @@ async def _route_question(
         return "lookup", []
 
 
-async def _embed_question(
-    question: str, config: Config, judge_or_task_client: genai.Client
-) -> list[float] | None:
+async def _embed_question(question: str, config: Config, judge_or_task_client: genai.Client) -> list[float] | None:
+    """Embed the question for retrieval. Returns None (never raises) if embedding
+    fails, so the caller can degrade to sparse-only retrieval instead of aborting."""
+
     try:
         return await embed_query(
             judge_or_task_client, question, config.embed_model, config.embed_dim
@@ -270,18 +289,18 @@ async def answer_question(
     judge_lm: dspy.LM | None = None,
     compiled_rag_program: RAGProgram | None = None,
 ) -> AsyncIterator[PipelineEvent]:
-    """Answer one question following the ordered stages in CLAUDE.md section 7.
+    """Answer one question: route, embed, retrieve, rerank, guardrail, generate,
+    validate, verify, persist, yielding a PipelineEvent at each step.
 
     task_lm is required when pipeline_config.use_dspy is True. judge_lm, when
-    provided, is used for the post generation groundedness check via CheckGrounded so
-    that check can run on JUDGE_MODEL rather than TASK_MODEL, matching section 3. When
-    judge_lm is None, task_lm is used for grounding too.
+    provided, is used for the post-generation groundedness check via CheckGrounded so
+    that check can run on JUDGE_MODEL rather than TASK_MODEL. When judge_lm is None,
+    task_lm is used for grounding too.
 
-    compiled_rag_program is the module cached at API startup, see CLAUDE.md section
-    12.1 rule 4, never loaded per request. It is used only when
-    pipeline_config.use_compiled is True; otherwise a fresh uncompiled RAGProgram is
-    constructed per request, matching config C's intent of exercising the DSPy program
-    without any optimizer output.
+    compiled_rag_program is the module cached once at API startup, never loaded per
+    request. It is used only when pipeline_config.use_compiled is True; otherwise a
+    fresh uncompiled RAGProgram is constructed per request, matching config C's intent
+    of exercising the DSPy program without any optimizer output.
     """
 
     trace: Trace = new_trace(question)
@@ -349,12 +368,12 @@ async def answer_question(
             {
                 "candidate_count": len(candidates),
                 "degraded": trace.degraded,
-                # Full chunk content, unlike the SSE facing RetrievalEvent below,
-                # which the API contract in CLAUDE.md section 12.3 deliberately caps
-                # to a slim per candidate summary with no content field. Trace.stages
-                # is never sent over SSE, so it is the right place for eval/run_eval.py
-                # to read real context text for RAGAS from, instead of substituting
-                # heading_path, which is not the actual retrieved text.
+                # Full chunk content, unlike the SSE-facing RetrievalEvent below,
+                # which is deliberately kept to a slim per-candidate summary with no
+                # content field. Trace.stages is never sent over SSE, so it is the
+                # right place for eval/run_eval.py to read real context text for
+                # RAGAS from, instead of substituting heading_path, which is not the
+                # actual retrieved text.
                 "context_texts": [c.content for c in candidates],
             },
         )

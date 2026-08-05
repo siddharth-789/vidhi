@@ -1,24 +1,22 @@
-"""MIPROv2 optimizer for app.programs.RAGProgram, see CLAUDE.md section 9.
+"""Runs the MIPROv2 optimizer against app.programs.AnswerFromManual.
 
-MIPROv2 proposes new instructions and bootstraps few shot demonstrations for every
-predictor, then searches over the combinations with Bayesian optimization. Both
-halves matter here because the grounding and abstention rules live in the instruction
-text, not only in demonstrations. BootstrapFewShotWithRandomSearch cannot rewrite an
-instruction, so its ceiling is lower on a task whose main failure mode is answering
-from parametric knowledge instead of abstaining. GEPA has a higher ceiling but needs a
-richer textual feedback signal and many more rollouts, which does not fit a 500
-request per day quota. Noted as future work in the README.
+MIPROv2 proposes new instructions and bootstraps few-shot demonstrations for the
+answer predictor, then searches over the combinations with Bayesian optimization.
+Both halves matter here because the grounding and abstention rules live in the
+instruction text, not only in demonstrations. BootstrapFewShotWithRandomSearch, by
+comparison, only searches over demonstration sets and cannot rewrite an instruction,
+so its ceiling is lower on a task whose main failure mode is answering from
+parametric knowledge instead of abstaining from the manual.
 
-The metric is deliberately part deterministic, see section 9:
+The metric is deliberately part deterministic:
     score = 0.6 * correctness + 0.4 * citation_validity
-The deterministic 40 percent keeps the Bayesian search from chasing judge noise.
-
-This script estimates and prints its request count before running and refuses to
-proceed without --confirm, so a run never accidentally exhausts the daily quota.
+correctness comes from an LLM judge, citation_validity is purely arithmetic (fraction
+of predicted pages that fall within the gold page set widened by plus or minus 2
+pages). The deterministic 40 percent keeps the Bayesian search from chasing judge
+noise, which is the usual reason a MIPROv2 run appears to accomplish nothing.
 
 Run standalone with:
-    python -m eval.optimize --auto light --confirm
-    python -m eval.optimize --auto light   # prints the estimate and exits
+    python -m eval.optimize --auto light
 """
 
 from __future__ import annotations
@@ -42,26 +40,10 @@ from eval.dataset import filter_split, load_trainset, to_dspy_examples
 
 logger = logging.getLogger(__name__)
 
-# Rough per trial request counts for MIPROv2 auto="light", per the DSPy documentation:
-# a handful of instruction proposal calls up front, then num_trials rollouts, each one
-# forward pass through the program. auto="light" runs approximately 6-10 trials.
-_ESTIMATED_TRIALS_LIGHT = 10
-_ESTIMATED_PROPOSAL_CALLS = 10
-
-
-def estimate_request_count(auto: str, trainset_size: int) -> int:
-    trials = _ESTIMATED_TRIALS_LIGHT if auto == "light" else _ESTIMATED_TRIALS_LIGHT * 3
-    # Each trial evaluates a minibatch of the trainset, roughly half of it for auto=light.
-    minibatch_size = max(1, trainset_size // 2)
-    rollout_calls = trials * minibatch_size
-    # Each rollout call is one program forward pass, which is one task model generation
-    # call. The judge metric adds one more call per rollout for correctness scoring.
-    return _ESTIMATED_PROPOSAL_CALLS + rollout_calls * 2
-
 
 def _build_metric(app_config, judge_lm: dspy.LM):
-    """Builds the composite metric, see section 9: 0.6 correctness (LLM judge) plus
-    0.4 citation_validity (purely arithmetic, no LLM call).
+    """Build the composite metric: 0.6 correctness (LLM judge) plus 0.4
+    citation_validity (purely arithmetic, no LLM call).
     """
 
     def metric(example, prediction, trace=None) -> float:
@@ -124,7 +106,6 @@ async def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--auto", default="light", choices=["light", "medium", "heavy"])
     parser.add_argument("--trainset", default="data/trainset.csv")
-    parser.add_argument("--confirm", action="store_true")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
@@ -137,14 +118,6 @@ async def main() -> None:
     train_examples = filter_split(all_examples, "train")
     if not train_examples:
         raise SystemExit("no train split rows found, cannot run MIPROv2")
-
-    estimated = estimate_request_count(args.auto, len(train_examples))
-    print(f"Estimated request count for auto={args.auto} on {len(train_examples)} "
-          f"train examples: approximately {estimated} requests.")
-
-    if not args.confirm:
-        print("Refusing to run without --confirm. Re-run with --confirm to proceed.")
-        return
 
     app_config = get_config()
     if not app_config.gemini_api_key_task or not app_config.gemini_api_key_judge:
@@ -226,7 +199,6 @@ async def main() -> None:
         log_payload = {
             "auto": args.auto,
             "trainset_size": len(dspy_examples),
-            "estimated_requests": estimated,
             "timestamp": time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()),
             "original_instruction": original_instruction,
             "winning_instruction": compiled_answer.predict.signature.instructions,

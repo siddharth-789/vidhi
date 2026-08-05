@@ -1,12 +1,11 @@
 """Wrapper around the Gemini API for embeddings and generation.
 
-Every call goes through a retry wrapper with exponential backoff and jitter on 429,
-and two retries then a typed error on 5xx or timeout, see CLAUDE.md section 2 and the
-degradation table in section 11.
+Every call goes through a retry wrapper: exponential backoff and jitter on a 429
+rate-limit response, two retries then a typed error on a 5xx or a timeout.
 
 Two separate genai.Client instances are constructed, one per API key, because the
-task key and the judge key belong to different Google Cloud projects with separate
-free tier quotas. Never share a client across the two roles.
+task key (serving and optimizing) and the judge key (evaluation and grounding checks)
+belong to different Google Cloud projects. Never share a client across the two roles.
 """
 
 from __future__ import annotations
@@ -26,19 +25,17 @@ logger = logging.getLogger(__name__)
 _MAX_RETRIES = 2
 _BASE_DELAY_SECONDS = 1.0
 
-# Vectors returned by gemini-embedding-2 at any requested output_dimensionality have
-# been observed to already be unit length (verified empirically against the live API
-# at 768 dimensions across multiple inputs, norm approximately 1.0 in every case).
-# This contradicts the general Gemini embedding API documentation, which states
-# vectors below 3072 dimensions are not normalized. Per an explicit decision on this
-# project, we rely on the API's output directly and do not renormalize.
 
 
 def build_client(api_key: str) -> genai.Client:
+    """Construct a Gemini client for one API key."""
+
     return genai.Client(api_key=api_key)
 
 
 async def _with_retry(description: str, fn, error_type: type[Exception]):
+    """Retry on rate limits and server errors with exponential backoff and jitter."""
+
     last_exc: Exception | None = None
     for attempt in range(_MAX_RETRIES + 1):
         try:
@@ -81,9 +78,9 @@ async def embed_text(
     output_dimensionality: int,
     task_type: str,
 ) -> list[float]:
-    """Embed a single text. task_type must be RETRIEVAL_DOCUMENT or RETRIEVAL_QUERY.
-
-    See CLAUDE.md section 3 embedding rules 1 and 2.
+    """Embed a single text. task_type must be RETRIEVAL_DOCUMENT (for chunks at
+    ingestion time) or RETRIEVAL_QUERY (for questions at query time), matching how
+    Gemini's retrieval embeddings are designed to be used.
 
     gemini-embedding-2 does not batch multiple documents into one embed_content call
     the way its own SDK usage example implies, confirmed empirically: passing a list
@@ -123,6 +120,8 @@ async def embed_texts(
 async def embed_query(
     client: genai.Client, text: str, model: str, output_dimensionality: int
 ) -> list[float]:
+    """Embed a user question for retrieval, using task_type=RETRIEVAL_QUERY."""
+
     return await embed_text(
         client, text, model, output_dimensionality, task_type="RETRIEVAL_QUERY"
     )

@@ -1,5 +1,5 @@
-# Single stage, see CLAUDE.md section 13.1. Every dependency in requirements.txt must
-# have a manylinux wheel, no compiler toolchain is installed.
+# Single stage. Every dependency in requirements.txt must have a manylinux wheel,
+# no compiler toolchain is installed.
 FROM python:3.11-slim
 
 WORKDIR /app

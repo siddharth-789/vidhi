@@ -1,7 +1,8 @@
-"""Dense and sparse retrieval plus reciprocal rank fusion, see CLAUDE.md section 7.
+"""Dense (semantic) and sparse (keyword) retrieval, combined with reciprocal rank
+fusion.
 
 Dense and sparse searches run concurrently. Fusion is a pure function so it can be
-unit tested against a hand computed example without touching the database.
+unit tested against a hand-computed example without touching the database.
 
 Run standalone with: python -m app.retrieve "some question"
 This embeds the question, runs both searches against DATABASE_URL, and prints the
@@ -25,6 +26,8 @@ _RRF_K = 60
 
 @dataclass(frozen=True)
 class Candidate:
+    """One retrieved chunk, plus where it ranked in each retrieval stage."""
+
     chunk_uid: str
     content: str
     heading_path: str | None
@@ -37,9 +40,9 @@ class Candidate:
     rerank_score: float | None = None
 
 
-async def dense_search(
-    pool: asyncpg.Pool, embedding: list[float], k: int
-) -> list[asyncpg.Record]:
+async def dense_search(pool: asyncpg.Pool, embedding: list[float], k: int) -> list[asyncpg.Record]:
+    """Nearest-neighbor search by cosine distance over chunk embeddings."""
+
     from pgvector.asyncpg import Vector
 
     async with pool.acquire() as conn:
@@ -57,6 +60,8 @@ async def dense_search(
 
 
 async def sparse_search(pool: asyncpg.Pool, query: str, k: int) -> list[asyncpg.Record]:
+    """Full-text keyword search over chunk content, ranked by Postgres's ts_rank_cd."""
+
     async with pool.acquire() as conn:
         return await conn.fetch(
             """
@@ -72,14 +77,13 @@ async def sparse_search(pool: asyncpg.Pool, query: str, k: int) -> list[asyncpg.
         )
 
 
-def fuse(
-    dense_rows: list[asyncpg.Record], sparse_rows: list[asyncpg.Record]
-) -> list[Candidate]:
+def fuse(dense_rows: list[asyncpg.Record], sparse_rows: list[asyncpg.Record]) -> list[Candidate]:
     """Reciprocal rank fusion. score = sum(1 / (RRF_K + rank)) across lists.
 
-    Rank is 1 indexed. A chunk missing from a list contributes nothing from that list
-    and keeps a null rank for that list, see the SSE contract in section 12.3, never a
-    sentinel number.
+    A chunk that ranks near the top of either the dense or the sparse list scores
+    well, without needing the two lists' raw scores to be on a comparable scale.
+    Rank is 1-indexed. A chunk missing from a list contributes nothing from that list
+    and keeps a null rank for that list (never a sentinel number).
     """
 
     by_uid: dict[str, dict] = {}
@@ -132,6 +136,8 @@ def fuse(
 
 @dataclass(frozen=True)
 class RetrievalResult:
+    """The fused candidate list for one query, plus whether anything degraded."""
+
     candidates: list[Candidate]
     degraded: bool
     degraded_reason: str | None = None
@@ -148,10 +154,10 @@ async def retrieve(
 ) -> RetrievalResult:
     """Run dense and, when enabled and available, sparse search, then fuse.
 
-    Implements the degradation table in section 11: a failed embedding upstream is
-    signalled by embedding being None, which forces sparse only. A dense or sparse
-    search that itself raises is caught here and degrades rather than propagating,
-    unless both fail, which raises RetrievalError.
+    A failed embedding upstream is signalled by embedding being None, which forces
+    sparse-only retrieval. A dense or sparse search that itself raises is caught here
+    and degrades rather than propagating, unless both fail, which raises
+    RetrievalError.
     """
 
     dense_rows: list[asyncpg.Record] = []

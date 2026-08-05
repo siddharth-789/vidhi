@@ -1,8 +1,8 @@
-"""Thin repository module over asyncpg. Raw SQL only, no ORM, see CLAUDE.md section 2.
+"""Thin repository module over asyncpg. Raw SQL only, no ORM.
 
 Every table lives in the vidhi schema and every query qualifies it explicitly, rather
-than relying on search_path, because Supabase's pooler does not guarantee session
-state such as search_path persists across statements on a pooled connection.
+than relying on search_path, because Supabase's connection pooler does not guarantee
+session state such as search_path persists across statements on a pooled connection.
 
 Run standalone with: python -m app.db
 This issues one trivial query against DATABASE_URL and prints the chunk count, the
@@ -31,6 +31,8 @@ _BASE_DELAY_SECONDS = 0.5
 
 
 async def _with_retry(description: str, fn):
+    """Retry a connection-level failure a few times with exponential backoff and jitter."""
+
     last_exc: Exception | None = None
     for attempt in range(1, _MAX_ATTEMPTS + 1):
         try:
@@ -69,12 +71,16 @@ async def _init_connection(conn: asyncpg.Connection) -> None:
 
 
 async def create_pool(database_url: str) -> asyncpg.Pool:
+    """Build the process-wide asyncpg connection pool."""
+
     return await asyncpg.create_pool(
         database_url, min_size=1, max_size=5, init=_init_connection
     )
 
 
 async def warm_pool(pool: asyncpg.Pool) -> None:
+    """Issue one trivial query so the first real request does not pay for connection setup."""
+
     async def _run():
         async with pool.acquire() as conn:
             await conn.fetchval("select 1")
@@ -83,6 +89,8 @@ async def warm_pool(pool: asyncpg.Pool) -> None:
 
 
 async def get_chunk_count(pool: asyncpg.Pool) -> int:
+    """Return how many chunk rows exist, used by /healthz to confirm data is loaded."""
+
     async def _run():
         async with pool.acquire() as conn:
             return await conn.fetchval("select count(*) from vidhi.chunks")
@@ -124,9 +132,9 @@ async def upsert_chunk(pool: asyncpg.Pool, chunk: dict[str, Any]) -> None:
     await _with_retry("upsert chunk", _run)
 
 
-async def get_chunks_missing_embedding(
-    pool: asyncpg.Pool, limit: int
-) -> list[asyncpg.Record]:
+async def get_chunks_missing_embedding(pool: asyncpg.Pool, limit: int) -> list[asyncpg.Record]:
+    """Return up to limit chunk rows that have not yet been embedded."""
+
     async def _run():
         async with pool.acquire() as conn:
             return await conn.fetch(
@@ -139,6 +147,8 @@ async def get_chunks_missing_embedding(
 
 
 async def set_embedding(pool: asyncpg.Pool, chunk_id: int, embedding: list[float]) -> None:
+    """Write one chunk's embedding vector."""
+
     async def _run():
         async with pool.acquire() as conn:
             await conn.execute(
@@ -151,11 +161,8 @@ async def set_embedding(pool: asyncpg.Pool, chunk_id: int, embedding: list[float
 
 
 async def insert_trace(pool: asyncpg.Pool, trace: dict[str, Any]) -> None:
-    """Fire and forget insert. Caller must catch DatabaseError and continue.
-
-    A trace write failure must never fail the request, see CLAUDE.md section 7 step 9
-    and section 11.
-    """
+    """Insert one trace row. Callers must catch DatabaseError and continue: a trace
+    write failure must never fail the user-facing request."""
 
     async def _run():
         async with pool.acquire() as conn:
@@ -186,6 +193,8 @@ async def insert_trace(pool: asyncpg.Pool, trace: dict[str, Any]) -> None:
 
 
 async def get_trace(pool: asyncpg.Pool, request_id: uuid.UUID) -> asyncpg.Record | None:
+    """Look up one stored trace row by its request id, or None if not found."""
+
     async def _run():
         async with pool.acquire() as conn:
             return await conn.fetchrow(

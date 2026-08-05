@@ -370,9 +370,13 @@
     try {
       const res = await fetch("/healthz");
       const data = await res.json();
-      bookSub.textContent = `${data.chunk_count} chunks indexed`;
+      if (typeof data.chunk_count === "number" && data.chunk_count > 0) {
+        bookSub.textContent = `${data.chunk_count} chunks indexed`;
+      } else {
+        bookSub.textContent = "";
+      }
     } catch (err) {
-      bookSub.textContent = "status unavailable";
+      bookSub.textContent = "";
       console.error("failed to load healthz", err);
     }
   }
@@ -547,10 +551,9 @@
             setStatus("verified");
             statusLine.textContent = `done, ${Math.round(performance.now() - startTime)}ms`;
             // done.answer is the source of truth. Token events may have streamed
-            // nothing for a DSPy config, per CLAUDE.md section 17: a short or
-            // ChainOfThought-produced answer can arrive as zero StreamResponse
-            // chunks before the final Prediction. Always resync here rather than
-            // trusting whatever token text happened to stream.
+            // nothing for a DSPy config: a short or ChainOfThought-produced answer
+            // can arrive as zero streamed chunks before the final prediction.
+            // Always resync here rather than trusting whatever token text streamed.
             answerEl.textContent = payload.answer;
             survivedUids = new Set((payload.citations || []).map(String));
             renderCandidates(lastCandidates, survivedUids);

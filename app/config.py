@@ -1,7 +1,8 @@
 """Single source of truth for environment configuration.
 
 Every module that needs a model name, threshold, key, or connection string reads it
-from here rather than from os.environ directly. See CLAUDE.md section 3.
+from here rather than from os.environ directly, so configuration is never scattered
+or hardcoded across files.
 """
 
 from __future__ import annotations
@@ -18,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class Config:
+    """All runtime configuration for the app, loaded once from environment variables."""
+
     embed_model: str
     embed_dim: int
     task_model: str
@@ -27,9 +30,6 @@ class Config:
     gemini_api_key_task: str | None
     gemini_api_key_judge: str | None
 
-    rerank_provider: str
-    rerank_api_key: str | None
-
     database_url: str | None
 
     retrieval_floor: float
@@ -37,6 +37,8 @@ class Config:
 
 
 def _load() -> Config:
+    """Read every setting from the environment, applying defaults where sensible."""
+
     task_model = os.environ.get("TASK_MODEL", "gemini-3.1-flash-lite")
 
     gemini_api_key_task = os.environ.get("GEMINI_API_KEY_TASK")
@@ -58,8 +60,6 @@ def _load() -> Config:
         judge_model=os.environ.get("JUDGE_MODEL", task_model),
         gemini_api_key_task=gemini_api_key_task,
         gemini_api_key_judge=gemini_api_key_judge,
-        rerank_provider=os.environ.get("RERANK_PROVIDER", "llm"),
-        rerank_api_key=os.environ.get("RERANK_API_KEY"),
         database_url=database_url,
         retrieval_floor=float(os.environ.get("RETRIEVAL_FLOOR", "0.35")),
         compiled_program_path=os.environ.get(
@@ -70,14 +70,16 @@ def _load() -> Config:
 
 @lru_cache(maxsize=1)
 def get_config() -> Config:
+    """Return the process-wide Config, loading it from the environment on first call."""
+
     return _load()
 
 
 def require_serving_config(config: Config) -> None:
     """Raise ConfigError if a value required to serve requests is missing.
 
-    Called once at API startup, see CLAUDE.md section 12.1. Judging keys are not
-    required here because evaluation is a separate process.
+    Called once at API startup. Judging keys are not required here because
+    evaluation is a separate process from serving.
     """
     if not config.database_url:
         raise ConfigError("DATABASE_URL is required to serve requests")
@@ -90,7 +92,7 @@ if __name__ == "__main__":
 
     load_dotenv()
     cfg = get_config()
-    secret_fields = {"gemini_api_key_task", "gemini_api_key_judge", "rerank_api_key", "database_url"}
+    secret_fields = {"gemini_api_key_task", "gemini_api_key_judge", "database_url"}
     for field_name in cfg.__dataclass_fields__:
         value = getattr(cfg, field_name)
         if field_name in secret_fields and value:

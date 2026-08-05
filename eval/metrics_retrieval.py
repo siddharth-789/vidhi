@@ -1,5 +1,5 @@
-"""Deterministic retrieval and citation metrics, zero LLM calls, see CLAUDE.md section 10
-group 1. Runs on the full dev split always, since it costs no quota.
+"""Deterministic retrieval and citation metrics: pure arithmetic, zero LLM calls, so
+they always run on the full dev split.
 
 Every function is pure, taking already computed per question records rather than
 calling the pipeline itself, so it can be unit tested against small synthetic
@@ -29,6 +29,8 @@ class QuestionRecord:
 
 
 def _span_hits_gold(span: tuple[int, int], gold_pages: list[int]) -> bool:
+    """Whether any gold page number falls inside a retrieved page span."""
+
     start, end = span
     return any(start <= page <= end for page in gold_pages)
 
@@ -114,6 +116,8 @@ def answer_page_overlap(records: list[QuestionRecord]) -> float:
 
 
 def compute_all(records: list[QuestionRecord]) -> dict[str, float]:
+    """Compute every group 1 metric over a set of evaluated questions."""
+
     return {
         "recall_at_5": recall_at_k(records, 5),
         "recall_at_10": recall_at_k(records, 10),

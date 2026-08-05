@@ -1,24 +1,24 @@
 # CLAUDE.md
 
-Project spec for an agentic coding assistant. Read this fully before writing any code.
-Follow it literally. Where it says MUST or NEVER, there is no discretion.
+Project spec for Vidhi, a retrieval augmented generation assistant. Read this before
+making changes. Where it says MUST or NEVER, there is no discretion.
 
 ---
 
 ## 1. What this project is
 
-A retrieval augmented generation question answering system over a single large PDF:
-"Bharat's GST Smart Guide, 3rd edition", roughly 1500 pages. It is an assignment
-deliverable for a senior AI engineer interview. The reviewer is an AI engineer.
+Vidhi answers questions over a single large PDF, "Bharat's GST Smart Guide, 3rd
+edition" (roughly 1500 pages), using retrieval augmented generation. Every answer is
+grounded in retrieved excerpts from the manual and cites page numbers rather than
+relying on the model's own knowledge. Each question is answered independently: there
+is no conversation memory or chat history.
 
-The system answers one independent question per request. There is no conversation
-memory, no chat history, no follow up resolution. Every answer must be grounded in
-retrieved excerpts from the PDF and must cite page numbers.
+The project also includes a full evaluation harness that compares four increasingly
+sophisticated pipeline configurations, and a DSPy-based prompt optimizer (MIPROv2),
+so the value of hybrid retrieval and prompt optimization can each be measured
+separately rather than assumed.
 
-**What the reviewer is actually grading:** the evaluation harness, the before and
-after optimizer metrics, and the honesty of the README. The pipeline is table stakes.
-Therefore evaluation code is a first class deliverable, not an afterthought. If you
-run short on time, cut features, never cut evaluation.
+Live at https://vidhi.readiq.app.
 
 ## 2. Hard rules
 
@@ -38,14 +38,14 @@ NEVER:
   That is acceptable. Do not import from it directly.)
 - NEVER use SQLAlchemy or any ORM. Raw SQL only.
 - NEVER install `torch`, `transformers`, or `sentence-transformers` into the serving
-  image. Cold start on Cloud Run is a graded latency concern.
+  image. Cold start on Cloud Run is a latency concern.
 - NEVER use a bare `except:` or `except Exception: pass`. Every handler logs and
   either degrades gracefully or re raises a typed exception.
 - NEVER write an em dash or a double hyphen in any prose, comment, docstring, README,
   or generated document. Use a comma or restructure the sentence. Command line flags
   in shell scripts and workflow files are exempt from this rule.
 - NEVER invent metric numbers, benchmark results, or page citations in the README.
-  Leave a clearly marked placeholder for anything not yet measured.
+  Leave a clearly marked `TBD` for anything not yet measured.
 - NEVER add authentication, user accounts, or multi tenancy. Out of scope.
 - NEVER build a chat interface with message history. Each query is independent.
 
@@ -57,71 +57,58 @@ Read these from environment variables. Defaults shown are the intended values.
 |---|---|---|
 | `EMBED_MODEL` | `gemini-embedding-2` | Multimodal capable, use text only here |
 | `EMBED_DIM` | `768` | Truncated from 3072 default via `output_dimensionality` |
-| `TASK_MODEL` | `gemini-3.1-flash-lite` | Serving model. Confirm the exact ID in AI Studio before the first run and update if different. |
+| `TASK_MODEL` | `gemini-3.1-flash-lite` | Serving model |
 | `PROMPT_MODEL` | same as `TASK_MODEL` | Used by MIPROv2 to propose instructions |
 | `JUDGE_MODEL` | same as `TASK_MODEL` | Used by RAGAS and the groundedness check |
 | `GEMINI_API_KEY_TASK` | none | Project A key, serving and optimizing |
 | `GEMINI_API_KEY_JUDGE` | none | Project B key, evaluation and judging |
-| `RERANK_PROVIDER` | `llm` | `cohere` |
-| `RERANK_API_KEY` | none | Unused when provider is `llm` |
 | `DATABASE_URL` | none | Supabase Postgres connection string, pooler port |
 | `RETRIEVAL_FLOOR` | `0.35` | Abstention threshold on top rerank score |
 | `COMPILED_PROGRAM_PATH` | `artifacts/compiled_program.json` | |
 
-Two separate API keys are deliberate. Free tier quotas are per project, and the
-evaluation harness makes far more requests than serving does. The task key MUST NEVER
-be used for judging, and vice versa. Log a warning at startup if either is missing.
+Two separate API keys are deliberate: they belong to two different Google Cloud
+projects, so evaluation traffic (which makes far more requests than serving) never
+competes with live serving traffic. The task key MUST NEVER be used for judging, and
+vice versa. Log a warning at startup if either is missing.
 
 ### Embedding rules, do not get these wrong
 
 1. Pass `task_type="RETRIEVAL_DOCUMENT"` when embedding chunks at ingestion time.
 2. Pass `task_type="RETRIEVAL_QUERY"` when embedding a user question at query time.
-3. `l2_normalize` is deliberately NOT implemented. Verified empirically against the
-   live API (`gemini-embedding-2`, `output_dimensionality=768`) across many sample
-   inputs during Phase 1: every returned vector already has norm approximately 1.0.
-   This contradicts the general assumption that sub-3072-dimension vectors are
-   unnormalized. Do not add a normalization step unless a future model change is
-   observed to actually return non-unit vectors, and if so, verify first rather than
-   assuming, per section 16.
+3. `gemini-embedding-2` was verified empirically (`output_dimensionality=768`) to
+   already return unit norm vectors. There is no L2 normalization step. If a future
+   model change is observed to return non-unit vectors, verify first rather than
+   assuming, per section 15, before adding one.
 4. `gemini-embedding-2` does NOT batch multiple documents per `embed_content` call,
    confirmed empirically, including against the SDK's own documented usage example
    (`contents=["text one", "text two"]` returns exactly one embedding, not two). Every
    embedding call in `app/llm.py` (`embed_text`) and `ingest/embed.py` embeds exactly
-   one document per call. Concurrency, not batching, is the only way to speed this up,
-   `ingest/embed.py` fans out a small number of calls at once with `asyncio.gather`.
-5. Retry with exponential backoff and jitter on HTTP 429. The observed free tier
-   constraints are a low four figure daily call cap and a 30000 token per minute cap;
-   with one document per call at ~700 tokens each, the token cap is not the binding
-   constraint, the daily call cap is. `ingest/embed.py` supports `--max-calls` and
-   `--api-key` so a run can be capped and resumed with a different key across days.
-6. The embed script MUST be resumable. Query for rows where `embedding is null` and
-   process only those, so an interrupted run can be restarted safely. Read and write
-   for this loop MUST happen on the same held asyncpg connection, not a fresh
+   one document per call. Concurrency, not batching, is the only way to speed this up:
+   `ingest/embed.py` fans out a small number of calls at once with `asyncio.gather`
+   (`--concurrency`, default 5).
+5. Retry with exponential backoff and jitter on HTTP 429.
+6. The embed script is resumable: it queries for rows where `embedding is null` and
+   processes only those, so an interrupted run can be restarted safely. Read and write
+   for this loop happen on the same held asyncpg connection, not a fresh
    `pool.acquire()` per call. Supabase's pooler was observed to not reliably make a
    write on one pooled connection visible to an immediately following read on a
-   different pooled connection, which caused the same not-yet-embedded rows to be
-   reselected repeatedly. `ingest/embed.py` supports `--skip-load` to skip re-upserting
-   `chunks.jsonl` into the database on every run, since chunk text and metadata do not
-   change between embedding runs, only which rows are missing an embedding.
+   different pooled connection, which caused already-embedded rows to be reselected.
+   `ingest/embed.py` supports `--skip-load` to skip re-upserting `chunks.jsonl` into
+   the database on every run, since chunk text and metadata do not change between
+   embedding runs, only which rows are missing an embedding.
 
 ### Reranker
 
-Implement `app/rerank.py` with a single `async def rerank(query, candidates, top_k)`
-and three interchangeable backends selected by `RERANK_PROVIDER`:
+`app/rerank.py` implements a single `async def rerank(query, candidates, top_k)`: one
+listwise call to `TASK_MODEL`. It sends the query plus numbered candidate snippets,
+asks for a JSON array of indices ordered best first with a relevance score from 0 to
+1 each, and parses the result defensively.
 
-- `cohere`: Cohere rerank endpoint.
-- `jina`: Jina reranker endpoint.
-- `llm`: single listwise call to `TASK_MODEL`. Send the query plus numbered candidate
-  snippets, ask for a JSON array of indices ordered best first with a relevance score
-  from 0 to 1 each. Parse defensively.
-
-Default to `llm` so the project runs with only a Gemini key. If reranking fails or
-times out after 4 seconds, fall back to the fusion order, set `degraded=True` on the
-trace, and continue. NEVER fail the request because reranking failed.
+If reranking fails or times out after 4 seconds, fall back to the fusion order, set
+`degraded=True` on the trace, and continue. NEVER fail the request because reranking
+failed.
 
 ## 4. Repository layout
-
-Create exactly this structure.
 
 ```
 .
@@ -148,14 +135,16 @@ Create exactly this structure.
 │   ├── errors.py
 │   ├── db.py
 │   ├── llm.py
-│   ├── embed_query.py
 │   ├── retrieve.py
 │   ├── rerank.py
 │   ├── programs.py
 │   ├── guardrails.py
 │   ├── trace.py
 │   ├── pipeline.py
-│   └── api.py
+│   ├── api.py
+│   └── static/
+│       ├── index.html
+│       └── metrics.html
 ├── eval/
 │   ├── dataset.py
 │   ├── metrics_retrieval.py
@@ -164,31 +153,28 @@ Create exactly this structure.
 │   ├── run_eval.py
 │   ├── optimize.py
 │   └── results/              (gitignored except .gitkeep)
-├── app/
-│   └── static
-|       └── index.html
 ├── artifacts/
 │   └── .gitkeep
+├── scripts/
+│   ├── answer_cli.py
+│   └── check_dspy_stream.py
 └── tests/
     ├── test_chunk.py
     ├── test_fusion.py
-    └── test_guardrails.py
+    ├── test_guardrails.py
+    └── test_metrics_retrieval.py
 ```
-
-`tests/test_normalize.py` is deliberately absent: there is no `l2_normalize` function
-to test, see embedding rule 3.
 
 ## 5. Database schema
 
-Written to `sql/schema.sql` and already applied once against Supabase. Do not attempt
-to run migrations from application code.
+Written to `sql/schema.sql` and applied against Supabase. Do not attempt to run
+migrations from application code.
 
-Deviation from the original spec, deliberate: both tables live under a `vidhi` schema
-rather than `public`, by explicit choice on this project. Every query in `app/db.py`
-and `ingest/embed.py` qualifies the table name explicitly, for example
-`select ... from vidhi.chunks`, rather than relying on `search_path`. This is required,
-not stylistic: Supabase's pooler was observed to not reliably carry a
-`set search_path` across statements on a pooled connection, which silently broke
+Both tables live under a `vidhi` schema rather than `public`, by deliberate choice.
+Every query in `app/db.py` and `ingest/embed.py` qualifies the table name explicitly,
+for example `select ... from vidhi.chunks`, rather than relying on `search_path`.
+This is required, not stylistic: Supabase's pooler was observed to not reliably carry
+a `set search_path` across statements on a pooled connection, which silently broke
 lookups when the schema was addressed unqualified.
 
 ```sql
@@ -235,13 +221,12 @@ create table if not exists vidhi.traces (
 create index if not exists traces_created_idx on vidhi.traces (created_at desc);
 ```
 
-`chunk_uid` MUST be a deterministic hash of chapter plus page_start plus the first 200
-characters of content, so reruns of ingestion upsert instead of duplicating. Implemented
-in `ingest/chunk.py` as a sha256 hex digest, truncated to 32 characters.
+`chunk_uid` is a deterministic hash of chapter plus page_start plus the first 200
+characters of content, so reruns of ingestion upsert instead of duplicating.
+Implemented in `ingest/chunk.py` as a sha256 hex digest, truncated to 32 characters.
 
-**Phase 1 status: complete.** 2373 chunks ingested and fully embedded (gemini-embedding-2,
-768 dimensions), 7 of 1321 pages suspected scanned (0.5 percent, no OCR needed). All
-embeddings verified: correct dimension, norm approximately 1.0, zero duplicate vectors.
+**Ingestion status:** 2373 chunks ingested and fully embedded (gemini-embedding-2,
+768 dimensions). 7 of 1321 pages suspected scanned (0.5 percent, no OCR needed).
 
 ## 6. Ingestion contract
 
@@ -278,13 +263,12 @@ embeddings verified: correct dimension, norm approximately 1.0, zero duplicate v
 
 `ingest/embed.py`
 - Reads `chunks.jsonl`, upserts rows without embeddings (skippable with `--skip-load`
-  once chunks are already loaded, since chunk text and metadata do not change between
-  embedding runs), then embeds one chunk per API call (see embedding rule 4), a small
-  number at a time concurrently via `asyncio.gather` (`--concurrency`, default 5).
-- Does NOT contain `l2_normalize`, see embedding rule 3.
-- Supports `--max-calls` to cap a run at a day's remaining quota, and `--api-key` to
-  resume with a different key. The read and write for the resumability check happen
-  on one held connection for the whole run, see embedding rule 6.
+  once chunks are already loaded), then embeds one chunk per API call (see embedding
+  rule 4), a small number at a time concurrently via `asyncio.gather` (`--concurrency`,
+  default 5).
+- Resumable: rows where `embedding is null` are selected and processed; an interrupted
+  run can simply be restarted. The read and write for this check happen on one held
+  connection for the whole run, see embedding rule 6.
 
 `ingest/run_ingest.py`
 - Orchestrates the three stages, each skippable by a flag, prints per stage timing.
@@ -301,7 +285,7 @@ async def answer_question(
 ```
 
 `PipelineConfig` selects the ablation variant so the same code path serves both the API
-and the evaluation harness. This is important, evaluation MUST exercise production code,
+and the evaluation harness. This is important: evaluation MUST exercise production code,
 not a parallel reimplementation.
 
 ```python
@@ -326,7 +310,7 @@ Stages in order:
 
 1. **Route.** DSPy `RouteQuery` when `use_dspy`, otherwise a hardcoded `lookup` route.
    On `out_of_scope`, skip retrieval entirely and emit the abstention message.
-2. **Embed query** with `RETRIEVAL_QUERY` task type, then normalize.
+2. **Embed query** with `RETRIEVAL_QUERY` task type.
 3. **Retrieve.** Dense and sparse searches run concurrently with `asyncio.gather`.
    Dense: `order by embedding <=> $1 limit $2`. Sparse: `ts_rank_cd` over `tsv`
    with `websearch_to_tsquery`. When `use_hybrid` is false, run dense only.
@@ -335,7 +319,7 @@ Stages in order:
 5. **Rerank** when enabled, keep `final_k`.
 6. **Guardrail, pre generation.** If the top rerank score is below `RETRIEVAL_FLOOR`,
    abstain without calling the generation model at all. This both prevents hallucination
-   and saves quota.
+   and saves an unnecessary call.
 7. **Generate.** Streams tokens. Cited pages MUST come only from the retrieved set.
 8. **Guardrail, post generation.** Validate citations against retrieved pages, dropping
    any that do not appear and marking the answer low confidence. Then run the
@@ -348,8 +332,7 @@ Stages in order:
 
 `app/programs.py`. Pin the DSPy version in `requirements.txt`.
 
-Three signatures, described in prose so you write idiomatic current DSPy rather than
-copying a possibly stale snippet:
+Three signatures:
 
 - `RouteQuery`: input `question`. Outputs `route` as a literal of
   `lookup | procedure | multi_hop | out_of_scope`, and `sub_questions` as a list of
@@ -368,15 +351,8 @@ evaluation harness can swap retrieval configurations.
 `CheckGrounded` is a separate program, deliberately outside `RAGProgram`, so it stays off
 the streaming path and out of the optimizer's search space.
 
-**Before writing anything else in this file, verify streaming works.** Write
-`scripts/check_dspy_stream.py` that streams a trivial two field signature end to end and
-prints tokens as they arrive. Run it. If the streaming API does not behave as expected,
-stop and report the exact error rather than guessing at the API surface. The fallback,
-which you should only use if directed: load the compiled program JSON, extract the
-optimized instruction and demonstrations, and stream through a direct Gemini call.
-
-Enable the DSPy LM cache so optimizer retries and repeated evaluation runs do not consume
-quota.
+Enable the DSPy LM cache so optimizer retries and repeated evaluation runs do not
+recall the model for identical inputs.
 
 ## 9. Optimizer
 
@@ -389,8 +365,6 @@ matter here because the grounding and abstention rules live in the instruction t
 in the demonstrations. `BootstrapFewShotWithRandomSearch` searches only over
 demonstration sets and cannot rewrite an instruction, so its ceiling is lower on a task
 whose main failure mode is answering from parametric knowledge instead of abstaining.
-GEPA has a higher ceiling but needs a richer textual feedback signal and many more
-rollouts, which does not fit a 500 request per day quota. Note it as future work.
 
 The metric is deliberately part deterministic:
 
@@ -405,15 +379,16 @@ score = 0.6 * correctness + 0.4 * citation_validity
 The deterministic 40 percent keeps the Bayesian search from chasing judge noise, which is
 the usual reason a MIPROv2 run appears to accomplish nothing.
 
+MIPROv2 compiles a bare `ChainOfThought(AnswerFromManual)` in isolation, not the full
+`RAGProgram`: `RAGProgram.forward` only calls the answer predictor, so the router gets
+no real training signal and would only waste search budget if included. The result is
+spliced into a fresh `RAGProgram` before saving.
+
 Save the result to `COMPILED_PROGRAM_PATH`. Also write `eval/results/optimize_log.json`
 with per trial scores and the winning instruction text, because the README needs to show
-the reviewer what the optimizer actually changed.
+what the optimizer actually changed.
 
-`optimize.py` MUST print an estimated request count before it starts and require an
-explicit confirmation flag to proceed, so the user does not accidentally exhaust the
-daily quota.
-
-## 10. Evaluation, the priority deliverable
+## 10. Evaluation
 
 `data/trainset.csv` is the single source of truth. Columns:
 
@@ -439,14 +414,13 @@ converts `train` rows into DSPy examples.
   `answerable=true` rows.
 - Answer exact page overlap.
 
-**Group 2, RAGAS, expensive.** `eval/metrics_ragas.py`. Faithfulness, answer relevancy,
+**Group 2, RAGAS.** `eval/metrics_ragas.py`. Faithfulness, answer relevancy,
 context precision, context recall. Runs on `JUDGE_MODEL` with the judge API key.
-Defaults to a subset of 25 dev questions, size controlled by a flag.
+Defaults to a subset of dev questions, size controlled by a flag.
 Context precision and recall depend only on retrieval, so cache and reuse them across
 configurations that share a retrieval setup. Configs C and D share retrieval, compute once.
 
-**Group 3, production and latency.** `eval/metrics_latency.py`. This group exists to
-make an honest case about serving on a free tier, so measure and report:
+**Group 3, production and latency.** `eval/metrics_latency.py`. This group measures:
 - Time to first token, p50 and p95.
 - Total wall clock, p50 and p95.
 - Per stage latency breakdown, mean and p95: query embedding, dense search, sparse
@@ -455,9 +429,7 @@ make an honest case about serving on a free tier, so measure and report:
   scaled to zero. Report warm and cold as distinct numbers, never blended.
 - Tokens per second on the output stream.
 - Input and output tokens per query, mean.
-- Requests consumed per query, so the daily throughput ceiling can be derived.
-- Estimated cost per thousand queries at the published paid tier rate, alongside the
-  free tier cost of zero.
+- Estimated cost per thousand queries at the published paid tier rate.
 
 `eval/run_eval.py` runs one or more named configurations, writes
 `eval/results/{config}_{timestamp}.json` with full per question records, and prints a
@@ -474,7 +446,7 @@ The four configurations:
 | `D_optimized` | Hybrid, fusion, rerank | DSPy, MIPROv2 compiled |
 
 This isolates retrieval gains from prompt optimization gains. A single before and after
-number would not, which is why the assignment is easy to answer shallowly.
+number would not, which is why a shallow evaluation misses this distinction.
 
 ## 11. Error handling
 
@@ -543,17 +515,17 @@ CORS is not needed. The page and the API share an origin. Do not add CORS middle
 | `GET` | `/trace/{request_id}` | Full stored trace as JSON |
 | `GET` | `/program` | Active DSPy instruction text and demonstration count |
 | `GET` | `/configs` | The four ablation config names and their settings |
+| `GET` | `/metrics` | Latest eval, latency, and optimizer result files |
 | `GET` | `/` | `app/static/index.html` |
 
 `GET /healthz` returns the git commit hash, the resolved model IDs, `EMBED_DIM`, the
-cached chunk count, whether the compiled artifact was found, and the reranker provider.
-This doubles as the post deploy smoke test target, so it MUST fail with a non 200 status
-when the chunk count is zero or the database is unreachable.
+cached chunk count, and whether the compiled artifact was found. This doubles as the
+post deploy smoke test target, so it MUST fail with a non 200 status when the chunk
+count is zero or the database is unreachable.
 
-`GET /program` exists so the UI can show the reviewer the instruction that MIPROv2
-actually produced. Return the instruction text for each predictor, the number of
-demonstrations attached, and whether the program in use is compiled or not. This is a
-small endpoint that carries a lot of the assignment's weight.
+`GET /program` exists so the UI can show the instruction that MIPROv2 actually produced.
+Return the instruction text for each predictor, the number of demonstrations attached,
+and whether the program in use is compiled or not.
 
 `POST /ask` request body:
 
@@ -607,11 +579,9 @@ the classic cause of a stream that appears to hang.
 Never abandon the connection mid stream, because the client cannot distinguish that from
 a network failure.
 
-### 12.4 Ordering, the trace write, and Cloud Run CPU throttling
+### 12.4 Ordering and the trace write
 
-Cloud Run does not guarantee CPU outside of request processing. A task spawned to run
-after the response closes may be throttled or never scheduled. Therefore, inside the
-`/ask` handler and before the `done` event is emitted:
+Inside the `/ask` handler and before the `done` event is emitted:
 
 1. Stream all `token` events.
 2. Run citation validation.
@@ -624,20 +594,18 @@ but they happen inside the request, so they are guaranteed to execute. A trace w
 failure MUST be logged and swallowed. It MUST NEVER prevent the `done` event.
 
 Handle client disconnection. If the client goes away mid stream, cancel the generation
-rather than continuing to consume quota for an answer nobody will read. Catch
-`asyncio.CancelledError`, log it, attempt the trace write with `abandoned=True` recorded
-in the `error` column, and re raise.
+rather than continuing needlessly. Catch `asyncio.CancelledError`, log it, attempt the
+trace write with `abandoned=True` recorded in the `error` column, and re raise.
 
 ### 12.5 `app/static/index.html`
 
 One file. Inline `<style>` and inline `<script>`. No external requests of any kind, no
-CDN, no fonts, no images. Vanilla JavaScript only. Roughly 200 lines including styles.
+CDN, no fonts, no images. Vanilla JavaScript only.
 
 **Streaming client.** Do not use `EventSource`. It cannot send a POST body, and it
 automatically reconnects when a stream ends, which on this project would silently re run
-the query and consume the daily request quota a second time. Use `fetch` with a POST
-body, read `response.body.getReader()`, decode with `TextDecoder`, and parse SSE frames
-manually:
+the query. Use `fetch` with a POST body, read `response.body.getReader()`, decode with
+`TextDecoder`, and parse SSE frames manually:
 
 - Keep a string buffer. Append each decoded chunk.
 - Split the buffer on a double newline. Process every complete frame, retain the trailing
@@ -653,11 +621,10 @@ manually:
    informational, generated from a single reference manual, and not professional tax
    advice.
 2. A short note stating that each query is handled independently and there is no
-   conversation memory. This is an assignment requirement, so make it visible rather
-   than burying it.
+   conversation memory.
 3. A config selector, populated from `GET /configs`, defaulting to `D_optimized`. Label
-   it clearly as an ablation switch. This lets the reviewer see the difference between
-   configurations live instead of taking the README table on faith.
+   it clearly as an ablation switch, so the difference between configurations is visible
+   live instead of only in a README table.
 4. A textarea for the question and a submit button. Enter submits, shift and enter
    inserts a newline.
 5. A status line driven by which events have arrived: routing, then retrieving, then
@@ -674,8 +641,7 @@ manually:
     - Route and any sub queries.
     - A candidates table with columns for page range, heading path, dense rank, sparse
       rank, fusion score, and rerank score. Mark the rows that survived into the final
-      context. Seeing which chunks the reranker promoted or dropped is the clearest
-      possible evidence that hybrid retrieval is doing real work.
+      context.
     - The per stage latency breakdown as a simple bar or a table.
     - Input and output token counts.
     - The active instruction text from `GET /program`, fetched once on page load.
@@ -696,9 +662,9 @@ mismatches a redeployed API.
 ## 13. Deployment
 
 One Cloud Run service named `rag`, in region `asia-south1`, deployed from one Dockerfile
-by one GitHub Actions workflow. The Supabase project MUST be in the geographically
-matching region. Colocating the application and the database is the single largest latency
-lever available on a free tier, larger than any code optimization in this project.
+by one GitHub Actions workflow. The Supabase project is in the geographically matching
+region. Colocating the application and the database is the single largest latency
+lever available, larger than any code optimization in this project.
 
 ### 13.1 Dockerfile
 
@@ -717,20 +683,18 @@ Use uvicorn directly with a single worker. Cloud Run scales by adding instances,
 multiple workers inside one container just multiply memory for no throughput gain.
 
 MUST NOT be installed: `torch`, `transformers`, `sentence-transformers`, `ragas`,
-`datasets`, `langchain-core`, `streamlit`, `pymupdf`. Ingestion and evaluation
-dependencies belong in `requirements-eval.txt` and never enter the serving image. Target
-an image under 400MB. A large image is measurable cold start latency, and the Artifact
-Registry free storage allowance is small enough that bloated images will exhaust it.
+`langchain-core`, `streamlit`, `pymupdf`. Ingestion and evaluation dependencies belong
+in `requirements-eval.txt` and never enter the serving image. Target an image under
+400MB. A large image is measurable cold start latency.
 
 Deviation, deliberate: `tiktoken` DOES enter the serving image, as an unavoidable
-transitive dependency of `dspy` via `litellm`, exactly analogous to the
-`langchain-core`-via-`ragas` carve out already written into section 2. It is a small
-pure tokenizer library with no model weights, not one of the heavy libraries this rule
-actually exists to exclude. See the note in `requirements.txt`.
+transitive dependency of `dspy` via `litellm`. It is a small pure tokenizer library
+with no model weights, not one of the heavy libraries this rule actually exists to
+exclude.
 
 `.dockerignore` MUST exclude `data/`, `eval/`, `ingest/`, `tests/`, `scripts/`, `.git`,
-`.github`, `__pycache__`, `*.pyc`, `.env`, `.venv`, and every markdown file except none.
-The PDF is hundreds of megabytes and MUST NEVER enter the build context.
+`.github`, `__pycache__`, `*.pyc`, `.env`, `.venv`. The PDF is hundreds of megabytes and
+MUST NEVER enter the build context.
 
 ### 13.2 Service configuration
 
@@ -741,16 +705,16 @@ The PDF is hundreds of megabytes and MUST NEVER enter the build context.
 | CPU | 1 | |
 | Startup CPU boost | enabled | Directly reduces cold start, no ongoing cost |
 | Concurrency | 20 | Requests are IO bound |
-| Min instances | 0 | Free tier requirement, accept the cold start |
-| Max instances | 3 | Caps runaway cost and protects the daily API quota |
+| Min instances | 0 | Accepts a cold start in exchange for zero idle cost |
+| Max instances | 3 | Caps runaway cost |
 | Request timeout | 120s | Well above the worst realistic request |
 | Ingress | all | |
-| Authentication | allow unauthenticated | The reviewer must open a URL and have it work |
+| Authentication | allow unauthenticated | Public demo |
 
-Note in the README that min instances of zero is a deliberate free tier choice, that it is
-the sole cause of the cold start figure in the latency table, and that setting it to one
-eliminates that figure at a small monthly cost. Reporting cold start honestly and
-explaining its cause reads far better than blending it into the warm numbers.
+Min instances of zero is a deliberate choice: it is the sole cause of the cold start
+figure in the latency table, and setting it to one eliminates that figure at a small
+monthly cost. Reporting cold start honestly and explaining its cause reads far better
+than blending it into the warm numbers.
 
 ### 13.3 Configuration and secrets
 
@@ -758,32 +722,30 @@ Secrets live in Google Secret Manager and are mounted as environment variables b
 Run, so application code reads them from the environment exactly as it does locally and
 `app/config.py` needs no special case.
 
-Store as secrets: `GEMINI_API_KEY_TASK`, `GEMINI_API_KEY_JUDGE`, `DATABASE_URL`, and
-`RERANK_API_KEY` when a hosted reranker is used. Grant the Cloud Run runtime service
-account the Secret Manager secret accessor role on each one. Secret values MUST NEVER
-appear in the workflow file, in the repository, or in deploy logs.
+Store as secrets: `GEMINI_API_KEY_TASK`, `GEMINI_API_KEY_JUDGE`, `DATABASE_URL`.
+Grant the Cloud Run runtime service account the Secret Manager secret accessor role on
+each one. Secret values MUST NEVER appear in the workflow file, in the repository, or
+in deploy logs.
 
-Non secret configuration is set as plain environment variables in the deploy step:
-`EMBED_MODEL`, `EMBED_DIM`, `TASK_MODEL`, `JUDGE_MODEL`, `RERANK_PROVIDER`,
-`RETRIEVAL_FLOOR`, `COMPILED_PROGRAM_PATH`, and `GIT_SHA`.
-
-Set the complete environment variable list in the deploy step every time, and treat the
-workflow file as the single source of truth. The `set-env-vars` flag replaces the entire
-set rather than merging into it, so a value that exists only because someone typed it into
-the console will vanish on the next deploy without any error. Never configure anything by
-hand in the console.
+Non secret environment variables (`EMBED_MODEL`, `EMBED_DIM`, `TASK_MODEL`,
+`JUDGE_MODEL`, `RETRIEVAL_FLOOR`, `COMPILED_PROGRAM_PATH`, `GIT_SHA`) and all secrets
+are currently managed by hand on the Cloud Run service in the GCP console, not by the
+workflow file's `--set-env-vars`/`--set-secrets` flags. This is a deliberate deviation
+from having the workflow file be the single source of truth: `gcloud run deploy`
+without those flags leaves whatever is already configured on the service untouched, so
+console-set values persist across deploys as long as the deploy step never adds those
+flags back.
 
 ### 13.4 The compiled program artifact
 
 `artifacts/compiled_program.json` is committed to the repository and baked into the image.
 It is a build input, not runtime state.
 
-Consequences to accept deliberately: the artifact does not exist during the first
-deployment, so the service MUST start correctly without it and fall back to the
-uncompiled program, with `/healthz` reporting `compiled: false`. After the MIPROv2 run
-produces the artifact, commit it and redeploy. That redeploy is the moment configuration
-`D_optimized` becomes live, and it should be a distinct commit with a clear message so the
-before and after state is legible in the git history.
+The service starts correctly without it and falls back to the uncompiled program, with
+`/healthz` reporting `compiled: false`. After a MIPROv2 run produces the artifact,
+commit it and redeploy. That redeploy is the moment configuration `D_optimized`
+becomes live, and it should be a distinct commit with a clear message so the before and
+after state is legible in the git history.
 
 Do not fetch the artifact from object storage at startup. That adds a network call to
 cold start and a failure mode, to solve a problem this project does not have.
@@ -792,23 +754,17 @@ cold start and a failure mode, to solve a problem this project does not have.
 
 `.github/workflows/deploy.yml`. Triggers on push to `main` when `app/`, `artifacts/`,
 `requirements.txt`, `Dockerfile`, or the workflow itself changes, and on manual dispatch.
-Ignore pushes that only touch markdown, `eval/`, `ingest/`, or `data/`, so filling out the
-trainset does not trigger a deploy.
 
 Steps:
 
 1. Checkout.
-2. Authenticate to Google Cloud. Prefer Workload Identity Federation, which needs no
-   long lived key. A service account JSON key in a repository secret is the pragmatic
-   fallback if federation setup is fighting you on a deadline. If you take the fallback,
-   say so in the README under tradeoffs rather than leaving it unmentioned.
+2. Authenticate to Google Cloud via Workload Identity Federation.
 3. Configure Docker authentication for Artifact Registry.
 4. Build, tagging the image with both the short commit SHA and `latest`. Pass the commit
    SHA in as a build argument so `/healthz` can report it. Never deploy an image
    referenced only by `latest`, because you lose the ability to identify what is running.
 5. Push.
-6. Deploy to Cloud Run with the settings in 13.2, the secret references from 13.3, and
-   the full environment variable list.
+6. Deploy to Cloud Run with the settings in 13.2.
 7. Smoke test. Curl `/healthz` on the returned service URL, parse the JSON, and fail the
    job unless the chunk count is greater than zero, the commit SHA matches the one just
    built, and every model ID is non empty. A deploy that reports success while the
@@ -818,96 +774,60 @@ Steps:
 Concurrency: cancel any in progress run for the same ref, so a rapid second push does not
 race the first deploy.
 
-Cloud Run keeps every revision, so rollback is redirecting traffic to a previous revision
-rather than rebuilding. Document that one line in the README.
+Cloud Run keeps every revision, so rollback is redirecting traffic to a previous
+revision rather than rebuilding.
 
-### 13.6 Cold start, measured and mitigated
+### 13.6 Cold start
 
-Mitigations already covered above: startup CPU boost enabled, image under 400MB, no torch,
-no work at import time, and the pool warmed during lifespan rather than on the first
-request.
+Mitigations: startup CPU boost enabled, image under 400MB, no torch, no work at import
+time, and the pool warmed during lifespan rather than on the first request.
 
-Measure cold start explicitly. `eval/metrics_latency.py` MUST have a mode that forces a
-cold path: wait out the scale to zero interval, issue one request, record time to first
-byte and time to first token, and repeat at least five times. Report those numbers as
-their own row, clearly labelled, never averaged together with warm requests. Blending the
-two produces a p95 that describes nothing real.
+Measure cold start explicitly. `eval/metrics_latency.py` has a mode that forces a cold
+path: wait out the scale to zero interval, issue one request, record time to first byte
+and time to first token, and repeat at least five times. Report those numbers as their
+own row, clearly labelled, never averaged together with warm requests.
 
 Document, but do not automate, the optional Cloud Scheduler warm ping: a job hitting
-`/healthz` every 5 minutes keeps one instance warm and the free tier covers a few jobs.
-Leave it as a documented option so the measured cold start numbers in the README stay
-honest.
+`/healthz` every 5 minutes keeps one instance warm at a small ongoing cost.
 
 ### 13.7 Local parity
 
 `docker build` then `docker run` with an env file and `PORT` set MUST produce a working
-service identical to the deployed one. Include the two commands in the README quick start.
-If the container works locally and fails on Cloud Run, the difference is configuration,
-and the smoke test in step 7 is what tells you that within a minute instead of an hour.
-
+service identical to the deployed one. Include the two commands in the README quick
+start. If the container works locally and fails on Cloud Run, the difference is
+configuration, and the smoke test in step 7 is what tells you that within a minute
+instead of an hour.
 
 ## 14. README requirements
 
-The README is graded. It MUST contain, in this order:
+The README is the primary document a reader sees first. It MUST contain:
 
-1. What the system does, in three sentences.
-2. Architecture diagram as a mermaid block.
-3. Quick start, both local and deployed URLs.
+1. What the system does, in plain language, near the top.
+2. A live link and a quick start (local and deployed).
+3. Architecture diagram as a mermaid block.
 4. The four configuration ablation table with real measured numbers.
 5. The production and latency table, warm and cold reported separately, with an honest
-   paragraph on which numbers are free tier artefacts and which are architectural.
+   paragraph on which numbers are Cloud Run scale-to-zero artefacts and which are
+   architectural.
 6. Optimizer section: which optimizer, why that one, what the alternatives would have
    traded off, the composite metric definition, the before and after instruction text,
    and the per trial score curve.
 7. Modern techniques implemented, one short paragraph each.
-8. Design tradeoffs, explicitly including why the reranker is a hosted API rather than a
-   local cross encoder, and what would change with a paid tier.
+8. Design tradeoffs, explicitly including why the reranker is an LLM call rather than a
+   local cross encoder, and what would change with a different reranker provider.
 9. Known limitations and what would be built next with more time. Be specific and honest.
    A named weakness reads better than a silent one.
 
 Placeholders for unmeasured numbers MUST be written as `TBD` and never as invented values.
 
-## 15. Build order
-
-Do not attempt the whole repository in one pass. Work in these phases, and stop at each
-checkpoint for the user to verify before continuing.
-
-**Phase 1, foundation. COMPLETE.** `config.py`, `errors.py`, `db.py`, `llm.py`,
-`sql/schema.sql`, `requirements*.txt`, `.env.example`, `scripts/check_dspy_stream.py`,
-the full `ingest/` package, and `tests/test_chunk.py`. (`tests/test_normalize.py` was
-dropped, see embedding rule 3.)
-Checkpoint passed: 2373 chunks ingested and fully embedded, 7 of 1321 pages (0.5 percent)
-suspected scanned, no OCR needed. Schema lives under a `vidhi` Postgres schema rather
-than `public`, see section 5.
-
-**Phase 2, retrieval and generation. START HERE.** `retrieve.py`, `rerank.py`, `programs.py`,
-`guardrails.py`, `trace.py`, `pipeline.py`, `tests/test_fusion.py`,
-`tests/test_guardrails.py`, and a command line entry point that answers one question and
-prints the full trace.
-Checkpoint: the user asks three real questions and confirms the citations point at
-correct pages.
-
-**Phase 3, evaluation and serving.** All of `eval/`, `api.py`, `streamlit_app.py`,
-Dockerfiles, the GitHub Actions workflow, and the README skeleton with `TBD` placeholders.
-Checkpoint: `run_eval.py` completes for configs A and B on the dev split.
-
-Within a phase, work file by file. After each file, state in one line what it does and
-what it assumes about the files not yet written.
-
-## 16. When you are unsure
+## 15. When you are unsure
 
 If an external library API is uncertain, write the smallest possible script that
-exercises it, run it, and report the result. Do not write fifteen files on top of an
+exercises it, run it, and report the result. Do not write many files on top of an
 unverified assumption. If a decision in this document conflicts with something you
 discover while running code, stop and report the conflict rather than silently choosing.
 
-## 17. Phase 1 outcomes and deviations, read before starting Phase 2
-
-Phase 1 is complete. The database has 2373 embedded chunks under a `vidhi` schema.
-Everything below is either a confirmed fact about this specific document and this
-specific infrastructure, or a deliberate deviation from an earlier section of this
-document, made after the deviation was surfaced and approved. Phase 2 code MUST be
-consistent with these, not with the sections they override.
+## 16. Confirmed facts and deviations, read before making changes
 
 - **Schema location.** Tables are `vidhi.chunks` and `vidhi.traces`, not `public.*`.
   Every query in `app/db.py` qualifies the schema explicitly. See section 5.
@@ -919,26 +839,24 @@ consistent with these, not with the sections they override.
   not batch multiple documents into one `embed_content` call despite its own SDK
   documented example implying it does. See embedding rule 4 in section 3.
 - **`tiktoken` ships in the serving image.** Accepted transitive dependency of `dspy`
-  via `litellm`, same treatment as the `langchain-core`-via-`ragas` carve out. See
-  section 13.1.
+  via `litellm`. See section 13.1.
 - **Supabase pooler does not reliably carry session state or make a write on one
   pooled connection immediately visible to a read on another pooled connection.**
   Two consequences for any new code that reads then writes, or writes then
   immediately reads, in a loop: hold one connection with `pool.acquire()` for the
   whole loop rather than acquiring per statement, and never rely on `search_path`,
-  qualify table names explicitly instead. This bit `ingest/embed.py` twice during
-  Phase 1, once for `search_path` and once for read-after-write visibility on the
-  resumability check.
-- **Chunking is tuned to this book's real structure**, not the generic regex list
-  originally in section 6. Read the comment block at the top of `ingest/chunk.py`
-  before assuming `Section N` or `Rule N` mean anything structural in this document,
-  they do not, they are inline citations.
-- **DSPy streaming works correctly** for realistic length answers (confirmed with an
-  18 chunk stream on a 300 word answer). A trivially short answer can arrive as zero or
-  one `StreamResponse` events before the final `Prediction`, this is a Gemini API
-  nuance, not a bug, do not add a workaround for it. See `scripts/check_dspy_stream.py`.
-- **Two Google Cloud projects, two Gemini API keys.** Free tier daily call quota is a
-  low four figure number per key, shared across the whole project on that key. Prefer
-  code that can accept a key override for a one off run, the way `ingest/embed.py`
-  accepts `--api-key`, over code that only ever reads `GEMINI_API_KEY_TASK` from the
-  environment, so a quota exhausted mid task is not a full stop.
+  qualify table names explicitly instead.
+- **Chunking is tuned to this book's real structure**, not a generic regex list.
+  Read the comment block at the top of `ingest/chunk.py` before assuming `Section N`
+  or `Rule N` mean anything structural in this document, they do not, they are inline
+  citations.
+- **DSPy streaming works correctly** for realistic length answers. A trivially short
+  answer can arrive as zero or one `StreamResponse` events before the final
+  `Prediction`, this is a Gemini API nuance, not a bug, do not add a workaround for
+  it. See `scripts/check_dspy_stream.py`.
+- **MIPROv2 optimizes only the `answer` predictor** of `RAGProgram`, compiled in
+  isolation as a bare `ChainOfThought(AnswerFromManual)`, then spliced into a fresh
+  `RAGProgram` before saving. See section 9.
+- **The single reranker backend is a listwise LLM call** on `TASK_MODEL`. There is no
+  separate hosted reranker integration; see the tradeoffs section of the README for
+  what a hosted cross encoder would change.

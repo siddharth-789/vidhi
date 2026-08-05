@@ -1,4 +1,4 @@
-"""Loads and validates data/trainset.csv, see CLAUDE.md section 10.
+"""Loads and validates data/trainset.csv.
 
 trainset.csv is the single source of truth for evaluation. This module fails loudly
 on malformed rows rather than silently skipping them, since a silently dropped row
@@ -29,11 +29,13 @@ _REQUIRED_COLUMNS = {
 
 
 class DatasetError(Exception):
-    """A row in trainset.csv is malformed. Fails loudly, see CLAUDE.md section 10."""
+    """A row in trainset.csv is malformed. Raised loudly rather than skipped."""
 
 
 @dataclass(frozen=True)
 class EvalExample:
+    """One question from trainset.csv, with its gold answer and metadata."""
+
     id: str
     question: str
     gold_answer: str
@@ -44,6 +46,8 @@ class EvalExample:
 
 
 def _parse_bool(raw: str, row_id: str) -> bool:
+    """Parse a 'true'/'false' string, raising DatasetError on anything else."""
+
     normalized = raw.strip().lower()
     if normalized == "true":
         return True
@@ -53,6 +57,9 @@ def _parse_bool(raw: str, row_id: str) -> bool:
 
 
 def _parse_gold_pages(raw: str, row_id: str, answerable: bool) -> list[int]:
+    """Parse a semicolon-separated list of page numbers. Answerable rows must have
+    at least one gold page."""
+
     raw = raw.strip()
     if not raw:
         if answerable:
@@ -65,6 +72,9 @@ def _parse_gold_pages(raw: str, row_id: str, answerable: bool) -> list[int]:
 
 
 def load_trainset(path: str | Path = "data/trainset.csv") -> list[EvalExample]:
+    """Load and validate every row of trainset.csv, raising DatasetError on the
+    first malformed row found."""
+
     path = Path(path)
     if not path.exists():
         raise DatasetError(f"trainset not found at {path}")
@@ -117,11 +127,13 @@ def load_trainset(path: str | Path = "data/trainset.csv") -> list[EvalExample]:
 
 
 def filter_split(examples: list[EvalExample], split: str) -> list[EvalExample]:
+    """Return only the rows belonging to one split ('train' or 'dev')."""
+
     return [e for e in examples if e.split == split]
 
 
 def to_dspy_examples(examples: list[EvalExample]) -> list:
-    """Converts train split rows into DSPy examples for the optimizer, see section 9.
+    """Convert train split rows into DSPy examples for the optimizer.
 
     Imports dspy lazily so eval/dataset.py stays importable without dspy installed,
     for callers that only need CSV validation.

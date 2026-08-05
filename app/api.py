@@ -1,8 +1,8 @@
-"""FastAPI app, the only exception boundary in the project, see CLAUDE.md section 12.
+"""FastAPI app: the HTTP surface of the project, and its one exception boundary.
 
-One service serves the JSON and SSE API and the single static HTML page. Lifespan
-handles startup validation, pool creation, pool warming, and compiled program loading,
-all before the first request, per section 12.1.
+One service serves the JSON and SSE API and the single static HTML page. The lifespan
+context manager handles startup validation, database pool creation and warming, and
+compiled DSPy program loading, all before the first request is served.
 """
 
 from __future__ import annotations
@@ -39,6 +39,8 @@ _state: dict[str, Any] = {}
 
 
 def _git_commit_hash() -> str:
+    """Resolve the running commit hash, preferring the build-time GIT_SHA env var."""
+
     env_sha = os.environ.get("GIT_SHA")
     if env_sha:
         return env_sha
@@ -55,6 +57,9 @@ def _git_commit_hash() -> str:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Validate config, open and warm the database pool, load DSPy LMs and the
+    compiled program if present, and cache the chunk count, all before serving."""
+
     config = get_config()
     require_serving_config(config)
 
@@ -103,10 +108,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     )
 
     logger.info(
-        "startup complete: chunk_count=%d compiled_loaded=%s reranker=%s",
+        "startup complete: chunk_count=%d compiled_loaded=%s",
         chunk_count,
         compiled_loaded,
-        config.rerank_provider,
     )
 
     yield
@@ -118,6 +122,8 @@ app = FastAPI(title="Bharat's GST Smart Guide RAG", lifespan=lifespan)
 
 
 class AskRequest(BaseModel):
+    """Request body for POST /ask: the question plus which ablation config to use."""
+
     question: str = Field(..., min_length=1, max_length=1000)
     config: str
 
@@ -137,11 +143,18 @@ class AskRequest(BaseModel):
 
 
 def _sse_frame(event: str, data: dict[str, Any]) -> str:
+    """Format one Server-Sent Events frame. JSON must stay single-line: an embedded
+    newline inside data: would break the frame."""
+
     payload = json.dumps(data, separators=(",", ":"))
     return f"event: {event}\ndata: {payload}\n\n"
 
 
 async def _event_stream(question: str, config_name: str) -> AsyncIterator[str]:
+    """Run the pipeline and translate each PipelineEvent into an SSE frame, inserting
+    a heartbeat comment if more than 10 seconds pass with no event (keeps proxies
+    from timing out an idle connection while reranking or generation is slow)."""
+
     config: Config = _state["config"]
     pool: asyncpg.Pool = _state["pool"]
     pipeline_config = CONFIGS[config_name]
@@ -213,6 +226,8 @@ async def _event_stream(question: str, config_name: str) -> AsyncIterator[str]:
 
 @app.post("/ask")
 async def ask(request: AskRequest) -> StreamingResponse:
+    """Stream an answer to one question as Server-Sent Events."""
+
     return StreamingResponse(
         _event_stream(request.question, request.config),
         media_type="text/event-stream",
@@ -226,6 +241,10 @@ async def ask(request: AskRequest) -> StreamingResponse:
 
 @app.get("/healthz")
 async def healthz() -> JSONResponse:
+    """Liveness check: reports model IDs, chunk count, and whether the compiled
+    program was found. Fails with a non-200 status if the database is unreachable or
+    no chunks are loaded, so this doubles as the post-deploy smoke test target."""
+
     config: Config = _state.get("config")
     pool: asyncpg.Pool | None = _state.get("pool")
 
@@ -245,7 +264,6 @@ async def healthz() -> JSONResponse:
         "embed_dim": config.embed_dim,
         "chunk_count": chunk_count,
         "compiled": _state.get("compiled_loaded", False),
-        "rerank_provider": config.rerank_provider,
     }
 
     if chunk_count == 0:
@@ -256,6 +274,8 @@ async def healthz() -> JSONResponse:
 
 @app.get("/trace/{request_id}")
 async def get_trace_endpoint(request_id: str) -> JSONResponse:
+    """Return the full stored trace for one past request, for debugging and demos."""
+
     try:
         parsed_id = uuid.UUID(request_id)
     except ValueError:
@@ -271,6 +291,10 @@ async def get_trace_endpoint(request_id: str) -> JSONResponse:
 
 @app.get("/program")
 async def get_program() -> JSONResponse:
+    """Return the currently active instruction text and demo count for each DSPy
+    predictor, so a reader can see exactly what the optimizer produced (or, if
+    nothing is compiled yet, the original hand-written instructions)."""
+
     compiled_rag_program = _state.get("compiled_rag_program")
     compiled_loaded = _state.get("compiled_loaded", False)
 
@@ -299,6 +323,8 @@ async def get_program() -> JSONResponse:
 
 @app.get("/configs")
 async def get_configs() -> JSONResponse:
+    """List the four ablation configs and their flags, for the UI's config selector."""
+
     return JSONResponse(
         content={
             name: {
@@ -316,11 +342,15 @@ _RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "eval", 
 
 
 def _latest_result_file(config_name: str) -> str | None:
+    """Find the most recently written eval result file for one config, if any."""
+
     matches = sorted(glob.glob(os.path.join(_RESULTS_DIR, f"{config_name}_*.json")))
     return matches[-1] if matches else None
 
 
 def _nan_to_none(value: Any) -> Any:
+    """Recursively convert NaN floats to null, since JSON has no NaN literal."""
+
     if isinstance(value, float) and value != value:
         return None
     if isinstance(value, dict):
@@ -337,6 +367,9 @@ def _load_json(path: str) -> Any:
 
 @app.get("/metrics")
 async def get_metrics() -> JSONResponse:
+    """Serve the latest eval, latency, and optimizer result files as one JSON blob,
+    for the metrics dashboard page."""
+
     configs: dict[str, Any] = {}
     for name in CONFIGS:
         config_entry: dict[str, Any] = {}
@@ -373,6 +406,9 @@ async def get_metrics() -> JSONResponse:
 
 @app.get("/", response_class=HTMLResponse)
 async def index() -> HTMLResponse:
+    """Serve the single-page UI, with no-cache so a redeploy is never masked by a
+    stale cached page."""
+
     html_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -384,7 +420,7 @@ app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__
 
 @app.exception_handler(Exception)
 async def _exception_boundary(request: Request, exc: Exception) -> JSONResponse:
-    """The one exception boundary in the project, see CLAUDE.md section 12.1.
+    """The one exception boundary in the project.
 
     Maps typed exceptions to status codes and always returns a structured JSON body
     carrying request_id, so a client-visible error is never an opaque 500 with no

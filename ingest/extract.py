@@ -5,7 +5,7 @@ Writes data/pages.jsonl, one JSON object per page: page, text, char_count.
 
 A page with fewer than 100 characters of text is logged as a suspected scanned page.
 If more than 5 percent of pages are suspect, a loud warning is printed telling the
-user OCR may be needed. OCR itself is out of scope, see CLAUDE.md section 6.
+user OCR may be needed. OCR itself is not implemented here.
 """
 
 from __future__ import annotations
@@ -25,6 +25,8 @@ _SUSPECT_RATIO_WARNING = 0.05
 
 
 def extract_pages(pdf_path: Path) -> list[dict]:
+    """Extract raw text from every page of the PDF."""
+
     doc = pymupdf.open(pdf_path)
     pages = []
     try:
@@ -44,6 +46,8 @@ def extract_pages(pdf_path: Path) -> list[dict]:
 
 
 def write_pages_jsonl(pages: list[dict], out_path: Path) -> None:
+    """Write one JSON object per page to out_path."""
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as f:
         for page in pages:
@@ -51,6 +55,9 @@ def write_pages_jsonl(pages: list[dict], out_path: Path) -> None:
 
 
 def summarize_suspected_scanned_pages(pages: list[dict]) -> int:
+    """Print a count of pages that look scanned (very little extracted text) and warn
+    loudly if more than 5 percent of the document is affected."""
+
     suspect_pages = [p["page"] for p in pages if p["char_count"] < _SUSPECT_CHAR_THRESHOLD]
     for page_num in suspect_pages:
         logger.info("page %d has fewer than %d characters, suspected scanned page",
@@ -64,12 +71,14 @@ def summarize_suspected_scanned_pages(pages: list[dict]) -> int:
         print(
             "WARNING: more than 5 percent of pages are suspected scanned pages. "
             "OCR may be needed before ingestion continues. This project does not "
-            "implement OCR, see CLAUDE.md section 6."
+            "implement OCR."
         )
     return suspect_count
 
 
 def main(pdf_path_arg: str | None = None, out_path_arg: str | None = None) -> None:
+    """Extract every page's text from the PDF and write it to pages.jsonl."""
+
     logging.basicConfig(level=logging.INFO)
     pdf_path = Path(pdf_path_arg or "data/manual.pdf")
     out_path = Path(out_path_arg or "data/pages.jsonl")

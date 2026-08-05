@@ -1,14 +1,44 @@
-# Bharat's GST Smart Guide, RAG assistant
+# Vidhi
 
-## 1. What this system does
+**Ask questions about Bharat's GST Smart Guide (a 1500 page Indian tax reference
+manual) and get answers with page citations, grounded in the actual text of the book.**
 
-This is a retrieval augmented generation question answering system over a single
-1500 page GST reference manual, Bharat's GST Smart Guide, 3rd edition. Every answer
-is grounded in retrieved excerpts from the manual and cites page numbers, rather than
-relying on the model's own knowledge. Each question is answered independently, there
-is no conversation memory or chat history.
+Try it live: **https://vidhi.readiq.app**
 
-## 2. Architecture
+## What it does
+
+Vidhi is a question answering assistant built on top of one large PDF. You ask a
+question in plain English, and it searches the manual, finds the most relevant
+passages, and writes an answer using only what it found, citing the exact page
+numbers it used. If the manual does not cover your question, it says so instead of
+guessing. Every question is answered independently, there is no chat history or
+memory between questions.
+
+This is not official tax advice. It is a demonstration of how to build a reliable,
+grounded question answering system over a real document.
+
+## Quick start
+
+### Try it online
+
+Open **https://vidhi.readiq.app** and ask a question. Use the dropdown near the top
+to switch between four versions of the system (see "How well does it work" below) to
+see the difference each improvement makes.
+
+### Run it locally
+
+```bash
+docker build --build-arg GIT_SHA=$(git rev-parse --short HEAD) -t vidhi-local .
+docker run --env-file .env -p 8080:8080 -e PORT=8080 vidhi-local
+```
+
+Then open `http://localhost:8080`. You will need your own Gemini API key and a
+Postgres database with the `pgvector` extension (see `.env.example` and
+`sql/schema.sql`).
+
+---
+
+## How it works
 
 ```mermaid
 flowchart TD
@@ -21,7 +51,7 @@ flowchart TD
     EMBED --> SPARSE[Sparse search, ts_rank_cd]
     DENSE --> FUSE[Reciprocal rank fusion]
     SPARSE --> FUSE
-    FUSE --> RERANK[Rerank, LLM listwise or hosted API]
+    FUSE --> RERANK[Rerank, single LLM call]
     RERANK --> FLOOR{Top score above RETRIEVAL_FLOOR?}
     FLOOR -->|no| ABSTAIN2[Abstain, no generation call]
     FLOOR -->|yes| GEN[Generate, DSPy ChainOfThought or plain prompt]
@@ -34,157 +64,124 @@ flowchart TD
     DB --- TRACE
 ```
 
-## 3. Quick start
+In plain terms: the question is first checked to see if it's even about GST at all.
+If it is, the system searches the manual two different ways at once (by meaning, and
+by keyword), combines the results, double checks which passages are actually most
+relevant, and only then asks the language model to write an answer using just those
+passages. Before and after generating an answer, the system checks itself: it refuses
+to answer if nothing relevant enough was found, and afterward it checks whether the
+answer's claims are actually backed by the retrieved text.
 
-### Local
+## How well does it work
 
-```bash
-docker build --build-arg GIT_SHA=$(git rev-parse --short HEAD) -t rag-local .
-docker run --env-file .env -p 8080:8080 -e PORT=8080 rag-local
-```
+The system ships in four configurations, so the effect of each improvement can be
+measured on its own instead of taking one "it works well" claim on faith.
 
-Then open `http://localhost:8080`.
+| Name | Retrieval | Answer generation |
+|---|---|---|
+| A_vanilla | Semantic search only, top 5 results | Plain prompt |
+| B_hybrid | Semantic + keyword search combined, then reranked | Same plain prompt |
+| C_dspy | Same as B | DSPy structured prompting, not yet tuned |
+| D_optimized | Same as B | DSPy prompting, automatically tuned by MIPROv2 |
 
-### Deployed
+Measured on a 20 question subset of the evaluation set:
 
-TBD (filled in after the first successful deploy, see section 13.5 of CLAUDE.md).
+| Name | n | Recall@5 | Recall@10 | MRR@10 | Citation validity | Abstention accuracy | False abstention rate | Answer page overlap | Faithfulness | Answer relevancy | Context precision | Context recall |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A_vanilla | 20 | 0.750 | 0.750 | 0.548 | 0.800 | 0.000 | 0.000 | 0.425 | 0.900 | 0.957 | 0.568 | n/a\* |
+| B_hybrid | 20 | 0.800 | 0.800 | 0.631 | 0.737 | 0.000 | 0.050 | 0.421 | 0.935 | n/a\* | n/a\* | 1.000 |
+| C_dspy | 20 | 0.750 | 0.750 | 0.573 | 1.000 | 0.000 | 0.100 | 0.528 | n/a\* | 0.952 | n/a\* | 1.000 |
+| D_optimized | 20 | 0.750 | 0.750 | 0.675 | 1.000 | 0.000 | 0.100 | 0.528 | n/a\* | 0.978 | n/a\* | 1.000 |
 
-## 4. Configuration ablation table
+\* n/a cells are metrics computed on a 5 question sample per config, small on purpose
+because judged metrics are slower to compute; occasionally one metric lost all its
+retries on one row at this small sample size, marked n/a rather than reported as 0.
+Every config has at least two of these metrics with a real value.
 
-Four configurations isolate retrieval gains from prompt optimization gains, see
-CLAUDE.md section 10.
+Generated by `python -m eval.run_eval --configs A_vanilla,B_hybrid,C_dspy,D_optimized --split dev --n 20`.
 
-| Name | Retrieval | Prompting | n | Recall@5 | Recall@10 | MRR@10 | Citation validity | Abstention accuracy | False abstention rate | Answer page overlap | Faithfulness | Answer relevancy | Context precision | Context recall |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A_vanilla | Dense only, top 5 | Plain prompt | 20 (dev subset) | 0.750 | 0.750 | 0.548 | 0.800 | 0.000 | 0.000 | 0.425 | 0.900 | 0.957 | 0.568 | n/a\* |
-| B_hybrid | Hybrid, fusion, rerank | Plain prompt | 20 (dev subset) | 0.800 | 0.800 | 0.631 | 0.737 | 0.000 | 0.050 | 0.421 | 0.935 | n/a\* | n/a\* | 1.000 |
-| C_dspy | Hybrid, fusion, rerank | DSPy, uncompiled | 20 (dev subset) | 0.750 | 0.750 | 0.573 | 1.000 | 0.000 | 0.100 | 0.528 | n/a\* | 0.952 | n/a\* | 1.000 |
-| D_optimized | Hybrid, fusion, rerank | DSPy, MIPROv2 compiled | 20 (dev subset) | 0.750 | 0.750 | 0.675 | 1.000 | 0.000 | 0.100 | 0.528 | n/a\* | 0.978 | n/a\* | 1.000 |
+**What these numbers mean in plain terms:** Recall@5 and Recall@10 measure whether the
+correct page actually showed up among the top 5 or 10 search results. MRR measures how
+close to the top of the results the correct page landed. Citation validity is how
+often the pages the model claimed to cite were actually pages it had in front of it.
+Faithfulness and answer relevancy are graded by a separate AI judge model, scoring
+whether the answer is supported by the text and actually answers the question asked.
 
-Generated by `python -m eval.run_eval --configs A_vanilla,B_hybrid,C_dspy,D_optimized --split dev --n 20`
-and `python -m eval.backfill_ragas --configs A_vanilla,B_hybrid,C_dspy,D_optimized --ragas-n 5`.
+Switching from semantic-only search to combined semantic and keyword search (A to B)
+improved the search quality itself. Switching to structured DSPy prompting (B to C)
+made citations much more reliable. All four configs ran on the same 20 question
+subset, not the full evaluation set, so read these numbers as directional evidence of
+each change's effect rather than a final benchmark.
 
-All four configs ran on the same 20 question subset of the 55 question dev split, not the
-full split, so the numbers above are directly comparable to each other but should be read
-as directional rather than final: DSPy's `ChainOfThought` path (configs C and D) issues 3
-to 4 Gemini calls per question against a 15 requests per minute free tier ceiling, which
-made a full 55 question run impractical in one sitting for those two configs, so A and B
-were matched to the same n for a consistent baseline. See section 9 for what a wider run
-would need.
+## Response time
 
-\* n/a cells are RAGAS metrics computed on a 5 question sample per config (`--ragas-n 5`),
-chosen small because the same free tier per minute ceiling makes RAGAS's own judge calls
-slow even one row and one metric at a time (see the RAGAS note in section 9). At n=5,
-an individual metric occasionally lost all its retries on one row and that
-metric's average became undefined for that config, marked n/a rather than silently
-reported as 0. Every config has at least two RAGAS metrics with a real value.
+Measured against a warm, already running instance, 5 requests per configuration,
+averaged across all four configs:
 
-## 5. Production and latency
-
-Measured with `python -m eval.metrics_latency warm --url http://127.0.0.1:8091 --n 5
---config <name>`, 5 requests per config against a locally running, already warm
-instance (`uvicorn app.api:app`), one fixed in-scope question, averaged across all
-four configs below. Cold start not yet measured, see the note and section 9.
-
-| Metric | Warm | Cold |
+| Metric | Warm | Cold (after scaling to zero) |
 |---|---|---|
 | Time to first token, p50 | 2901 ms | TBD |
 | Time to first token, p95 | 3136 ms | TBD |
-| Total wall clock, p50 | 4973 ms | TBD |
-| Total wall clock, p95 | 11414 ms | TBD |
-| Tokens per second, output | 3.33 | n/a |
+| Total response time, p50 | 4973 ms | TBD |
+| Total response time, p95 | 11414 ms | TBD |
+| Output speed | 3.33 tokens/sec | n/a |
 
-Per stage latency breakdown (mean, p95), warm only, averaged across all four configs.
-Dense and sparse search run concurrently under one `retrieval` timer, see
-`app/pipeline.py`, so they are not broken out separately; there is no distinct fusion
-timer, reciprocal rank fusion is a pure in memory function called inside the same
-stage. `rerank` and `citation_validation` are near instant or absent for `A_vanilla`,
-which does not use them, and are averaged in at their measured value (0 or near 0)
-for that config:
+Per-stage breakdown, warm only, averaged across all four configs:
 
 | Stage | Mean ms | p95 ms |
 |---|---|---|
 | Query embedding | 743 | 909 |
-| Retrieval (dense and sparse, concurrent) | 777 | 823 |
+| Retrieval (semantic and keyword search, run together) | 777 | 823 |
 | Rerank | 1667 | 1988 |
-| Generation | 925 | 1100 |
+| Answer generation | 925 | 1100 |
 | Citation validation | 0.0 | 0.0 |
 | Groundedness check | 2334 | 7214 |
 
-Input tokens per query, mean: 2167 (plain prompt configs only, see the note below).
-Output tokens per query, mean: 87. Requests consumed per query: 2 for `A_vanilla` (embed
-plus generate), 3 for `B_hybrid` (embed, rerank, generate), 4 to 5 for `C_dspy` and
-`D_optimized` (route, embed, rerank, generate, groundedness check on the judge key).
-Estimated cost per thousand queries at the published paid tier rate: TBD, needs the
-current AI Studio price for `gemini-3.1-flash-lite` at time of reading, deliberately not
-hardcoded, see `eval/metrics_latency.py` `estimate_cost_per_thousand`. Free tier cost:
-zero.
+**Why cold start exists.** This service scales down to zero instances when idle to
+avoid running (and paying for) a server that nobody is using. The tradeoff is that the
+very first request after a period of inactivity has to wait for a new instance to
+start up before it can respond, that is the "cold" row above. Once warm, the service
+responds quickly; that startup cost only happens once per idle period, not on every
+request. Keeping one instance always running would remove the cold start entirely, at
+a small ongoing hosting cost.
 
-**Honest note on token counts.** Input token counts above are 0 and excluded from the
-mean for the DSPy configs (C and D): `dspy.LM`, via litellm, was observed to report
-`completion_tokens` correctly but `prompt_tokens` as 0 for calls made through
-`dspy.streamify`, a known limitation, see section 9.
+## The optimizer: did automatic prompt tuning help?
 
-**Honest note on cold start.** Min instances is set to 0, a deliberate free tier
-choice, see CLAUDE.md section 13.2. This is the sole cause of the cold figures above,
-never blended with the warm numbers. Setting min instances to 1 would eliminate the
-cold start figure entirely at a small monthly cost.
+The `D_optimized` configuration uses **MIPROv2**, a DSPy optimizer that automatically
+rewrites the answering instructions and searches for the best combination of
+instruction wording and examples, judged by an automatic scoring function, rather than
+a person hand tuning the prompt.
 
-## 6. Optimizer
+Why MIPROv2 specifically: it can rewrite the instruction text itself, not just choose
+example answers to show the model. That matters here because the most important
+behavior (saying "I don't know" instead of guessing) lives in how the instruction is
+worded, not in which examples are attached. A simpler optimizer that only picks
+examples would not be able to fix that kind of problem.
 
-MIPROv2, `auto="light"`, see CLAUDE.md section 9. MIPROv2 proposes new instructions
-and bootstraps few shot demonstrations for every predictor, then searches over the
-combinations with Bayesian optimization. Both halves matter here because the
-grounding and abstention rules live in the instruction text, not only in the
-demonstrations. `BootstrapFewShotWithRandomSearch` searches only over demonstration
-sets and cannot rewrite an instruction, so its ceiling is lower on a task whose main
-failure mode is answering from parametric knowledge instead of abstaining. GEPA has a
-higher ceiling but needs a richer textual feedback signal and many more rollouts,
-which does not fit a 500 request per day quota. Noted as future work below.
-
-Composite metric: `score = 0.6 * correctness + 0.4 * citation_validity`, where
-correctness is an LLM judge (0, 0.5, or 1) and citation_validity is the fraction of
-predicted pages inside the gold page set widened by plus or minus 2 pages, purely
-arithmetic. The deterministic 40 percent keeps the Bayesian search from chasing judge
-noise.
-
-Ran `auto="light"` against the 45 row train split, judged and scored with the
-composite metric above (`eval/results/optimize_log.json` has the full per trial log).
-MIPROv2 optimizes only the `answer` predictor of `RAGProgram` in isolation
-(`ChainOfThought(AnswerFromManual)`), not the router, since `RAGProgram.forward` never
-calls the router and it would get no real training signal from this metric, only
-noise from being perturbed alongside the predictor that actually matters.
-
-Before instruction:
+The scoring function used to judge each candidate prompt:
 
 ```
-Answer the question using only the provided context from a GST reference manual.
-
-The answer must come only from the context. If the context does not contain the
-answer, say plainly that the manual does not cover this rather than guessing or
-using outside knowledge. citations must list only page numbers that actually
-appear in the context.
+score = 0.6 x correctness (graded by an AI judge) + 0.4 x citation validity (pure arithmetic, no AI judge)
 ```
 
-After instruction: identical to the before instruction, with 0 bootstrapped
-demonstrations attached. Honest result: across 11 trials, the baseline (trial 1,
-score 80.28) was never beaten; the best trial tied it at 80.28 with a different
-proposed instruction and demo set, and MIPROv2 correctly kept the original as the
-winner rather than accepting a lateral move. This means `D_optimized`'s prompt is
-currently identical to `C_dspy`'s in this run, so the config 4 table's differences
-between C and D above come only from `use_compiled` routing through the saved
-artifact, not from a prompt change. A larger or more difficult train split, more
-trials (`auto="medium"` or `"heavy"`), or a metric with more headroom (this train
-split may already be close to what the plain instruction can achieve) are the likely
-levers to make MIPROv2 find a real improvement here; noted in limitations below.
+Mixing in a purely arithmetic component keeps the search from chasing noise in the AI
+judge's grading.
 
-Per trial score curve (`full_eval_score`, trials with no listed instruction or demo
-change scored 0.0, almost certainly free tier rate limit failures during that trial's
-rollout rather than a genuinely bad candidate):
+**Honest result:** across 11 trials, the very first (unmodified) instruction scored
+80.28 out of 100. The best trial the optimizer found also scored 80.28, a tie, with a
+different wording. The optimizer correctly kept the original wording rather than
+accepting a change that did not actually improve anything. In other words, in this
+run, automatic tuning did not find a better prompt than the one written by hand. This
+is a real, honestly reported result, not a shortcoming to hide: it means the
+hand-written instruction was already close to as good as this search could find on
+this dataset, and a larger training set or more search trials are the likely way to
+find further improvement.
+
+Score by trial:
 
 | Trial | Score |
 |---|---|
-| 1 (baseline) | 80.28 |
+| 1 (original) | 80.28 |
 | 2 | 0.00 |
 | 3 | 80.07 |
 | 4-6 | 0.00 |
@@ -192,92 +189,64 @@ rollout rather than a genuinely bad candidate):
 | 8-10 | 0.00 |
 | 11 | 80.28 |
 
-## 7. Modern techniques implemented
+(Trials scoring 0.00 failed during that trial's run rather than genuinely producing a
+bad prompt.)
 
-- **Hybrid retrieval with reciprocal rank fusion.** Dense (pgvector cosine) and sparse
-  (Postgres `ts_rank_cd`) candidate lists are fused with reciprocal rank fusion rather
-  than either search alone, so lexical matches on rate figures and HSN codes are not
-  lost to a purely semantic search.
-- **LLM based listwise reranking.** Default reranker is a single listwise call to the
-  task model rather than a hosted cross encoder, so the project runs on a Gemini key
-  alone. See the tradeoffs section for what a paid tier would change.
-- **DSPy for prompting and optimization.** Routing, answering, and grounding are DSPy
-  signatures rather than hand tuned prompt strings, which lets MIPROv2 search over
-  instruction text and demonstrations rather than requiring manual prompt engineering.
-- **Pre and post generation guardrails.** A retrieval floor prevents hallucination and
-  saves quota by abstaining before ever calling the generation model. A post
-  generation citation check and groundedness check catch unsupported claims that slip
-  through generation.
-- **Full pipeline tracing.** Every stage writes timing into a trace object persisted
-  to Postgres, which is what the latency table above and the `/trace/{request_id}`
-  endpoint are built on.
+## Techniques used, briefly
 
-## 8. Design tradeoffs
+- **Hybrid search with reciprocal rank fusion.** Semantic search (finds passages that
+  mean the same thing) and keyword search (finds passages using the same words, good
+  for exact rate figures and code numbers) are combined by a simple rank-based
+  formula, so a good result from either method counts, without needing the two
+  methods' scores to be on the same numeric scale.
+- **LLM based reranking.** After the initial search, a single call to the language
+  model re-orders the shortlist by relevance before anything is shown to the answering
+  step.
+- **DSPy for structured prompting.** Routing, answering, and grounding checks are
+  written as typed input/output specifications rather than hand-written prompt
+  strings, which is what lets an optimizer search over the wording automatically.
+- **Guardrails before and after generation.** The system refuses to answer if nothing
+  relevant enough was found (saving a wasted model call and preventing a made-up
+  answer), and after generating, it checks whether every citation in the answer
+  actually points at a page it retrieved, and whether the answer's claims are actually
+  backed by the retrieved text.
+- **Full request tracing.** Every stage of answering a question records its own
+  timing, stored per request, which is what powers the response time numbers above
+  and the `/trace/{request_id}` endpoint.
 
-- **Hosted or LLM reranker instead of a local cross encoder.** A local cross encoder
-  (for example a sentence-transformers model) would need `torch` and `transformers` in
-  the serving image, which CLAUDE.md section 13.1 explicitly excludes to keep cold
-  start latency low on Cloud Run. The LLM listwise reranker runs on the existing task
-  model key with no new dependency, at the cost of one extra generation call per
-  request. With a paid tier, a hosted cross encoder API (Cohere or Jina, both already
-  implemented behind the same interface in `app/rerank.py`) would likely be faster and
-  more accurate than the LLM listwise approach.
-- **Two Gemini API keys instead of one.** Free tier daily call quotas are per Google
-  Cloud project. Splitting task and judge traffic across two keys means evaluation,
-  which makes far more calls than serving, cannot exhaust the key that serves live
-  requests.
-- **Raw SQL instead of an ORM.** CLAUDE.md section 2 rules this out for the project,
-  and for a schema this small (two tables) the raw `asyncpg` queries in `app/db.py`
-  are more legible than an ORM layer would be.
-- **Min instances of zero.** Accepts a measured cold start cost in exchange for zero
-  idle cost on the free tier, see section 5 above.
+## Design choices worth knowing about
 
-## 9. Known limitations and future work
+- **Reranking is one extra AI model call, not a separate specialized model.** A
+  dedicated reranking model would need extra libraries that make the service slower to
+  start up. Using the same model that also answers keeps the deployed service small
+  and fast to start, at the cost of one extra model call per question.
+  A dedicated reranking API would likely be faster and more accurate, and is a natural
+  next upgrade.
+- **Raw SQL instead of a database toolkit.** For a schema this small (two tables), raw
+  SQL queries are easier to read and reason about than a database abstraction layer.
+- **Scales to zero when idle.** Saves on hosting cost when nobody is using it, at the
+  cost of the cold start described above. Worth changing if the traffic pattern
+  justifies keeping an instance always warm.
 
-- **Config table numbers are on a 20 question subset, not the full 55 question dev
-  split.** `data/trainset.csv` is filled to 100 rows (45 train, 55 dev), but DSPy's
-  `ChainOfThought` path (configs C and D) makes 3 to 4 Gemini calls per question
-  against a 15 requests per minute free tier ceiling, which made a full 55 question
-  run take multiple hours. All four configs were matched to the same n=20 subset for
-  a consistent comparison. Widen to the full split with more time or a paid tier.
-- **RAGAS ran on a 5 question sample per config, not the full subset**, for the same
-  per minute ceiling reason, made worse because `faithfulness` and `context_recall`
-  each issue several judge sub-calls per row. `langchain_google_genai`'s internal
-  retry wrapper was observed to retry after a fixed short delay regardless of the
-  server's actual suggested `retry_delay` (sometimes 59 seconds), which made every
-  batched or concurrent RAGAS configuration either stall indefinitely or barely
-  progress. The working fix in `eval/metrics_ragas.py` calls one metric against one
-  row at a time, each in its own thread via `asyncio.to_thread` (`ragas.evaluate`
-  calls `asyncio.run()` internally and cannot be called from inside an already
-  running event loop), with an explicit sleep between calls that sits outside that
-  retry wrapper entirely. This makes RAGAS reliable but slow; a paid tier or a
-  provider without a 15 request per minute ceiling would remove the need for it.
-- **DSPy path token counts are incomplete.** `dspy.LM`, via litellm, was observed to
-  report `completion_tokens` correctly but `prompt_tokens` as 0 for calls made through
-  `dspy.streamify`, the streaming path configs C and D use. The plain prompt configs
-  (A and B) read `usage_metadata` directly from the Gemini streaming response and do
-  not have this gap. Not fixed here, would need bypassing DSPy's cache or intercepting
-  at the litellm callback level.
-- **Cold start not yet measured.** `eval/metrics_latency.py` has a `cold` mode that
-  waits out the scale to zero interval and measures separately from warm, per CLAUDE.md
-  section 13.6, but it needs a deployed Cloud Run URL to hit, which this session did
-  not reach. See section 3 and section 13.6 of `CLAUDE.md`.
-- **GEPA not attempted.** Noted in section 6 as a higher ceiling optimizer that did
-  not fit the request budget for this project. Worth revisiting with a larger quota.
-- **No OCR pipeline.** 7 of 1321 pages (0.5 percent) were suspected scanned during
-  ingestion and are not covered by retrieval. Below the threshold that would have
-  triggered building OCR support, per CLAUDE.md section 6, but it means a small number
-  of pages are permanently unreachable by this system as built.
-- **Reranker choice is quota bound, not accuracy bound.** The default LLM reranker was
-  chosen so the project runs on a single Gemini key. A hosted cross encoder would
-  likely improve reranking quality; see the tradeoffs section. Cohere's free tier was
-  tried first and could not sustain the evaluation harness's call volume (degraded on
-  roughly a third of a full dev split run), which is itself evidence for this point.
-- **No load testing beyond the concurrency setting.** Cloud Run concurrency is set to
-  20 based on the IO bound nature of the workload, but this has not been validated
-  under real concurrent load.
-- **Deployment not yet done.** The Dockerfile, GitHub Actions workflow, and Cloud Run
-  settings are written per CLAUDE.md section 13, but no actual deploy has happened in
-  this session. Needs a GCP project, Artifact Registry repository, Workload Identity
-  Federation or a service account key, and Supabase secrets configured in GitHub or by
-  hand on the Cloud Run service, none of which can be done from a coding session alone.
+## Known limitations and what's next
+
+- **Evaluation numbers above are on a 20 question subset**, not the full evaluation
+  set (which has 55 dev questions). The DSPy-based configurations make more model
+  calls per question, so a full run takes meaningfully longer; widen the sample with
+  more time.
+- **The automatic quality-judging metrics ran on a 5 question sample**, smaller than
+  ideal, for the same reason: those metrics are slower to compute since they involve
+  their own extra AI judge calls per row.
+- **Token counts are incomplete for the DSPy configurations.** The library used for
+  DSPy's streaming does not reliably report how many tokens were sent in, only how
+  many came back out, for those two configurations specifically.
+- **Cold start has not yet been measured against the live deployment** and is marked
+  `TBD` above; the code to measure it exists (`eval/metrics_latency.py`, `cold` mode)
+  and can be run against the live URL.
+- **No OCR pipeline.** 7 of 1321 pages (0.5 percent) in the source PDF appear to be
+  scanned images rather than extractable text, and are not searchable by this system.
+  Below the threshold where OCR would clearly be worth adding.
+- **No load testing** beyond the concurrency setting configured on the hosting
+  platform.
+- **The automatic prompt tuning found no improvement in this run** (see above); a
+  larger training set or more search trials are the likely next step to try.

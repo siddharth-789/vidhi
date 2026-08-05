@@ -1,24 +1,20 @@
-"""DSPy signatures and the composed RAG program, see CLAUDE.md section 8.
+"""DSPy signatures and the composed RAG program.
 
-Verified against gemini-3.1-flash-lite via scripts/check_dspy_stream.py (streaming)
-and a throwaway script exercising Literal, list[str], list[int], and bool output
-fields plus ChainOfThought (this session, not committed). Findings that shaped this
-file:
+A DSPy Signature is a typed input/output contract for a model call: instead of hand
+writing a prompt string, you declare input and output fields and DSPy builds and
+parses the prompt for you. This lets an optimizer like MIPROv2 later search over the
+instruction text and few-shot examples without touching this code.
 
-- dspy.Predict and dspy.ChainOfThought handle Literal, list, and bool output fields
-  correctly with gemini-3.1-flash-lite.
-- RouteQuery accuracy is sensitive to the signature docstring. A one line docstring
-  with no domain description misclassified an out of scope question (Roman history)
-  as lookup. Naming the GST domain explicitly and giving concrete criteria for
-  out_of_scope and multi_hop fixed it. The docstring below is written for that reason,
-  not for style.
+RouteQuery's docstring is written to be specific on purpose: a vague one-line
+docstring with no domain description was observed to misclassify an out-of-scope
+question (a Roman history question) as "lookup". Naming the GST domain explicitly and
+giving concrete criteria for out_of_scope and multi_hop fixed it.
 
 CheckGrounded is a separate program, not part of RAGProgram, so it stays off the
-streaming path and out of MIPROv2's search space, see section 8.
+streaming path and out of MIPROv2's search space.
 
 The retriever is injected as a callable so the evaluation harness can swap retrieval
-configurations without constructing a new module, see section 7 and PipelineConfig in
-app/pipeline.py.
+configurations without constructing a new module, see PipelineConfig in app/pipeline.py.
 """
 
 from __future__ import annotations
@@ -77,9 +73,9 @@ RetrieverFn = Callable[[str], Awaitable[list]]
 class RAGProgram(dspy.Module):
     """Composes the router and a ChainOfThought answerer over injected retrieval.
 
-    The retriever is a callable rather than being constructed inside this module, see
-    CLAUDE.md section 8, so app/pipeline.py can inject different PipelineConfig backed
-    retrieval without changing this class.
+    The retriever is a callable rather than being constructed inside this module, so
+    app/pipeline.py can inject different PipelineConfig-backed retrieval without
+    changing this class.
     """
 
     def __init__(self) -> None:
@@ -93,7 +89,7 @@ class RAGProgram(dspy.Module):
 
 def configure_lm_cache() -> None:
     """Enable the DSPy LM cache so optimizer retries and repeated eval runs do not
-    consume quota, see CLAUDE.md section 8. Call once at process startup."""
+    re-call the model for identical inputs. Call once at process startup."""
 
     dspy.configure_cache(
         enable_disk_cache=True,
@@ -102,6 +98,8 @@ def configure_lm_cache() -> None:
 
 
 def build_lm(model_name: str, api_key: str) -> dspy.LM:
+    """Wrap a Gemini model name with the gemini/ prefix DSPy/litellm expects."""
+
     full_name = model_name if model_name.startswith("gemini/") else f"gemini/{model_name}"
     return dspy.LM(full_name, api_key=api_key, cache=True)
 

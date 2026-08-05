@@ -1,10 +1,10 @@
-"""Pre and post generation guardrails, see CLAUDE.md section 7 steps 6 and 8.
+"""Two safety checks that bracket generation: one before it runs, one after.
 
-Pre generation: abstain without calling the generation model at all when the top
-rerank score is below RETRIEVAL_FLOOR, or when zero chunks were retrieved. This both
-prevents hallucination and saves quota.
+Pre-generation: abstain without calling the generation model at all when the top
+rerank score is below RETRIEVAL_FLOOR, or when zero chunks were retrieved. This
+prevents the model from hallucinating an answer out of nothing.
 
-Post generation: validate citations against the retrieved page set, dropping any
+Post-generation: validate citations against the retrieved page set, dropping any
 citation that does not appear in it and marking the answer low confidence when any
 were dropped. The groundedness check (app/programs.py CheckGrounded) is invoked by the
 pipeline separately, after the stream completes, and is not part of this module.
@@ -24,7 +24,7 @@ def check_pre_generation(candidates: list[Candidate], retrieval_floor: float) ->
     """Raise GuardrailAbstain if generation must not proceed.
 
     Zero candidates always abstains, regardless of floor, so an empty context is never
-    sent to the model, see section 7 step 6 and the degradation table in section 11.
+    sent to the model.
     """
 
     if not candidates:
@@ -44,13 +44,11 @@ def check_pre_generation(candidates: list[Candidate], retrieval_floor: float) ->
         )
 
 
-def validate_citations(
-    citations: list[int], candidates: list[Candidate]
-) -> tuple[list[int], bool]:
+def validate_citations(citations: list[int], candidates: list[Candidate]) -> tuple[list[int], bool]:
     """Drop citations whose page is not covered by any retrieved candidate.
 
-    Returns (valid_citations, any_dropped). any_dropped drives the low confidence
-    marking described in section 7 step 8.
+    Returns (valid_citations, any_dropped). any_dropped drives the low-confidence
+    marking on the final answer.
     """
 
     retrieved_pages: set[int] = set()
