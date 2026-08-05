@@ -1,0 +1,1203 @@
+{
+  "config": "C_dspy",
+  "n": 20,
+  "group1_retrieval": {
+    "recall_at_5": 0.75,
+    "recall_at_10": 0.75,
+    "mrr_at_10": 0.5725,
+    "citation_validity_rate": 1.0,
+    "abstention_accuracy": 0.0,
+    "false_abstention_rate": 0.1,
+    "answer_page_overlap": 0.5277777777777778
+  },
+  "group2_ragas": {
+    "faithfulness": NaN,
+    "answer_relevancy": 0.9518369355241699,
+    "context_precision": NaN,
+    "context_recall": 1.0
+  },
+  "records": [
+    {
+      "example_id": "2",
+      "question": "How does Section 2(52) of the CGST Act define 'goods'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        60
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Under Section 2(52) of the CGST Act, \"goods\" are defined as every kind of movable property other than money and securities. This definition specifically includes actionable claims, growing crops, grass, and things attached to or forming part of the land which are agreed to be severed before supply or under a contract of supply.",
+      "citations": [
+        60,
+        124,
+        920
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          920,
+          920
+        ],
+        [
+          59,
+          60
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          65,
+          65
+        ],
+        [
+          64,
+          65
+        ]
+      ],
+      "context_texts": [
+        "Chapter 45 Actionable Claims under GST Synopsis 1. Meaning of Actionable Claim 2. Scope of Actionable Claims under GST 3. Meaning of Lottery 4. Meaning of betting and gambling 5. Taxability of Actionable Claims under GST 6. Advance Ruling 1. Meaning of Actionable Claim The concept of \u201cactionable claim\u201d owes its roots from erstwhile Service Tax law, CST, VAT law of the most of the States and Transfer of property Act, 1882. GST law makers while explaining the meaning of \u201cgoods \u201cunder Section 2(52) of the Central Goods and Services Tax Act, 2017 defines \u201cgoods\u201d means every kind of movable property other than money and securities but includes actionable claim, growing crops, grass and things attached to or forming part of the land which are agreed to be served before supply or under a contract of supply\u201d. With the legacy of the past, GST law makers have rightly incorporated the concept of actionable claim as goods under GST. 2. Scope of Actionable Claims under GST GST law makers have incorporated \u201cactionable claims\u201d under scope of supply in order to levy and collect GST. The expression supply includes Actionable Claims other than lottery; batting and gambling Section 7(2)(a) read with Sl.No. 6 of Schedule III to the CGST Act, 2017 wherein it has been specified that actionable claims other than lottery, betting and gambling shall be neither a supply of goods nor a supply of services. By this specific provision only actionable claims of lottery, betting and gambling are subjected to GST. It is pertinent to mention that the definition of Service Tax law as excluded \u201cactionable claims\u201d and lottery, betting and gambling were included in the negative list of Service Tax. However, under Service tax for the expression \u201ctransaction in money or actionable claim\u201d",
+        "provision of service and for VAT/CST it was sale. 1. Taxable event under GST The earlier concept of taxable event, \u201cmanufacture\u201d, has been replaced with concept of taxable event \u201csupply\u201d and the term manufacture has no relevant under the GST regime. The taxable event under GST is the \u201csupply of goods or services\u201d or both made for consideration in the course or furtherance of business. The taxable events under the earlier indirect tax laws, such as manufacture, sale, or provision of services stand subsumed in the present taxable event known as \u2018supply\u2019. Therefore, the concept supply has occupied key place and the vital event in determining the taxability of all transaction whether commercial or otherwise under the GST regime. 2. Meaning of GST The Constitution defines \u201cGoods and Services Tax\u201d as \u201cany tax on supply of goods or services or both except tax on supply of alcoholic liquor for human consumption [Article 366(12A) of the Constitutional (101st Amendment) Act, 2016]\u201d. Levy and Collection of Tax 3. Meaning of Goods Section 2(52) of the CGST Act, defines \u201cgoods\u201d as every kind of movable property other than money and securities but includes actionable claim, growing crops, grass and things attached to or forming part of the land which are agreed to be severed before supply or under a contract of supply. 4. Meaning of Services Section 2(102) of the CGST Act, defines \u201cservices\u201d as anything other than goods, money and securities but includes activities relating to the use of money or its conversion by cash or by any other mode, from one form, currency or denomination, to another form, currency or denomination for which a separate consideration is charged. 5. Meaning and Scope of Supply Section 7 of the CGST Act, has been defined",
+        "(IGST) (b) two different Union Territories (UTGST); (c) a State and a Union Territory (UTGST). (5) IGST paid on supply of services imported into India in the course of inter-State trade or commerce under Section 7(4) of the IGST Act. 6. Various definitions relating to ITC 6.1 Input Tax Credit Section 2(63) of CGST Act, 2017 defined \u201cinput tax credit\u201d means the Credit of Input Tax. 6.2 Input Section 2(59) of the CGST Act, 2017 defines \u201cInput\u201d means any goods other than capital goods used or intended to be used by a supplier in the course or furtherance of business. 6.3 Goods Section 2(52) of the CGST Act, 2017 defines \u201cgoods\u201d means every kind of movable property other than money and securities but includes actionable claim, growing crops, grass and things attached to or forming part of the land which are agreed to be served before supply or under a contract of supply. 6.4 Capital Goods Section 2(19) of CGST Act, 2017 defines \u201cCapital Goods\u201d means goods, the value of which is capitalized in the books of account of the person claiming the Input Tax Credit and which are used or intended to be used in the course or furtherance of business. 6.5 Services \u201cServices\u201d means anything other than goods, money and securities but includes activities relating to the use of money or its conversion by cash or by any other mode, from one form, currency or denomination, to another form, currency or denomination for which a separate consideration is charged [Section 2(102) of the CGST Act, 2017]. 6.6 Input Service \u201cInput service\u201d means any service used or intended to be used by a supplier in the course or furtherance of business. [Section 2(60) of the CGST Act,",
+        "Principal Supply Section 2(90) of the CGST Act, defines \u2018principal supply\u2019 means the supply of goods or services which constitutes the predominant element of a composite supply and to which any other supply forming part of that composite supply is ancillary. 13. Exempt supply Section 2(47) of the CGST Act, defines \u2018exempt supply\u2019 means supply of any goods or services or both which attracts nil rate of tax or which may be wholly exempt from tax under Section 11 or under Section 6 of the Integrated Goods and Services Tax Act, and includes non-taxable supply. 14. Non-taxable supply Section 2(78) of the CGST Act, defines \u2018non-taxable supply\u2019 means a supply of goods or services or both which is not taxable under this Act or under the Integrated Goods and Services Tax Act. 15. Zero-rated supply Section 16 of the Integrated Goods and Services Tax Act, defines \u2018zero-rated supply\u2019 means any of the following supplies of goods or services or both, namely\u2014 (a) export of goods or services or both, or (b) supply of goods or services or both to a Special Economic Zone or developer of a Special Economic Zone. 16. Continuous Supply of Goods Section 2(32) of the CGST Act, defines \u201ccontinuous supply of goods\u201d means a supply of goods which is provided, or agreed to be provided, continuously or on recurrent basis, under a contract, whether or not by means of a wire, cable, pipeline or other conduit, and for which the supplier invoices the recipient on a regular or periodic basis and includes supply of such goods as the Government may, subject to such conditions, as it may, by notification, specify; 17. Continuous Supply of Services Section 2(33) of the CGST Act, defines \u201ccontinuous supply of services\u201d means a supply of services which is provided, or agreed to be",
+        "GST. 9. Supply in the Taxable Territory For a supply to attract GST, the place of supply should be in India except for the State of Jammu and Kashmir. The place of supply of any goods or services is determined based on Sections 10, 11, 12 and 13 of IGST Act, 2017. 10. Inter/Intra-State Supply The location of the supplier and the place of supply determines whether a supply is treated as an intra-State supply or an inter-State supply. Determination of the nature of supply is essential to ascertain whether Integrated tax is to be paid or Central plus State taxes are to be paid. Inter-State supply of goods means a supply of goods where the location of the supplier and place of supply are in different States or Union territories. Intra-State supply of goods means supply of goods where the location of the supplier and the place of supply are in the same State or Union territory. Imports, Supplies from and to SEZs are treated as deemed Inter-State supplies. 11. Tax liability on composite and mixed supplies Section 8 of the CGST Act, defines the tax liability on a composite or a mixed supply shall be determined in the following manner, namely - (a) Composite Supply comprising two or more supplies one of which, is a principal supply, shall be treated as supply of such principal supply. (b) Mixed Supply comprising two or more supplies, shall be treated as supply of that particular supply which attracts the highest rate of tax. 12. Principal Supply Section 2(90) of the CGST Act, defines \u2018principal supply\u2019 means the supply of goods or services which constitutes the predominant element of a composite supply and to which any other supply forming part of that composite supply is ancillary. 13. Exempt supply Section 2(47) of the CGST Act,"
+      ],
+      "latency_ms": {
+        "route": 373.50879999576136,
+        "embed_query": 1124.6477999957278,
+        "retrieval": 3950.1232999609783,
+        "rerank": 1975.278600002639,
+        "generation": 22.867700026836246,
+        "citation_validation": 0.007099995855242014,
+        "groundedness_check": 11.72690000385046
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "4",
+      "question": "What is the taxable event under the GST regime, and what earlier concept did it replace?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        59
+      ],
+      "route": "multi_hop",
+      "abstained": false,
+      "degraded": false,
+      "answer": "The taxable event under the GST regime is \"supply,\" which replaced the earlier concept of \"manufacture.\"",
+      "citations": [
+        59,
+        60
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          59,
+          60
+        ],
+        [
+          58,
+          59
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          998,
+          999
+        ],
+        [
+          58,
+          59
+        ]
+      ],
+      "context_texts": [
+        "provision of service and for VAT/CST it was sale. 1. Taxable event under GST The earlier concept of taxable event, \u201cmanufacture\u201d, has been replaced with concept of taxable event \u201csupply\u201d and the term manufacture has no relevant under the GST regime. The taxable event under GST is the \u201csupply of goods or services\u201d or both made for consideration in the course or furtherance of business. The taxable events under the earlier indirect tax laws, such as manufacture, sale, or provision of services stand subsumed in the present taxable event known as \u2018supply\u2019. Therefore, the concept supply has occupied key place and the vital event in determining the taxability of all transaction whether commercial or otherwise under the GST regime. 2. Meaning of GST The Constitution defines \u201cGoods and Services Tax\u201d as \u201cany tax on supply of goods or services or both except tax on supply of alcoholic liquor for human consumption [Article 366(12A) of the Constitutional (101st Amendment) Act, 2016]\u201d. Levy and Collection of Tax 3. Meaning of Goods Section 2(52) of the CGST Act, defines \u201cgoods\u201d as every kind of movable property other than money and securities but includes actionable claim, growing crops, grass and things attached to or forming part of the land which are agreed to be severed before supply or under a contract of supply. 4. Meaning of Services Section 2(102) of the CGST Act, defines \u201cservices\u201d as anything other than goods, money and securities but includes activities relating to the use of money or its conversion by cash or by any other mode, from one form, currency or denomination, to another form, currency or denomination for which a separate consideration is charged. 5. Meaning and Scope of Supply Section 7 of the CGST Act, has been defined",
+        "Chapter 3 Levy and Collection of Tax Synopsis 1. Taxable event under GST 2. Meaning of GST 3. Meaning of Goods 4. Meaning of Services 5. Meaning and Scope of Supply 5.1 Activities or transaction to be treated as supply of goods or supply of services 5.2 Transaction that will be taxable as \u2018supply\u2019 even if no consideration 5.3 Activities or Transactions to be treated neither as supply of goods or supply of services 5.4 Activities or transactions which shall be treated neither as supply of goods nor services 5.5 Transaction to be treated as no supply 5.6 Transaction that are treated as supply: Sub-section (3) Section 7 of the CGST Act, 2017 6. Elements that Constitute of Supply under GST 7. Taxable Supply 8. Taxable Person 9. Supply in the Taxable Territory 10. Inter/Intra-State Supply 11. Tax liability on composite and mixed supplies 12. Principal Supply 13. Exempt supply 14. Non-taxable supply 15. Zero-rated supply 16. Continuous Supply of Goods 17. Continuous Supply of Services 18. Power to Levy GST 19. Manner of Levy and Collection of Tax 20. Clarification of perquisites provided by employer to the employees as per contractual agreement 21. Composition Levy Scheme 21.1 Limit under Composition levy Scheme 21.2 Composition dealers to be allowed to supply of services 21.3 Composition levy extended to supplies of goods under e-commerce 22. Meaning of Aggregate Turnover 22.1 Exclusion of elements for aggregate turnover 23. Procedures for opting for Composition Scheme 24. Intimation for composition levy: 25. Effective date for composition levy: 26. Conditions and restriction for composition levy 27. Composition Scheme is required to be intimated every year to continue this scheme 28. Conditions for availing Composition Scheme for First Supplies of goods and services or both 29. Registered person",
+        "means a supply of goods or services or both which is leviable to tax under this Act. For a supply to attract GST, the supply must be taxable. Taxable supply has been broadly defined and means any supply of goods or services or both which, is leviable to tax under the Act. Exemptions may be provided to the specified goods or services or to a specified category of persons/entities making supply. 8. Taxable Person A supply to attract GST should be made by a taxable person. Hence, a supply between two non-taxable persons does not constitute supply under GST. A \u201ctaxable person\u201d is a person who is registered or liable to be registered under Section 22 or Section 24. Hence, even an unregistered person who is liable to be registered is a taxable person. Similarly, a person not liable to be registered but has taken voluntary registration and got himself registered is also a taxable person. It should be noted that GST in India is State-centric. Hence, a person making supplies from different States needs to take separate registration in each State. Further, the person may take more than one registration within a State if the person has multiple business verticals. A person who has obtained or is required to obtain more than one registration, whether in one State or Union territory or more than one State or Union territory shall, in respect of each such registration, be treated as distinct persons for the purposes of GST. Hence, a supply between these entities constitutes supply under GST. 9. Supply in the Taxable Territory For a supply to attract GST, the place of supply should be in India except for the State of Jammu and Kashmir. The place of supply of any goods or services is determined based on Sections 10, 11, 12 and 13 of IGST Act, 2017.",
+        "CGST, SGST/UTGST and IGST. Question 6: What is destination based consumption tax? Answer: When a supply originates in one State and is consumed in another State, tax can accrue to either of the two States. In a destination based consumption tax, taxes accrue to the State where the supply is consumed. In origin based tax, the tax accrues to the State where the supply originates. GST is basically a destination based consumption tax. For example, if a car is manufactured in Chennai but is purchased eventually by a consumer in Mumbai, SGST (or the State component in IGST) would accrue to Maharashtra and not to Tamil Nadu. Question 7: Who will pay GST? Answer: GST is generally paid by the supplier, i.e. the one who makes the supply after collecting it from the recipient. The supplier collects GST from the recipient of the supply as part of the consideration. However, in a few exceptional cases, the recipient, would be liable to pay GST to the Government on reverse charge basis. Question 8: What is Input Tax Credit? Answer: A person doing business will be purchasing goods/availing services for making further supplies in the course or furtherance of business. When such purchases are made by him, tax would have been charged by his supplier and collected from him. Since tax is collected from him, he can avail credit of the tax paid by him to his supplier (that is to say, he can use this amount for making payment of tax due from him on further supply made by him). This is known as input tax credit for the recipient. Question 9: Is GST going to increase compliance burden on the trade? Answer: No. On the contrary GST will result in streamlining of processes and reduction of compliance burden.",
+        "for Composition Scheme 24. Intimation for composition levy: 25. Effective date for composition levy: 26. Conditions and restriction for composition levy 27. Composition Scheme is required to be intimated every year to continue this scheme 28. Conditions for availing Composition Scheme for First Supplies of goods and services or both 29. Registered person under Composition scheme is not required collect tax, not entitled to avail ITC and issue bill of supply in place of Invoice 30. Issue of Bill of supply for Composition Scheme for Services 31. Validity of Composition levy 32. Rate of tax for the Composition levy 33. New Rates for Composition Levy 34. Filing of return under Composition Scheme 35. Annual returns 36. Power to grant exemption from tax 37. Exemption from payment of tax on advance payment 38. Scope of mixed supply and composite supply 39. Concept of \u201cBundled service\u201d in pre-GST era 40. Tax liability on \u2018composite\u2019 and \u2018mixed\u2019 supplies 41. Determination of a Composite supply and rate of tax 42. Determination of a mixed supply and rate of tax 43. Time of supply in case of composite supply 44. Time of supply in case of mixed supply 45. Important Notifications 46. Important Circulars 47. No supply no tax liability 48. Case Laws/Advance Ruling The levy and collection of tax is based on the taxable event in any tax law, in the erstwhile tax laws there are different taxable events for different types of taxes, such as for Excise duty it was manufacture, for Service Tax it was provision of service and for VAT/CST it was sale. 1. Taxable event under GST The earlier concept of taxable event, \u201cmanufacture\u201d, has been replaced with concept of taxable event \u201csupply\u201d and the term manufacture has no relevant under the GST regime. The taxable event under GST is the \u201csupply"
+      ],
+      "latency_ms": {
+        "route": 9.680400020442903,
+        "embed_query": 1059.3251999816857,
+        "retrieval": 969.3706999532878,
+        "rerank": 1378.6133999819867,
+        "generation": 996.6767000150867,
+        "citation_validation": 0.005099980626255274,
+        "groundedness_check": 1000.2283999929205
+      },
+      "tokens": {
+        "input": 0,
+        "output": 75
+      },
+      "error": null
+    },
+    {
+      "example_id": "7",
+      "question": "How does Section 2(61) of the CGST Act define an 'Input Service Distributor'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        125
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "As per the Budget 2024 proposal for the substituted Section 2(61) of the CGST Act, \"Input Service Distributor\" means an office of the supplier of goods or services or both which receives tax invoices towards the receipt of input services, including invoices in respect of services liable to tax under sub-section (3) or sub-section (4) of section 9, for or on behalf of distinct persons referred to in section 25, and is liable to distribute the input tax credit in respect of such invoices in the manner provided in section 20.",
+      "citations": [
+        125,
+        137
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          125,
+          126
+        ],
+        [
+          137,
+          138
+        ],
+        [
+          137,
+          138
+        ],
+        [
+          149,
+          150
+        ],
+        [
+          136,
+          137
+        ]
+      ],
+      "context_texts": [
+        "form, currency or denomination for which a separate consideration is charged [Section 2(102) of the CGST Act, 2017]. 6.6 Input Service \u201cInput service\u201d means any service used or intended to be used by a supplier in the course or furtherance of business. [Section 2(60) of the CGST Act, 2017]. 6.7 Input Service Distributor Section 2(61) of the CGST Act,2017 defines \u201cInput Service Distributor\u201d means an office of the supplier of goods or services or both which receives tax invoices issued under Section 31 towards the receipt of input services and issue a prescribed document for the purposes of distributing the credit of Central tax, State tax, Integrated tax or Union territory tax paid on the said services to a supplier of taxable goods or services or both having the same Permanent Account Number (PAN) as that of the said office. 6.8 Agent \u201cAgent\u201d means a person, including a factor, broker, commission agent, arhatia, del credere agent, an auctioneer or any other mercantile agent, by whatever name called, who carries on the business of supply or receipt of goods or services or both on behalf of another [Section 2(5) of the CGST Act, 2017]. Input Tax Credit 7. Who are eligible to take Input Tax Credit? Section 16 of the CGST Act, prescribed every registered person shall, subject to such conditions and restrictions prescribed under Section 49, be entitled to take credit of input tax charged on any supply of goods or services or both which are used or intended to be used in the course or furtherance of his business. 8. Who are not eligible to take Input Tax Credit? A registered person working under composition scheme even when received goods or services are used in furtherance of his business. A non-resident taxable person on receipt of goods",
+        "of the Seventh Schedule to the Constitution and entries 51 and 54 of List II of the said Schedule. BUDGET-2024 PROPOSAL ON ISD. \uf0b7 The proposals in Budget 2024 provide for changes in ISD mechanism under in Two places in the GST Law. \uf0b7 Firstly, definitions of ISD under Section 2(61) has been substituted as a result of which the scope has been explained to include offices that received tax invoices for input services for or on behalf of persons having same PAN , including those services liable to tax under RCM specified in sections 9(3) and 9 (4) of CGST Act. \uf0b7 The proposed substituted definition is extracted hereunder: \uf0d8 (61) \u201cInput Service Distributor\u201d means an office of the supplier of goods or services or both which receives tax invoices towards the receipt of input services, including invoices in respect of services liable to tax under sub-section (3) or sub-section (4) of section 9, for or on behalf of distinct persons referred to in section 25, and liable to distribute the input tax credit in respect of such invoices in the manner provided in section 20;\u2019. \uf0d8 For section 20 of the Central Goods and Services Tax Act, the following section shall be substituted, namely:\u2014 \uf0d8 \u201c20. (1) Any office of the supplier of goods or services or both which receives tax invoices towards the receipt of input services, including invoices in respect of services liable to tax under sub-section (3) or sub-section (4) of section 9, for or on behalf of distinct persons referred to in section 25, shall be required to be registered as Input Service Distributor under clause (viii) of section 24 and shall distribute the input tax credit in respect of such invoices. Input Tax Credit \uf0d8 (2) The Input Service",
+        "sub-section (4) of section 9, for or on behalf of distinct persons referred to in section 25, shall be required to be registered as Input Service Distributor under clause (viii) of section 24 and shall distribute the input tax credit in respect of such invoices. Input Tax Credit \uf0d8 (2) The Input Service Distributor shall distribute the credit of central tax or integrated tax charged on invoices received by him, including the credit of central or integrated tax in respect of services subject to levy of tax under sub-section (3) or sub-section (4) of section 9 paid by a distinct person registered in the same State as the said Input Service Distributor, in such manner, within such time and subject to such restrictions and conditions as may be prescribed. \uf0d8 (3) The credit of central tax shall be distributed as central tax or integrated tax and integrated tax as integrated tax or central tax, by way of issue of a document containing the amount of input tax credit, in such manner as may be prescribed. 15. Documents\u2019 requirement for claiming Input Tax Credit Rule 36 of the CGST Rules, prescribed that the Input Tax Credit shall be availed by a registered person, including the Input Service Distributor, on the basis of any of the following documents, namely:\u2014 (a) an invoice issued by the supplier of goods or services or both in accordance with the provisions of Section 31; (b) an invoice issued in accordance with the provisions of clause (f) of sub- section (3) of Section 31, subject to the payment of tax; (c) a debit note issued by a supplier in accordance with the provisions of Section 34; (d) a bill of entry or any similar document prescribed under the Customs Act, 1962 or rules made thereunder for the assessment of integrated tax on",
+        "distribute Input Tax Credit in the manner and subject to the following conditions, namely - (a) the Input Tax Credit available for distribution in a month shall be distributed in the same month and the details thereof shall be furnished in FORM GSTR-6 in accordance with the provisions of Chapter VIII of these rules; (b) the Input Service Distributor shall, in accordance with the provisions of clause (d), separately distribute the amount of ineligible Input Tax Credit (ineligible under the provisions of sub-section (5) of Section 17 or otherwise) and the amount of eligible Input Tax Credit; (c) the Input Tax Credit on account of Central Tax, State Tax, Union Territory Tax and Integrated Tax shall be distributed separately in accordance with the provisions of clause (d); (d) the Input Tax Credit that is required to be distributed in accordance with the provisions of clauses (d) and (e) of sub-section (2) of Section 20 to one of the recipients \u2018R1\u2019, whether registered or not, from amongst the total of all the recipients to whom Input Tax Credit is attributable, including the recipient(s) who are engaged in making exempt supply, or are otherwise not registered for any reason, shall be the amount, \u201cC1\u201d, to be calculated by applying the following formula\u2014 C1 = (t1\u00f7T) \u00d7 C where, \u201cC\u201d is the amount of credit to be distributed, \u201ct1\u201d is the turnover, as referred to in Section 20, of person R1 during the relevant period, and \u201cT\u201d is the aggregate of the turnover, during the relevant period, of all recipients to whom the input service is attributable in accordance with the provisions of Section 20; Input Tax Credit (e) the Input Tax Credit on account of integrated tax shall be distributed as Input Tax Credit of Integrated Tax",
+        "the said relevant period; (e) the credit of tax paid on input services attributable to all recipients of credit shall be distributed amongst such recipients and such distribution shall be pro rata on the basis of the turnover in a State or turnover in a Union territory of such recipient, during the relevant period, to the aggregate of the turnover of all recipients and which are operational in the current year, during the said relevant period. Explanation.\u2014For the purposes of this section,- (a) the \"relevant period\" shall be- (i) if the recipients of credit have turnover in their States or Union territories in the financial year preceding the year during which credit is to be distributed, the said financial year; or (ii) if some or all recipients of the credit do not have any turnover in their States or Union territories in the financial year preceding the year during which the credit is to be distributed, the last quarter for which details of such turnover of all the recipients are available, previous to the month during which credit is to be distributed; (b) the expression \"recipient of credit\" means the supplier of goods or services or both having the same Permanent Account Number as that of the Input Service Distributor; (c) the term \"turnover\", in relation to any registered person engaged in the supply of taxable goods as well as goods not taxable under this Act, means the value of turnover, reduced by the amount of any duty or tax levied 1[under entries 84 and 92A] of List I of the Seventh Schedule to the Constitution and entries 51 and 54 of List II of the said Schedule. BUDGET-2024 PROPOSAL ON ISD. \uf0b7 The proposals in Budget 2024 provide for changes in ISD mechanism under in Two places in the GST Law. \uf0b7 Firstly, definitions of ISD"
+      ],
+      "latency_ms": {
+        "route": 8.466999977827072,
+        "embed_query": 987.3001999803819,
+        "retrieval": 651.6242999932729,
+        "rerank": 1518.7986000091769,
+        "generation": 1548.6845999839716,
+        "citation_validation": 0.004299974534660578,
+        "groundedness_check": 966.8412000173703
+      },
+      "tokens": {
+        "input": 0,
+        "output": 287
+      },
+      "error": null
+    },
+    {
+      "example_id": "9",
+      "question": "How does Section 2(5) of the CGST Act define 'Agent'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        125
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Section 2(5) of the CGST Act defines \"agent\" as a person, including a factor, broker, commission agent, arhatia, del credere agent, an auctioneer or any other mercantile agent, by whatever name called, who carries on the business of supply or receipt of goods or services or both on behalf of another.",
+      "citations": [
+        126,
+        879,
+        880,
+        1033
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          1033,
+          1034
+        ],
+        [
+          879,
+          880
+        ],
+        [
+          879,
+          879
+        ],
+        [
+          1033,
+          1033
+        ],
+        [
+          125,
+          126
+        ]
+      ],
+      "context_texts": [
+        "out activities on behalf of the principal. 3. The term \u201cagent\u201d has been defined under sub-section (5) of Section 2 of the CGST Act as follows: \u201cagent\u201d means a person, including a factor, broker, commission agent, arhatia, del credere agent, an auctioneer or any other mercantile agent, by whatever name called, who carries on the business of supply or receipt of goods or services or both on behalf of another. 4. The following two key elements emerge from the above definition of agent: Circular No. 57/31/2018-GST (a) the term \u201cagent\u201d is defined in terms of the various activities being carried out by the person concerned in the principal-agent relationship; and (b) the supply or receipt of goods or services has to be undertaken by the agent on behalf of the principal. From this, it can be deduced that the crucial component for covering a person within the ambit of the term \u201cagent\u201d under the CGST Act is corresponding to the representative character identified in the definition of \u201cagent\u201d under the Indian Contract Act, 1872. Valuation Mechanism & Applicability of GST 5. Further, the two limbs of any supply under GST are \u201cconsideration\u201d and \u201cin the course or furtherance of business\u201d. Where the consideration is not extant in a transaction, such a transaction does not fall within the ambit of supply. But, in certain scenarios, as elucidated in Schedule I of the CGST Act, the key element of consideration is not required to be present for treating certain activities as supply. One such activity which has been detailed in para 3 of Schedule I (hereinafter referred to as \u201cthe said entry\u201d) is reproduced hereunder: 3. Supply of goods\u2014 (a) by a principal to his agent where the agent undertakes to supply such",
+        "to procure such goods or services. 3. Pure Agent concept in the GST regime Section 2(5) of the CGST Act, 2017 defines \u201cagent\u201d means a person, including a factor, broker, commission agent, arhatia, del credere agent, an auctioneer or any other mercantile agent, by whatever name called, who carries on the business of supply or receipt of goods or services or both on behalf of another; Pure Agent Services Thus, the GST Act defines an Agent as a person including a factor, broker, commission agent, agent, arhatia, del credere agent, an auctioneer or any other mercantile agent, by whatever name called, who carries on the business of supply or receipt of goods or services or both on behalf of another. Broadly speaking, a pure agent is one who while making a supply to the recipient, also receives and incurs expenditure on some other supply on behalf of the recipient and claims reimbursements (as actual, without adding it to the value of his own supply) for such supplies from the recipient of the main supply. While the relationship between them (provider of service and recipient of service) in respect of the main service is on a principal to principal basis, the relationship between them in respect of other ancillary services is that of a pure agent. 4. Relevance of Pure Agent under GST The concept of pure agent has been explained in Rule 33 of the CGST Rules, 2017 of Chapter IV of Determination of Value of Supply and a pure agent expression meaning as follows:\u2014 A \u201cpure agent\u201d means a person who: (a) enters into a contractual agreement with the recipient of supply to act as his pure agent to incur expenditure or costs in the course of supply of goods or services or both; (b) neither intends to hold nor holds any title to",
+        "Chapter 39 Pure Agent Services Synopsis 1. Meaning of Pure Agent 2. Pure Agent concept in pre-GST era 3. Pure Agent concept in the GST regime 4. Relevance of Pure Agent under GST 5. Illustration of Pure Agent 6. Exclusion from value of supply for levy of GST 7. Illustration of exclusion from value of supply 8. Examples of pure agent expenditures 9. Advance Rulings 1. Meaning of Pure Agent Generally, speaking agent means a person who plays role of intermediary to facilitate business between two parties or to arrange goods or services for his client procuring from another person. An agent gets commission or brokerage amount on requirement order of his client. The concept of pure agent was also available under Service Tax law. A pure agent concept was borrowed from the erstwhile Service Tax Determination of Value Rules, 2006 and the same provision incorporated under GST law. 2. Pure Agent concept in pre-GST era Pure agent has been defined in Explanation to sub-rule 2 of Rule (5) of the Valuation Rules as a person who:\u2014 \uf0b7 enters into a contractual agreement with the recipient of service to act as his pure agent to incur expenditure or costs in the course of providing taxable service; \uf0b7 neither intends to hold nor holds any title to the goods or services so procured or provided as pure agent of the recipient of service; \uf0b7 does not use such goods or services so procured; and \uf0b7 receives only the actual amount incurred to procure such goods or services. 3. Pure Agent concept in the GST regime Section 2(5) of the CGST Act, 2017 defines \u201cagent\u201d means a person, including a factor, broker, commission agent, arhatia, del credere agent, an auctioneer or any other mercantile agent, by whatever name called,",
+        "Appendix 2 Valuation Mechanism & Applicability of GST Circular No. 57/31/2018-GST [CBEC-20/16/4/2018-GST], dated 4-9-2018 Subject: Scope of Principal-agent relationship in the context of Schedule I of the CGST Act \u2014 regarding In terms of Schedule I of the Central Goods and Services Tax Act, 2017 (hereinafter referred to as the \u201cCGST Act\u201d), the supply of goods by an agent on behalf of the principal without consideration has been deemed to be a supply. In this connection, various representations have been received regarding the scope and ambit of the principal-agent relationship under GST. In order to clarify some of the issues and to ensure uniformity in the implementation of the provisions of the law across the field formations, the Board, in exercise of its powers conferred under Section 168(1) of the CGST Act hereby clarifies the issues in the succeeding paras. 2. As per Section 182 of the Indian Contract Act, 1872, an \u201cagent\u201d is a person employed to do any act for another, or to represent another in dealings with third person. The person for whom such act is done, or who is so represented, is called the \u201cprincipal\u201d. As delineated in the definition, an agent can be appointed for performing any act on behalf of the principal which may or may not have the potential for representation on behalf of the principal. So, the crucial element here is the representative character of the agent which enables him to carry out activities on behalf of the principal. 3. The term \u201cagent\u201d has been defined under sub-section (5) of Section 2 of the CGST Act as follows: \u201cagent\u201d means a person, including a factor, broker, commission agent, arhatia, del credere agent, an auctioneer or any other mercantile agent,",
+        "form, currency or denomination for which a separate consideration is charged [Section 2(102) of the CGST Act, 2017]. 6.6 Input Service \u201cInput service\u201d means any service used or intended to be used by a supplier in the course or furtherance of business. [Section 2(60) of the CGST Act, 2017]. 6.7 Input Service Distributor Section 2(61) of the CGST Act,2017 defines \u201cInput Service Distributor\u201d means an office of the supplier of goods or services or both which receives tax invoices issued under Section 31 towards the receipt of input services and issue a prescribed document for the purposes of distributing the credit of Central tax, State tax, Integrated tax or Union territory tax paid on the said services to a supplier of taxable goods or services or both having the same Permanent Account Number (PAN) as that of the said office. 6.8 Agent \u201cAgent\u201d means a person, including a factor, broker, commission agent, arhatia, del credere agent, an auctioneer or any other mercantile agent, by whatever name called, who carries on the business of supply or receipt of goods or services or both on behalf of another [Section 2(5) of the CGST Act, 2017]. Input Tax Credit 7. Who are eligible to take Input Tax Credit? Section 16 of the CGST Act, prescribed every registered person shall, subject to such conditions and restrictions prescribed under Section 49, be entitled to take credit of input tax charged on any supply of goods or services or both which are used or intended to be used in the course or furtherance of his business. 8. Who are not eligible to take Input Tax Credit? A registered person working under composition scheme even when received goods or services are used in furtherance of his business. A non-resident taxable person on receipt of goods"
+      ],
+      "latency_ms": {
+        "route": 8.008399978280067,
+        "embed_query": 957.1368000470102,
+        "retrieval": 797.8383000008762,
+        "rerank": 1893.3569000218995,
+        "generation": 9.135400003287941,
+        "citation_validation": 0.005199981387704611,
+        "groundedness_check": 8.459499978926033
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "11",
+      "question": "How does Section 2(6) of the CGST Act define 'Aggregate Turnover'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        195
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "As per Section 2(6) of the CGST Act, 2017, \u201caggregate turnover\u201d means the aggregate value of all taxable supplies (excluding the value of inward supplies on which tax is payable by a person on reverse charge basis), exempt supplies, exports of goods or services or both, and inter-State supplies of persons having the same Permanent Account Number, to be computed on an all-India basis. It excludes Central tax, State tax, Union territory tax, Integrated tax, and Cess.",
+      "citations": [
+        68
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          68,
+          69
+        ],
+        [
+          1241,
+          1241
+        ],
+        [
+          279,
+          280
+        ],
+        [
+          82,
+          83
+        ],
+        [
+          192,
+          192
+        ]
+      ],
+      "context_texts": [
+        "Turnover As per Section 2(6) of CGST Act, 2017, \u201caggregate turnover\u201d means the aggregate value of all taxable supplies (excluding the value of inward supplies on which tax is payable by a person on reverse charge basis), exempt supplies, exports of goods or services or both and inter-State supplies of persons having the same Permanent Account Number, to be computed on all India basis but excludes Central tax, State tax, Union territory tax, Integrated tax and Cess;\u201d Therefore, the value of following supplies shall not be taken into account while computing the threshold limit of composition levy. (i) Value of all taxable supplies excluding the value of inward supplies. (ii) Value of exempted supplies. (iii) Value of export goods or services or both. (iv) Value of inter-State supplies of persons having same PAN to be computed on all India basis. 22.1 Exclusion of elements for aggregate turnover Further, the following elements shall not be taken into computing the annual aggregate turnover to arrived threshold limit of Composition levy. (i) Taxes if any charged under the head of CGST, SGST and IGST. (ii) Value of inward supplies on which the tax is payable on the reverse charge basis under Section 9(3) of the Act. (iii) Value of inward supplies. 23. Procedures for opting for Composition Scheme The procedure/Rules of Composition Scheme has been prescribed vide Notification No. 3/2017-C.T., dated 19-7-2017, for submission of different forms and returns, formalities for observance by the registered persons opting for Composition Scheme under GST. The Key Features of Composition Rules/procedures are summarized as under: 24. Intimation for composition levy: (1) Any person who has been granted registration on a provisional basis under clause (b) sub-rule (1) of Rule 24 and who",
+        "the purpose of composition? Ans. Aggregate turnover will be computed on the basis of turnover on an all India basis and will include value of all taxable supplies, exempt supplies and exports made by all persons with same PAN, but would exclude inward supplies under reverse charge as well as Central, State/Union Territory and Integrated taxes and cess. Q8. Can a person who has opted to pay tax under the composition scheme avail Input Tax Credit on his inward supplies? Ans. No. A taxable person opting to pay tax under the composition scheme is out of the credit chain. He cannot take credit on his input supplies. When he switch over from composition scheme to normal scheme, eligible credit on the date of transition would be allowed (refer Q.6 above). Q9. Can a registered person, who purchases goods from a taxable person paying tax under the composition scheme, avail credit of tax paid on purchases made from the composition dealer? Ans. No as the composition dealer cannot collect tax paid by him on outward supplies from his customers, the registered person making purchases from a taxable person paying tax under the composition scheme cannot avail credit. Q10. Can a person paying tax under the composition scheme issue a tax invoice under GST? Ans. No. He can issue a bill of supply in lieu of tax invoice. Q11. Are monthly returns required to be filed by the person opting to pay tax under the composition scheme? Ans. No. Such persons need to electronically file quarterly returns in Form GSTR-4 on the GSTN common portal by the 18th of the month succeeding the quarter. For example return in respect of supplies made during July, 2017 to September, 2017 is required to be filed by 18th October, 2017. Q12. What are the basic information that need to be",
+        "+exempted supplies +NIL rated supplies + Zero rates supplies + Non GST supplies] - [Taxes and compensation cess + inward supplies + supplies under reverse charge] of a person having the same PAN across all his business entities in India. 67. Definition of Invoice Section 2(66) of the CGST Act, 2017 defines \u201cinvoice\u201d or \u201ctax invoice\u201d means the tax invoice referred to in section 31; 68. Export Invoice A registered person supplying taxable goods shall, before or at the time of, \u2014 Section 31(1) of CGST Act. (a) removal of goods for supply to the recipient, where the supply involves movement of goods; or (b) delivery of goods or making available thereof to the recipient, in any other case, issue a tax invoice showing the description, quantity and Tax Invoice, Credit and Debit Notes value of goods, the tax charged thereon and such other particulars as may be prescribed: Provided that the Government may, on the recommendations of the Council, by notification, specify the categories of goods or supplies in respect of which a tax invoice shall be issued, within such time and in such manner as may be prescribed. 69. Mandatory HSN Code Vide Notification No.78/2020-C.T., dated 15-10-2020 the Central Government made it mandatory for the registered person to indicate HSN code in the invoice as detailed below: \uf0d8 Aggregate turnover in the preceding financial year-up to ` 5 crores- Numbers of digits of HSN Code is 4. \uf0d8 Aggregate turnover in the preceding financial year is more than ` 5 crores \u2013 number of digits of HSN Code is 6. Provided that a registered person having aggregate turnover up to five crores rupees in the previous financial year may not mention the number of digits of HSN Code, as specified in",
+        "no mandatory requirement of taking separate registration by ECOs for payment of tax on restaurant service under section 9(5) of the CGST Act, 2017. Would the ECOs be liable to pay tax on supply of restaurant service made by unregistered business entities? Yes. ECOs will be liable to pay GST on any restaurant service supplied through them including by an unregistered person. What would be the aggregate turnover of person supplying \u2018restaurant service\u2019 through ECOs? It is clarified that the aggregate turnover of person supplying restaurant service through ECOs shall be computed as defined in section 2(6) of the CGST Act, 2017 and shall include the aggregate value of supplies made by the restaurant through ECOs. Accordingly, for threshold considera- tion or any other purpose in the Act, the person providing restaurant service through ECO shall account such services in his aggregate turnover. Can the supplies of restaurant service made through ECOs be recorded as inward supply of ECOs (liable to reverse charge) in GSTR 3B? No. ECOs are not the recipient of restaurant service supplied through them. Since these are not input services to ECO, these are not to be reported as inward supply (liable to reverse charge). Would ECOs be liable to reverse proportional input tax credit on his input goods and services for the reason that input tax credit is not admissible on \u2018restaurant service\u2019? ECOs provide their own services as an electronic platform and an intermediary for which it would acquire inputs/input service on which ECOs avail input tax credit (ITC). The ECO charges commission/fee etc. for the services it provides. The ITC is utilised by ECO for payment of GST on services provided by ECO on its own account (say, to a restaurant). The situation in Sl. No. Issue Clarification this regard remains unchanged",
+        "Chapter 8 Registration Synopsis 1. Person liable for registration 1.1 To sum up threshold limit of registration 2. Definition of Supplier 3. Definition of Aggregate Turnover 4. Persons not liable for registration 5. Compulsory registration in certain cases 6. Two threshold limits of Registration under GST 7. Process of Registration - Rule 8 7.1 Authentication of Aadhar number 7.2 Verification of the application and approval - Rule 9 8. Issue of registration certificate available on the common portal - Rule 10 of CGST Rules, 2017 8.1 Furnishing of Bank Account Details - Rule 10A 8.1.1 During suspension of registration the said registered person may not be allowed to furnish the details of outward supplies in FORM GSTR-1 or IFF 8.2 Separate registration for multiple places of business within a State or a Union territory - Rule 11 8.3 Grant of registration to persons required to deduct tax at source or to collect tax at source - Rule 12 8.4 Grant of registration to non-resident taxable person - Rule 13 8.5 Grant of registration to a person supplying online information and database access or retrieval services from a place outside India to a non-taxable online recipient or a person supplying online money gaming from a place outside India to a person in India - Rule 14 8.6 Extension in period of operation by casual taxable person and non- resident taxable person \u2013 Rule 15 8.7 Suo moto registration \u2013 Rule 16 8.8 Assignment of Unique Identity Number to certain special entities - Rule 17 8.9 Display of registration certificate and Goods and Services Tax Identification Number on the name board \u2013 Rule 18 8.10 Manner of registration 8.11 Physical verification of business premises in certain cases 8.12 Proof of possession of Aadhaar for registration 9. Deemed Registration 10. Registration for casual taxable or non-resident"
+      ],
+      "latency_ms": {
+        "route": 8.696199976839125,
+        "embed_query": 1011.313599999994,
+        "retrieval": 797.2731999470852,
+        "rerank": 2153.505900001619,
+        "generation": 1311.0240999958478,
+        "citation_validation": 0.004499976057559252,
+        "groundedness_check": 1321.7971000121906
+      },
+      "tokens": {
+        "input": 0,
+        "output": 228
+      },
+      "error": null
+    },
+    {
+      "example_id": "13",
+      "question": "How does Section 2(68) of the CGST Act define 'job work'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        650
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Under Section 2(68) of the CGST Act, 2017, \"job work\" is defined as any treatment or process undertaken by a person on goods belonging to another registered person.",
+      "citations": [
+        649,
+        650,
+        657,
+        658
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          657,
+          657
+        ],
+        [
+          658,
+          658
+        ],
+        [
+          649,
+          649
+        ],
+        [
+          650,
+          650
+        ],
+        [
+          649,
+          650
+        ]
+      ],
+      "context_texts": [
+        "168(1) of the Central Goods and Services Tax Act, 2017, (hereinafter referred to as the \u201cCGST Act\u201d) hereby clarifies the various issues raised as below: 2. As per clause (68) of section 2 of the CGST Act, 2017, \u201cjob work\u201d means any treatment or process undertaken by a person on goods belonging to another registered person and the expression \u201cjob worker\u201d shall be construed accordingly. The registered person on whose goods (inputs or capital goods) job work is performed is called the \u201cPrincipal\u201d for the purposes of section 143 of the CGST Act. The said section which encapsulates the provisions related to job work, provides that the registered principal may, without payment of tax, send inputs or capital goods to a job worker for job work and, if required, from there subsequently to another job worker and so on. Subsequently, on completion of the job work (by the last job worker), the principal shall either bring back the goods to his place of business or supply (including export) the same directly from the place of business/premises of the job worker within one year in case of inputs or within three years in case of capital goods (except moulds and dies, jigs and fixtures or tools). 3. It may be noted that the responsibility of keeping proper accounts of the inputs and capital goods sent for job work lies with the principal. Moreover, if the time frame of one year/three years for bringing back or further supplying the inputs/capital goods is not adhered to, the activity of sending the goods for job work shall be deemed to be a supply by the principal on the day when the said inputs/capital goods were sent out by him. Thus, essentially, sending goods for job work is not a supply as such, but it acquires the",
+        "providing the services of job 3 work. It may be noted that the definition of job work, as contained in clause (68) of section 2 of the CGST Act, entails that the job work is a treatment or process undertaken by a person on goods belonging to another registered person. Thus, the job worker is expected to work on the goods sent by the principal and whether the activity is covered within the scope of job work or not would have to be determined on the basis of facts and circumstances of each case. Further, it is clarified that the job worker, in addition to the goods received from the principal, can use his own goods for providing the services of job work. 6. Requirement of registration for the principal/job worker: It is important to note that the provisions of section 143 of the CGST Act are applicable to a registered person. Thus, it is only a registered person who can send the goods for job work under the said provisions. It may also be noted that the registered person (principal) is not obligated to follow the said provisions. It is his choice whether or not to avail of the benefit of these special provisions. 6.1 Doubts have been raised about the requirement of obtaining registration by job workers when they are located in the same State where the principal is located or when they are located in a State different from that of the principal. It may be noted that the job worker is required to obtain registration only if his aggregate turnover, to be computed on all India basis, in a financial year exceeds the specified threshold limit (i.e. `20 lakhs or `10 lakhs in case of special category States except Jammu & Kashmir) in case both the principal and the job worker are located in the same State. Where",
+        "Chapter 25 Job Work under GST Synopsis 1. Meaning of Job work in Pre-GST era 2. Meaning of job work under GST 3. Facility of Job Working 4. Job work procedure 5. Responsibility of the Principal manufacturer on job working 6. Job worker place additional place of business 7. Accounting of job working of inputs and capital goods 8. GST shall be payable by the principal manufacturer on \u201cDeemed Supply\u201d in case of non-compliances 9. Special provisions of job work relating to moulds and dies, jigs and fixtures, or tools 10. Documents for movement of inputs and Capital goods to job worker 11. Taking input tax credit in respect of inputs and capital goods sent for job work 12. Conditions and restrictions in respect of inputs and capital goods sent to the job-worker 13. Disposal of scrap and waste after job working 14. Levy and collection of tax on supply of services by job worker 15. Job Work under GST (conditions and restrictions) 16. C.B.I. & C, Circular 17. Advance Rulings Job work means outsourcing of manufacturing activities for completion of a product beyond the premises of the principal manufacturer. The principal manufacturer gets the manufacturing facilities through job worker to meet requirement of customers. Job work is one of the most cost effective ways to get the finished goods without any investment on plant and machinery for manufacturing process. The importance of Job work has tremendously increased due to market competition on first moving consumer goods and outsourcing of goods available in cheaper prices. In Indian market context, domestic production mainly depends upon Job Work. 1. Meaning of Job work in Pre-GST era In pre-GST era job work was carried as per Notification No. 214/86-C.E. and defined \u201cjob work\u201d means processing or working upon of raw materials or semi- finished goods supplied",
+        "Facility of Job Working As per Section 143(1) of CGST Act, 2017, the inputs and capital goods can be sent for job work and Section 19(7) of CGST Act, 2017, Mould and dies, jigs and fixtures, or tools sent out to a job worker for job work. Explanation: For purposes of job work, input includes intermediate goods arising from any treatment or process carried out on the inputs by the principal or the job worker. 4. Job work procedure The procedure of Job work has been specified under Chapter XX1 as Miscellaneous provisions under CGST Act, 2017. Section 143(1) of CGST Act, provides that a registered person (principal) may under intimation and subject to such conditions as may be prescribed, send inputs or capital goods, without payment of tax, to a job worker for job work and if required, from there subsequently send to another job worker and so on. Subsequently, on completion of the job work (by the last job worker), the principal shall bring back the goods to his place of business or supply (including export) the same directly from the place of business/premises of the job worker within one year in case of inputs or within three years in case of capital goods (except moulds and dies, jigs and fixtures or tools). The commissioner has been empowered to extend the time limit for return of inputs and capital goods up to a period of one year and two years respectively. 5. Responsibility of the Principal manufacturer on job working Section 143(1)(a) and (b) of CGST Act, 2017 prescribed that principal manufacturer shall comply the following responsibilities: (a) bring back inputs, after completion of job work or otherwise, or capital goods, other than moulds and dies, jigs and fixtures, or tools, within one year and three years, respectively,",
+        "prices. In Indian market context, domestic production mainly depends upon Job Work. 1. Meaning of Job work in Pre-GST era In pre-GST era job work was carried as per Notification No. 214/86-C.E. and defined \u201cjob work\u201d means processing or working upon of raw materials or semi- finished goods supplied to the job worker, so as to complete a part or of the process resulting in the manufacture or finishing of an article or any operation which is essential for the aforesaid process. Job Work under GST 2. Meaning of job work under GST Section 2(68) of CGST Act, 2017, \u201cjob work\u201d means any treatment or process undertaken by a person on goods belonging to another registered person and expression \u201cjob worker\u201d shall be constructed accordingly. The registered person on whose goods (inputs or capital goods) job work is performed is called the \u201cprincipal\u201d for the purpose of Section 143 of the CGST Act. The principal must be a registered taxable person under Section 25 of the CGST Act, 2017. The person who under takes to carry job working of another person is called \u201cjob worker\u201d. The transaction between principal and job worker is fully covered under scope of supply and GST is payable thereon. But there is exception in terms of Section 143(1) of the CGST Act, 2017 prescribed that registered person can send any inputs or capital goods, without payment of tax, to a Job worker for job work and there subsequently send to another job worker and likewise. 3. Facility of Job Working As per Section 143(1) of CGST Act, 2017, the inputs and capital goods can be sent for job work and Section 19(7) of CGST Act, 2017, Mould and dies, jigs and fixtures, or tools sent out to a job worker for job work. Explanation: For"
+      ],
+      "latency_ms": {
+        "route": 11.515600024722517,
+        "embed_query": 1096.8070999952033,
+        "retrieval": 710.1079000276513,
+        "rerank": 1624.881599971559,
+        "generation": 3624.256899987813,
+        "citation_validation": 0.004399975296109915,
+        "groundedness_check": 1282.6064000255428
+      },
+      "tokens": {
+        "input": 0,
+        "output": 138
+      },
+      "error": null
+    },
+    {
+      "example_id": "15",
+      "question": "What did the Electronic Way Bill (E-way Bill) system replace, and under which rule is it governed?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        668
+      ],
+      "route": "multi_hop",
+      "abstained": false,
+      "degraded": false,
+      "answer": "The Electronic Way Bill (E-way Bill) system replaced the manual filling of way bills (the erstwhile road permit system). It is governed by Rule 138 of the CGST Rules, 2017.",
+      "citations": [
+        668,
+        669,
+        1270
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          669,
+          670
+        ],
+        [
+          1269,
+          1270
+        ],
+        [
+          990,
+          991
+        ],
+        [
+          668,
+          669
+        ],
+        [
+          50,
+          50
+        ]
+      ],
+      "context_texts": [
+        "Statement every month to the tax authority; 2. There is no need manual filling of way bill and has been replaced with electronic way bill; 3. Unlike earlier system E-way bill under GST regime is user friendly and convenient; 4. The generation of E-way Bill is easy and quick through various modes of generation; 5. There are several checks and balances for smooth tax administration and verification of E-way Bill by the GST officials to control tax evasion; 6. There is no need to vehicle to stand at entry point at check posts under GST regime to get verification by check post authority, thereby there is no physical existence of check post office at entry point of each State; 7. Under GST regime E-way Bill is ensuring faster movement of goods, resulting in reduction of transit time as well as cost of transportation. 4. Statutory provision of E-way Bill Rule 138 of the CGST Rules, 2017 before its amendment stated that till such time an E-way Bill system is developed and approved by the Council, the Government may, by notification, specify the documents that the person in charge of a conveyance carrying any goods in transit shall carry the said documents. Provisions with regard to Electronic Way Bill Rules has been notified on 30th August, 2017 vide Notification No. 27/2017-CT, dated 30-8- 2017 whereunder the provisions for providing for providing information to be Electronic Way Bill furnished prior to commencement of movement of goods and generation of E- way Bill were incorporated by amending Rule 138 and inserting new Rules from 138A to 138D in the CGST Rules, 2017. But the implementation of E-way Bill was deferred by the GST Council meeting. Thereafter, as per decision of the GST Council, the Central Government has decided to introduce E-way",
+        "Q6. When will the E-way Bill provisions be implemented? Ans. The E-way Bill provisions in respect of inter-State supplies of goods shall be implemented w.e.f. 1st February, 2018. The States may choose their own timings for implementation of E-way Bill for intra-State movement of goods on any date before 1st June, 2018. Q7. When should an E-way Bill be generated? Ans. As per Rule 138 of the CGST Rules, 2017, an E-way Bill has to be generated prior to the commencement of transport of goods. Q8. Whether E-way Bill need to be generated for all movements of goods? Ans. E-way Bill is not required to be generated in the following cases: (a) Transport of goods as specified in Annexure to Rule 138 of the CGST Rules, 2017 which is reproduced below : S/No. Description of Goods 1 Liquefied petroleum gas for supply to household and non-domestic exempted category (NDEC) customers 2 Kerosene oil sold under PDS 3 Postal baggage transported FAQs on E-way Bill by Department of Posts 4 Natural or cultured pearls and precious or semi- precious stones; precious metals and metals clad with precious metal (Chapter 71) 5 Jewellery, goldsmiths\u2019 and silversmiths\u2019 wares and other articles (Chapter 71) 6 Currency 7 Used personal and household effects 8 Coral, unworked (0508) and worked coral (9601) (b) Goods being transported by a non-motorised conveyance; (c) Goods being transported from the port, airport, air cargo complex and land customs station to an inland container depot or a container freight station for clearance by Customs; and (d) In respect of movement of goods within such areas as are notified under Rule 138(14)(d) of the SGST Rules, 2017 of the concerned State.",
+        "document required for movement of goods from one place to another. The movement may be either (i) from supplier to recipient and vice versa; or (ii) from manufacturer to job worker and vice versa; or (iii) between two premises of same businessman; or (iv) for any other purpose. (2) EWB is to be generated by every registered person causing movement of goods of consignment value (inclusive of GST) exceeding `50,000/-. For consignments even below `50,000/-, EWB is mandatory in case of inter-State movement of (i) goods being sent for job work; and (ii) handicraft goods. (3) There can be four situations for movement of goods: (i) Registered supplier to registered recipient: EWB may be generated by either of them depending on terms of delivery i.e. the person causing movement of goods is responsible for EWB generation. (ii) Registered supplier to unregistered recipient: EWB to be generated mandatorily by registered supplier. (iii) Unregistered supplier to registered recipient: In such supplies, the movement of goods is deemed to have been caused by registered recipient and he is required to generate EWB. (iv) Unregistered supplier to unregistered recipient: In such transactions, though EWB Is not mandatory, it can be generated by either of them on voluntary basis. (4) Normally EWB is not required for exempted goods. In addition, there are few items for which EWB is not required as detailed in Annexure to Rule 138(14) of the CGST Rules. (5) No distance exemption clause in EWB provisions. Any direct movement of goods between supplier and recipient warrants EWB, irrespective of distance. However, for Intra-Sate movement of goods from supplier\u2019s premises to transporter and from transporter\u2019s premises to recipient, part B is not mandatory, if the said distance is below 50",
+        "for transport of goods, which is incorporated under GST laws required for movement of goods, if the value of GST paid goods is more than `50,000/- through road, railways, airways and vessels except for certain specified goods as notified by the Government. The person in charge of a conveyance carrying any GST paid goods shall carry Tax invoice along with E-way Bill and present to the Check post authority at entry point of any States or Union territory for scrutiny of Tax paid goods and also facilitates the transit checking of goods by the GST officer. 2. Advantages of E-way Bill (i) Easy access to E-way Bill portal by the supplier, recipient and transporter, (ii) Unique single document valid for the across the country, (iii) Quick generation and cancellation of E-way Bill, (iv) To control tax evasion in the Country, (v) To ensure there is no pilferages of goods in transit, no mismatch of input tax credit, (vi) Hassle free movement of goods throughout the country, (vii) Tracking of the movement of goods with RFID mapped with vehicle, (viii) Provisions allowed for consolidation and extension of validity of E-way Bill, (ix) Easier for transit checking by the authorised officer. 3. Comparison of E-way Bill with erstwhile road permit The comparative benefits of E-way Bill are summarized as under: 1. There is no need to follow with Commercial tax authority for issuance of way bills book and submission utilization of way bills Statement every month to the tax authority; 2. There is no need manual filling of way bill and has been replaced with electronic way bill; 3. Unlike earlier system E-way bill under GST regime is user friendly and convenient; 4. The generation of E-way Bill is easy and quick through various modes of",
+        "in the GST are new for small and medium enterprises in particular, who were not used to regular and online filing of returns and other formalities. 30.2 Based on the feedback received from businesses, consumers and taxpayers from across the country, attempt has been made to incorporate suggestions and reduce problems through short-term as well as long-term solutions. After rectifying system glitches, E-way bill for inter-State movement of goods has been successfully implemented from 1-4-2018. As regards intra- State supplies, option was given to States to choose any date on or before 3-6-2018. All States have notified e-way bill rules for intra-State supplies last being NCT of Delhi where it was introduced w.e.f. 16-6-2018. A total of 37.12 crore e-way bills for inter-State movement and 3.17 crore for intra-State movement have been generated till 31-5-2019. 30.3 NAA has initiated investigation into various complaints of anti- profiteering and has passed orders in some cases to protect consumer interest. 30.4 To expedite sanction of refund, electronic filing of refunds, along with all supporting documents/invoices, has been enabled on the common portal. Clarificatory Circulars and notifications have been issued to guide field formations of CBIC and States in this regard. The government has put in place an IT grievance redressal mechanism to address the difficulties faced by taxpayers owing to technical glitches on the GST portal. 30.5 The introduction of GST is truly a game changer for Indian economy as it has replaced multi-layered, complex indirect tax structure with a simple, transparent and technology-driven tax regime. It has integrated India into a single, common market by breaking barriers to inter-State trade and commerce. By eliminating cascading of taxes"
+      ],
+      "latency_ms": {
+        "route": 8.243699965532869,
+        "embed_query": 973.3690000139177,
+        "retrieval": 811.4468000130728,
+        "rerank": 2058.589900028892,
+        "generation": 1026.2073000194505,
+        "citation_validation": 0.005499983672052622,
+        "groundedness_check": 950.5948000005446
+      },
+      "tokens": {
+        "input": 0,
+        "output": 122
+      },
+      "error": null
+    },
+    {
+      "example_id": "17",
+      "question": "How does Section 95 of the CGST Act define an 'advance ruling'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        561
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Under Section 95 of the CGST Act, \"advance ruling\" refers to a decision provided by the Authority, the Appellate Authority, or the National Appellate Authority to an applicant on matters or questions specified in sub-section (2) of Section 97, sub-section (1) of Section 100, or section 101C of the CGST Act, 2017, in relation to the supply of goods or services or both being undertaken or proposed to be undertaken by the applicant.",
+      "citations": [
+        561
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          561,
+          562
+        ],
+        [
+          560,
+          560
+        ],
+        [
+          571,
+          572
+        ],
+        [
+          567,
+          568
+        ],
+        [
+          560,
+          561
+        ]
+      ],
+      "context_texts": [
+        "of Indirect Tax law. The advance ruling means decision passed by the Advance Ruling Authority. The said decision helps the applicant in planning their activities well in advance on GST issues. The scope of advance ruling is very wide and reduces the quantum of litigation between taxpayers and department. The decision of advance ruling is binding on the applicant as well as Government authorities as a legally constituted body under GST law. 2. Definition of Advance Ruling - Section 95 of CGST Act \u201cadvance ruling\u201d means a decision provided by the Authority or the Appellate Authority or the National Appellate Authority to an applicant on matters or on questions specified in sub-section (2) of Section 97 or sub-section (1) of Section 100 or of section 101C of CGST Act, 2017, in relation to the supply of goods or services or both being undertaken or proposed to be undertaken by the applicant. 3. Advantages of Advance Ruling The major advantages of advance ruling as primary decision making authority on tax law are summarized as under: 1. Seeking advance ruling is cheaper and procedure very simple; 2. Early disposal of application with solution for the applicant; 3. Provide certainty in tax liability in advance in relation to an activity proposed to be undertaken by the applicant; 4. Pronounced ruling expeditiously in a transparent and inexpensive manner; 5. Reduce litigation at the initial stage of ambiguity; 6. Advance ruling can be delivered with conducting due personal hearing of the applicant; 7. With transparent decision attract Foreign Direct Investment (FDI). Advance Ruling 4. Authority for Advance Ruling (AAR) - Section 96 of CGST Act Section 96 of CGST Act, 2017 has prescribed, the Authority for advance ruling constituted under the provisions of a State Goods and Services",
+        "Chapter 21 Advance Ruling Synopsis 1. Introduction 2. Definition of Advance Ruling - Section 95 of CGST Act 3. Advantages of Advance Ruling 4. Authority for Advance Ruling (AAR) - Section 96 of CGST Act 5. Questions Specified for Advance Ruling - Section 97 of CGST Act. 6. Procedure on receipt of application - Section 98 of CGST Act 7. Appellate Authority for Advance Ruling - Section 99 of CGST Act 7.1 Appeal to Appellate Authority - Section 100 of CGST Act 7.2 Orders of Appellate Authority - Section 101 of CGST Act 7.3 Constitution of National Appellate Authority for Advance Ruling - Section 101A of CGST Act 7.4 Appeal to National Appellate Authority - Section 101B of CGST Act 8. Order of National Appellate Authority - Section 101C of CGST Act 9. Applicability of Advance Ruling \u2013 Section 103 of the CGST Act, 2017 10. Time period of Validity - Void of Advance Ruling - Section 104 of the CGST Act, 2017 10.1 Powers of Authority and Appellate Authority - Section 105 of CGST Act 551 10.2 Procedure of Authority and Appellate Authority - Section 106 of CGST Act 11. Procedure for obtaining Advance Ruling 12. Remedies against order of AAR - Section 100 of the CGST Act, 2017 13. Orders of Appellate Authority \u2013 Section 101 of CGST Act 13.1 Rectification of advance ruling - Section 102 of CGST Act 13.2 Applicability of advance ruling - Section 103 of CGST Act 14. Procedure of Advance Ruling 14.1 Qualification and appointment of members of the Authority for Advance Ruling - Rule 103 of CGST Rules 14.2 Form and manner of application to the Authority for Advance Ruling - Rule 104 of CGST Rules 14.3 Certification of copies of advance",
+        "applicants referred to in clause (a) and the registered persons having the same Permanent Account Number issued under the Income-tax Act, 1961 (43 of 1961). (2) The advance ruling referred to in sub-section (1) and sub-section (1A)] shall be binding unless the law, facts or circumstances supporting the original advance ruling have changed. 14. Procedure of Advance Ruling 14.1 Qualification and appointment of members of the Authority for Advance Ruling - Rule 103 of CGST Rules The Government shall appoint officers not below the rank of Joint Commissioner as member of the Authority for Advance Ruling. Advance Ruling 14.2 Form and manner of application to the Authority for Advance Ruling - Rule 104 of CGST Rules (1) An application for obtaining an advance ruling under sub-section (1) of section 97 shall be made on the common portal in FORM GST ARA-01 and shall be accompanied by a fee of five thousand rupees, to be deposited in the manner specified in section 49. (2) The application referred to in sub-rule (1), the verification contained therein and all the relevant documents accompanying such application shall be signed in the manner specified in rule 26. 14.3 Certification of copies of advance rulings pronounced by the Authority - Rule 105 of CGST Rules A copy of the advance ruling shall be certified to be a true copy of its original by any member of the Authority for Advance Ruling. 14.4 Form and manner of appeal to the Appellate Authority for Advance Ruling - Rule 106 of CGST Rules (1) An appeal against the advance ruling issued under sub-section (6) of section 98 shall be made by an applicant on the common portal in FORM GST ARA-02 and shall be accompanied by a fee of ten thousand rupees to be deposited in the",
+        "(2) The advance ruling referred to in sub-section (1) [and sub-section (1A)] shall be binding unless the law, facts or circumstances supporting the original advance ruling have changed. Advance Ruling 10. Time period of Validity - Void of Advance Ruling - Section 104 of the CGST Act, 2017 (1) Where the Authority or the Appellate Authority or the National Appellate Authority finds that advance ruling pronounced by it under sub-section (4) of section 98or under sub-section (1) of section 101 or under section 101C has been obtained by the applicant or the appellant by fraud or suppression of material facts or misrepresentation of facts, it may, by order, declare such ruling to be void ab-initio and thereupon all the provisions of this Act or the rules made thereunder shall apply to the applicant or the appellant as if such advance ruling had never been made: Provided that no order shall be passed under this sub-section unless an opportunity of being heard has been given to the applicant or the appellant. Explanation.\u2014The period beginning with the date of such advance ruling and ending with the date of order under this sub-section shall be excluded while computing the period specified in sub-sections (2) and (10) of section 73 or sub- sections (2) and (10) of section 74. (2) A copy of the order made under sub-section (1) shall be sent to the applicant, the concerned officer and the jurisdictional officer. 10.1 Powers of Authority and Appellate Authority - Section 105 of CGST Act The Authority or the Appellate Authority or the National Appellate Authority shall, for the purpose of exercising its powers regarding\u2014 (a) discovery and inspection; (b) enforcing the attendance of any person and examining him on oath; (c) issuing commissions",
+        "Section 103 of CGST Act 14. Procedure of Advance Ruling 14.1 Qualification and appointment of members of the Authority for Advance Ruling - Rule 103 of CGST Rules 14.2 Form and manner of application to the Authority for Advance Ruling - Rule 104 of CGST Rules 14.3 Certification of copies of advance rulings pronounced by the Authority - Rule 105 of CGST Rules 14.4 Form and manner of appeal to the Appellate Authority for Advance Ruling - Rule 106 of CGST Rules 14.5 Certification of copies of the advance rulings pronounced by the Appellate Authority - Rule 107 of CGST Rules 15. Manual filing and processing Application - Rule 107A of CGST Rules 16. Rectification of Advance Ruling 17. Void of Advance Ruling under certain circumstances 18. Powers of AAR and AAAR 19. Formation of AAR 20. National Appellate Authority for Advance Ruling 21. Constitution of National Appellate Authority for Advance Ruling: Section 101A of CGST Act 22. Appointment of President and Technical Members 23. Remunerations of the Members 24. Tenure of office 25. Procedure of resignation 26. Procedure of Removal 27. Order of Removal 28. Order of Suspension 29. Appearance before the Authority 30. Appeal to National Appellate Authority 31. Order of National Appellate Authority 32. Majority of opinion 33. Time period of Order 34. Disposal of Order 35. Rectification of Order 1. Introduction The concept of Advance Ruling is not new one and borrowed from erstwhile provision of Indirect Tax law. The advance ruling means decision passed by the Advance Ruling Authority. The said decision helps the applicant in planning their activities well in advance on GST issues. The scope of advance ruling is very wide and reduces the quantum of litigation between taxpayers and department. The decision of"
+      ],
+      "latency_ms": {
+        "route": 8.43180000083521,
+        "embed_query": 652.1740999887697,
+        "retrieval": 813.7528999941424,
+        "rerank": 1865.9479999914765,
+        "generation": 1337.7939999918453,
+        "citation_validation": 0.006599992047995329,
+        "groundedness_check": 1297.0096000353806
+      },
+      "tokens": {
+        "input": 0,
+        "output": 241
+      },
+      "error": null
+    },
+    {
+      "example_id": "19",
+      "question": "Under GST law, what are the two broad grounds on which the tax department can raise a demand for unpaid or short-paid tax?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        522
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "The two broad grounds on which the tax department can raise a demand for unpaid or short-paid tax are:\n1. When there is a reason of fraud, willful misstatement, or suppression of facts.\n2. When there is no reason of fraud, willful misstatement, or suppression of facts.",
+      "citations": [
+        522
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          522,
+          523
+        ],
+        [
+          521,
+          521
+        ],
+        [
+          554,
+          555
+        ],
+        [
+          527,
+          528
+        ],
+        [
+          582,
+          582
+        ]
+      ],
+      "context_texts": [
+        "issuance of show cause notice and end with Adjudication proceedings. 2. The major grounds of demand of Tax The primary demand for tax can be raised by the authorised officer of GST for short payment or non-payment of tax in the following situations: (a) when there is reason of fraud or wilful misstatement or suppression of facts (b) when there is no reason of fraud or wilful misstatement or suppression of facts 3. When there is no reason of fraud - Section 73 of CGST Act Section 73 of CGST Act, deals with the cases any tax has not been paid or short paid or erroneously refunded, or where input tax credit has been wrongly availed or utilised for any reason, other than the reason of fraud or any wilful- mis-statement or suppression of facts to evade tax. (1) Where it appears to the proper officer that any tax has not been paid or short paid or erroneously refunded, or where input tax credit has been wrongly availed or utilised for any reason, other than the reason of fraud or any wilful- misstatement or suppression of facts to evade tax, he shall serve notice on the person chargeable with tax which has not been so paid or which has been so short paid or to whom the refund has erroneously been made, or who has wrongly availed or utilised input tax credit, requiring him to show cause as to why he should not pay the amount specified in the notice along with interest payable thereon under section 50 and a penalty leviable under the provisions of this Act or the rules made thereunder. \uf0d8 Proper officer issue notice 3 months prior to time limit of 3 years: (2) The proper officer shall issue the notice under sub-section (1) at least three months prior to",
+        "Chapter 20 Demand and Recovery Synopsis 1. Introduction 2. The major grounds of demand of Tax 3. When there is no reason of fraud - Section 73 of CGST Act 4. Limitation for recovery and adjudication is within 3 years of filing Annual return 5. When there is Fraud - Section 74 of CGST Act 6. Limitation for recovery and adjudication 7. Interest and Penalty 8. General provisions relating to determination of Tax 9. Tax collected but not paid to Government \u2013 Section 76 10. Tax wrongly collected and paid to Central/State Government 11. Intimation recovery proceedings 12. Manner of Recovery of Tax \u2013 Section 79 of CGST Act. 13. Payment of tax and other amount in instalments 14. Transfer of property to be void in certain cases 15. Tax to be first charge on property 16. Provisional attachment 17. Continuation and validation of certain recovery proceedings 17.1 Liability in case of transfer of business - Section 85 of CGST Act. 17.2 Liability of agent and principal - Section 86 of CGST Act. 17.3 Liability in case of amalgamation or merger of companies - Section 87 of CGST Act 17.4 Liability in case of company in liquidation - Section 88 of CGST Act 17.5 Liability of directors of private company - Section 89 of CGST Act. 17.6 Liability of partners of firm to pay tax - Section 90 of CGST Act 17.7 Liability of guardians, trustees, etc - Section 91 of CGST Act. 17.8 Liability of Court of Wards, etc - Section 92 of CGST Act 17.9 Special provisions regarding liability to pay tax, interest or penalty in certain cases - section 93 of the CGST Act 17.10 Liability in other cases - Section 94 of CGST Act 18. Statutory",
+        "FORM GST DRC-01 and uploading of summary of order in FORM GST DRC-07 electronically on the portal by the proper officer-regarding. Reference is invited to the provisions of section 52, section 73, section 74, section 122, section 123, section 124, section 125, section 127, section 129 and section 130 of Central Goods and Service Tax Act, 2017 (herein after referred to as the CGST Act), as per which a notice is required to be issued by the proper officer to a person for demand and recovery of any amount of tax not paid or short paid/amount of input tax credit wrongly availed/amount of refund erroneously made, for recovery of interest and/ or for imposition of any penalty or fine on the said person. Attention is also invited to sub-rule (1) of rule 142 of Central Goods and Service Tax Rules, 2017 (herein after referred to as the CGST Rules) as per which, along with the notices issued under section 52 or section 73 or section 74 or section 122 or section 123 or section 124 or section 125 or section 127 or section 129 or section 130 of CGST Act, a summary of such notice is also required to be served by the proper officer electronically on the portal in FORM GST DRC-01. 2. It is also mentioned that as per sub-rule (5) of rule 142 of CGST Rules, where any order is issued by the proper officer under section 52 or section 62 or section 63 or section 64 or section 73 or section 74 or section 75 or section 76 or section 122 or section 123 or section 124 or section 125 or section 127 or section 129 or section 130 of CGST Act, summary of such order is also required to be uploaded electronically on the portal by the proper officer in FORM GST DRC- 07, specifying",
+        "\"suppression\" shall mean non-declaration of facts or information which a taxable person is required to declare in the return, statement, report or any other document furnished under this Act or the rules made thereunder, or failure to furnish any information on being asked for, in writing, by the proper officer. 6. Limitation for recovery and adjudication (i) If the case relating to fraud or suppression of facts, the adjudication of the case should be done within 5 years from the date of filing of annual return for the relevant financial year. (ii) If the assessee received an erroneous refund, the case must be adjudicated within 5 years from the date on which such refund was credited to the assessee\u2019s account. (iii) The proper officer shall issue notice for recovery of Tax at least 3 months before the deadline for adjudication of case or issue of order. (iv) The proper officer shall issue order of adjudication within 5 years from the due date for furnishing of annual return for the financial year for the relevant period of dispute. 7. Interest and Penalty The incidence of short payment of tax or erroneous refund or wrong availment of Input Tax Credit may be because of an inadvertent bona fide mistake (Normal Cases) or it may be a deliberate attempt (Fraud Cases) to evade the tax. Since the nature of offence is totally different in both the incidences, hence, separate provisions for recovery of the tax and the amount of penalty have been made to deal with such type of cases. There are provisions to encourage Demand and Recovery voluntary compliance such as no penalty or lesser penalty if the tax dues along with interest, are paid within the specified time limit/incidence. The rate of interest and amount of penalty on the various",
+        "opportunity of showing cause against the proposed order: Provided further that where the Appellate Authority is of the opinion that any tax has not been paid or short-paid or erroneously refunded, or where input tax credit has been wrongly availed or utilised, no order requiring the appellant to pay such tax or input tax credit shall be passed unless the appellant is given notice to show cause against the proposed order and the order is passed within the time limit specified under section 73 or section 74. (12) The order of the Appellate Authority disposing of the appeal shall be in writing and shall state the points for determination, the decision thereon and the reasons for the decision. \uf0d8 Appeal to be decided within period of one year. (13) The Appellate Authority shall, where it is possible to do so, hear and decide every appeal within a period of one year from the date on which it is filed: Provided that where the issuance of order is stayed by an order of a Court or Tribunal, the period of such stay shall be excluded in computing the period of one year. (14) On disposal of the appeal, the Appellate Authority shall communicate the order passed by it to the appellant, respondent and to the Adjudicating authority. (15) A copy of the order passed by the Appellate Authority shall also be sent to the jurisdictional Commissioner of CGST or the authority designated by him in this behalf and the jurisdictional Commissioner of SGST or the authority designated by him in this behalf. (16) Every order passed by the Appellate, subject to the provisions of Section 108 or Section 113 or Section 117 or Section 118, be final and binding on the parties. 5. Appeal to the Appellate Authority - Rule"
+      ],
+      "latency_ms": {
+        "route": 10.49559999955818,
+        "embed_query": 1117.2473999904469,
+        "retrieval": 834.3766999896616,
+        "rerank": 1660.589599981904,
+        "generation": 9.465499955695122,
+        "citation_validation": 0.005099980626255274,
+        "groundedness_check": 8.667099988088012
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "21",
+      "question": "How does Section 2(19) of the CGST Act define 'Capital Goods'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        125
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Section 2(19) of the CGST Act defines 'Capital Goods' as goods, the value of which is capitalized in the books of account of the person claiming the Input Tax Credit and which are used or intended to be used in the course or furtherance of business.",
+      "citations": [
+        124
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          1157,
+          1158
+        ],
+        [
+          1238,
+          1238
+        ],
+        [
+          1127,
+          1128
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          650,
+          650
+        ]
+      ],
+      "context_texts": [
+        "the ITC for such inputs is not restricted under Refund under GST section 17(5) of the CGST Act. Further, capital goods have been clearly defined in section 2(19) of the CGST Act as goods whose value has been capitalized in the books of account and which are used or intended to be used in the course or furtherance of business. Stores and spares, the expenditure on which has been charged as a revenue expense in the books of account, cannot be held to be capital goods. 63. It is requested that suitable trade notices may be issued to publicize the contents of this circular. * * * Circular No. 161/17/2021-GST dated 20-9-2021 Clarification relating to export of services-condition (v) of section 2(6) of the IGST Act 2017\u2013reg. Various representations have been received citing ambiguity caused in interpretation of the Explanation 1 under section 8 of the IGST Act, 2017 in relation to condition (v) of export of services as mentioned in sub-section (6) of the section 2 of the IGST Act 2017. Doubts have been raised whether the supply of service by a subsidiary/sister concern/group concern, etc. of a foreign company in India, which is incorporated under the laws in India, to the foreign company incorporated under laws of a country outside India, will hit by condition (v) of sub-section (6) of section 2 of IGST Act. 2. The matter has been examined. In view of the difficulties being faced by the trade and industry and to ensure uniformity in the implementation of the provisions of the law across field formations, the Board, in exercise of its powers conferred by section 168(1) of the Central Goods and Services Tax Act, 2017 (hereinafter referred to as \u201cCGST Act\u201d), hereby clarifies",
+        "the purposes of his/her business and there is no specific restriction on the availment of such ITC anywhere else in the GST Act. The GST paid on inward supplies of stores and spares, packing materials etc. shall be available as ITC as long as these inputs are used for the purpose of the business and/or for effecting taxable supplies, including zero-rated supplies, and the ITC for such inputs is not restricted under section 17(5) of the CGST Act. Further, capital goods have been clearly defined in section 2(19) of the CGST Act as goods whose value has been capitalized in the books of account and which are used or intended to be used in the course or furtherance of business. Stores and spares, the expenditure on which has been charged as a revenue expense in the books of account, cannot be held to be capital goods. Refund of accumulated ITC of input services and capital goods arising on account of inverted duty structure: 14. Section 54(3) of the CGST Act provides that refund of any unutilized ITC may be claimed where the credit has accumulated on account of rate of tax on inputs being higher than the rate of tax on output supplies (other than nil rated or fully exempt supplies). Further, section 2(59) of the CGST Act defines inputs as any goods other than capital goods used or intended to be used by a supplier in the course or furtherance of business. Thus, inputs do not include services or capital goods. Therefore, clearly, the intent of the law is not to allow refund of tax paid on input services or capital goods as part of refund of unutilized input tax credit. Accordingly, in order to align the CGST Rules with the CGST Act, notification No 26/2018-Central Tax dated 13.06.2018 was issued",
+        "the manufacturing process and therefore, do not qualify as input. There are also instances where stores and spares charged to revenue are considered as capital goods and therefore the ITC availed on them is not included in Net ITC, even though the value of these goods has not been capitalized in his books of account by the claimant. 13. In relation to the above, it is clarified that the input tax credit of the GST paid on inputs shall be available to a registered person as long as he/she uses or intends to use such inputs for the purposes of his/her business and there is no specific restriction on the availment of such ITC anywhere else in the GST Act. The GST paid on inward supplies of stores and spares, packing materials etc. shall be available as ITC as long as these inputs are used for the purpose of the business and/or for effecting taxable supplies, including zero-rated supplies, and the ITC for such inputs is not restricted under Section 17(5) of the CGST Act. Refund under GST Further, capital goods have been clearly defined in Section 2(19) of the CGST Act as goods whose value has been capitalized in the books of account and which are used or intended to be used in the course or furtherance of business. Stores and spares, the expenditure on which has been charged as a revenue expense in the books of account, cannot be held to be capital goods. Refund of accumulated ITC of input services and capital goods arising on account of inverted duty structure: 14. Section 54(3) of the CGST Act provides that refund of any unutilized ITC may be claimed where the credit has accumulated on account of rate of tax on inputs being higher than the rate of tax on output supplies (other than nil rated or",
+        "(IGST) (b) two different Union Territories (UTGST); (c) a State and a Union Territory (UTGST). (5) IGST paid on supply of services imported into India in the course of inter-State trade or commerce under Section 7(4) of the IGST Act. 6. Various definitions relating to ITC 6.1 Input Tax Credit Section 2(63) of CGST Act, 2017 defined \u201cinput tax credit\u201d means the Credit of Input Tax. 6.2 Input Section 2(59) of the CGST Act, 2017 defines \u201cInput\u201d means any goods other than capital goods used or intended to be used by a supplier in the course or furtherance of business. 6.3 Goods Section 2(52) of the CGST Act, 2017 defines \u201cgoods\u201d means every kind of movable property other than money and securities but includes actionable claim, growing crops, grass and things attached to or forming part of the land which are agreed to be served before supply or under a contract of supply. 6.4 Capital Goods Section 2(19) of CGST Act, 2017 defines \u201cCapital Goods\u201d means goods, the value of which is capitalized in the books of account of the person claiming the Input Tax Credit and which are used or intended to be used in the course or furtherance of business. 6.5 Services \u201cServices\u201d means anything other than goods, money and securities but includes activities relating to the use of money or its conversion by cash or by any other mode, from one form, currency or denomination, to another form, currency or denomination for which a separate consideration is charged [Section 2(102) of the CGST Act, 2017]. 6.6 Input Service \u201cInput service\u201d means any service used or intended to be used by a supplier in the course or furtherance of business. [Section 2(60) of the CGST Act,",
+        "Facility of Job Working As per Section 143(1) of CGST Act, 2017, the inputs and capital goods can be sent for job work and Section 19(7) of CGST Act, 2017, Mould and dies, jigs and fixtures, or tools sent out to a job worker for job work. Explanation: For purposes of job work, input includes intermediate goods arising from any treatment or process carried out on the inputs by the principal or the job worker. 4. Job work procedure The procedure of Job work has been specified under Chapter XX1 as Miscellaneous provisions under CGST Act, 2017. Section 143(1) of CGST Act, provides that a registered person (principal) may under intimation and subject to such conditions as may be prescribed, send inputs or capital goods, without payment of tax, to a job worker for job work and if required, from there subsequently send to another job worker and so on. Subsequently, on completion of the job work (by the last job worker), the principal shall bring back the goods to his place of business or supply (including export) the same directly from the place of business/premises of the job worker within one year in case of inputs or within three years in case of capital goods (except moulds and dies, jigs and fixtures or tools). The commissioner has been empowered to extend the time limit for return of inputs and capital goods up to a period of one year and two years respectively. 5. Responsibility of the Principal manufacturer on job working Section 143(1)(a) and (b) of CGST Act, 2017 prescribed that principal manufacturer shall comply the following responsibilities: (a) bring back inputs, after completion of job work or otherwise, or capital goods, other than moulds and dies, jigs and fixtures, or tools, within one year and three years, respectively,"
+      ],
+      "latency_ms": {
+        "route": 18.8071999582462,
+        "embed_query": 1052.764300024137,
+        "retrieval": 838.504399987869,
+        "rerank": 1737.8442999906838,
+        "generation": 3.848699969239533,
+        "citation_validation": 0.006399990525096655,
+        "groundedness_check": 8.387200010474771
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "23",
+      "question": "Which Indian State was the last to implement VAT, and from what date?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        22
+      ],
+      "route": "out_of_scope",
+      "abstained": true,
+      "degraded": false,
+      "answer": "I could not find a confident answer to this in Bharat's GST Smart Guide. Please rephrase the question or ask something covered by the manual.",
+      "citations": [],
+      "grounded": null,
+      "retrieved_page_spans": [],
+      "context_texts": [],
+      "latency_ms": {
+        "route": 9.546099987346679
+      },
+      "tokens": {},
+      "error": null
+    },
+    {
+      "example_id": "25",
+      "question": "How does Section 2(59) of the CGST Act define 'Input'?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        125
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Section 2(59) of the CGST Act defines \"Input\" as any goods other than capital goods used or intended to be used by a supplier in the course or furtherance of business.",
+      "citations": [
+        124,
+        1128,
+        1238
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          124,
+          125
+        ],
+        [
+          1128,
+          1128
+        ],
+        [
+          122,
+          122
+        ],
+        [
+          1238,
+          1238
+        ],
+        [
+          1127,
+          1128
+        ]
+      ],
+      "context_texts": [
+        "(IGST) (b) two different Union Territories (UTGST); (c) a State and a Union Territory (UTGST). (5) IGST paid on supply of services imported into India in the course of inter-State trade or commerce under Section 7(4) of the IGST Act. 6. Various definitions relating to ITC 6.1 Input Tax Credit Section 2(63) of CGST Act, 2017 defined \u201cinput tax credit\u201d means the Credit of Input Tax. 6.2 Input Section 2(59) of the CGST Act, 2017 defines \u201cInput\u201d means any goods other than capital goods used or intended to be used by a supplier in the course or furtherance of business. 6.3 Goods Section 2(52) of the CGST Act, 2017 defines \u201cgoods\u201d means every kind of movable property other than money and securities but includes actionable claim, growing crops, grass and things attached to or forming part of the land which are agreed to be served before supply or under a contract of supply. 6.4 Capital Goods Section 2(19) of CGST Act, 2017 defines \u201cCapital Goods\u201d means goods, the value of which is capitalized in the books of account of the person claiming the Input Tax Credit and which are used or intended to be used in the course or furtherance of business. 6.5 Services \u201cServices\u201d means anything other than goods, money and securities but includes activities relating to the use of money or its conversion by cash or by any other mode, from one form, currency or denomination, to another form, currency or denomination for which a separate consideration is charged [Section 2(102) of the CGST Act, 2017]. 6.6 Input Service \u201cInput service\u201d means any service used or intended to be used by a supplier in the course or furtherance of business. [Section 2(60) of the CGST Act,",
+        "goods arising on account of inverted duty structure: 14. Section 54(3) of the CGST Act provides that refund of any unutilized ITC may be claimed where the credit has accumulated on account of rate of tax on inputs being higher than the rate of tax on output supplies (other than nil rated or fully exempt supplies). Further, Section 2(59) of the CGST Act defines inputs as any goods other than capital goods used or intended to be used by a supplier in the course or furtherance of business. Thus, inputs do not include services or capital goods. Therefore, clearly, the intent of the law is not to allow refund of tax paid on input services or capital goods as part of refund of unutilized input tax credit. Accordingly, in order to align the CGST Rules with the CGST Act, Notification No. 26/2018-C.T., dated 13-6-2018 was issued wherein it was stated that the term Net ITC, as used in the formula for calculating the maximum refund amount under Rule 89(5) of the CGST Rules, shall mean input tax credit availed on inputs during the relevant period other than the input tax credit availed for which refund is claimed under sub-rules (4A) or (4B) or both. In view of the above, it is clarified that both the law and the related rules clearly prevent the refund of tax paid on input services and capital goods as part of refund of input tax credit accumulated on account of inverted duty structure. 15. All previous Circulars/Instructions issued on the subject stand modified accordingly. It is requested that suitable trade notices may be issued to publicize the contents of this circular. 16. Difficulty, if any, in implementation of this Circular may please be brought to the notice of the Board. Hindi version would follow. * *",
+        "Chapter 7 Input Tax Credit Synopsis 1. ITC scheme is the backbone of the GST regime 2. Provision of ITC 3. Input Tax Credit on RCM 4. Meaning of Reverse Charge 5. Meaning of Input Tax 6. Various definitions relating to ITC 6.1 Input Tax Credit 6.2 Input 6.3 Goods 6.4 Capital Goods 6.5 Services 6.6 Input Service 6.7 Input Service Distributor 6.8 Agent 7. Who are eligible to take Input Tax Credit? 8. Who are not eligible to take Input Tax Credit? 9. Input Tax Credit not available on the following goods and services 10. Other restrictions of Input Tax Credit 11. Clarification on various issues pertaining to GST as under: 12. Eligibility & conditions for taking Input Tax Credit 13. ITC appears in restricted category, the same cannot be availed by the registered person 14. Manner of distribution of credit by Input Service Distributor 15. Documents\u2019 requirement for claiming Input Tax Credit 16. Input Tax Credit shall be availed if relevant information contained in the document 17. Input Tax Credit shall not be availed on confirmed demand of fraud or wilful misstatement or suppression of facts 18. Input tax credit to be availed that has been reflected in GSTR-2B 19. Delinks availment of ITC on debit notes 20. As per 45 GST Council meeting decision availment of ITC on Debit Notes 21. Extension of due date of availment of ITC till 30th November 22. Restriction on claim of ITC if details have not been uploaded by the suppliers in GSTR-1 return 23. Inserted proviso to Rule 36(4) for cumulative adjustment of ITC 24. ITC claimed has to be matched as per rule 36(4) of the CGST Rules 25. ITC availed only on the basis of GSTR-2B auto-populated return 26.",
+        "the purposes of his/her business and there is no specific restriction on the availment of such ITC anywhere else in the GST Act. The GST paid on inward supplies of stores and spares, packing materials etc. shall be available as ITC as long as these inputs are used for the purpose of the business and/or for effecting taxable supplies, including zero-rated supplies, and the ITC for such inputs is not restricted under section 17(5) of the CGST Act. Further, capital goods have been clearly defined in section 2(19) of the CGST Act as goods whose value has been capitalized in the books of account and which are used or intended to be used in the course or furtherance of business. Stores and spares, the expenditure on which has been charged as a revenue expense in the books of account, cannot be held to be capital goods. Refund of accumulated ITC of input services and capital goods arising on account of inverted duty structure: 14. Section 54(3) of the CGST Act provides that refund of any unutilized ITC may be claimed where the credit has accumulated on account of rate of tax on inputs being higher than the rate of tax on output supplies (other than nil rated or fully exempt supplies). Further, section 2(59) of the CGST Act defines inputs as any goods other than capital goods used or intended to be used by a supplier in the course or furtherance of business. Thus, inputs do not include services or capital goods. Therefore, clearly, the intent of the law is not to allow refund of tax paid on input services or capital goods as part of refund of unutilized input tax credit. Accordingly, in order to align the CGST Rules with the CGST Act, notification No 26/2018-Central Tax dated 13.06.2018 was issued",
+        "the manufacturing process and therefore, do not qualify as input. There are also instances where stores and spares charged to revenue are considered as capital goods and therefore the ITC availed on them is not included in Net ITC, even though the value of these goods has not been capitalized in his books of account by the claimant. 13. In relation to the above, it is clarified that the input tax credit of the GST paid on inputs shall be available to a registered person as long as he/she uses or intends to use such inputs for the purposes of his/her business and there is no specific restriction on the availment of such ITC anywhere else in the GST Act. The GST paid on inward supplies of stores and spares, packing materials etc. shall be available as ITC as long as these inputs are used for the purpose of the business and/or for effecting taxable supplies, including zero-rated supplies, and the ITC for such inputs is not restricted under Section 17(5) of the CGST Act. Refund under GST Further, capital goods have been clearly defined in Section 2(19) of the CGST Act as goods whose value has been capitalized in the books of account and which are used or intended to be used in the course or furtherance of business. Stores and spares, the expenditure on which has been charged as a revenue expense in the books of account, cannot be held to be capital goods. Refund of accumulated ITC of input services and capital goods arising on account of inverted duty structure: 14. Section 54(3) of the CGST Act provides that refund of any unutilized ITC may be claimed where the credit has accumulated on account of rate of tax on inputs being higher than the rate of tax on output supplies (other than nil rated or"
+      ],
+      "latency_ms": {
+        "route": 8.97120003355667,
+        "embed_query": 727.2609999636188,
+        "retrieval": 861.5437000407837,
+        "rerank": 1640.053800016176,
+        "generation": 9.183300018776208,
+        "citation_validation": 0.005200039595365524,
+        "groundedness_check": 9.166500007268041
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "27",
+      "question": "What happens if capital goods (other than moulds, dies, jigs, fixtures, or tools) sent to a job worker are not returned to the principal within the prescribed period?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        651
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "If capital goods (other than moulds, dies, jigs, fixtures, or tools) are neither received back by the principal nor supplied from the job worker\u2019s premises within the period of three years, the following occurs:\n1. The goods are deemed to have been supplied by the principal to the job worker on the day the goods were initially sent out.\n2. The principal must issue an invoice and declare these supplies in their return for the month in which the three-year period expires.\n3. Interest for the intervening period is payable on the tax.\n4. If such goods are returned after the stipulated time, the transaction is treated as a supply by the job worker to the principal, and the job worker is liable to pay GST if they are liable for registration.",
+      "citations": [
+        652,
+        653,
+        656,
+        663,
+        666
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          663,
+          663
+        ],
+        [
+          652,
+          653
+        ],
+        [
+          656,
+          657
+        ],
+        [
+          666,
+          666
+        ],
+        [
+          657,
+          658
+        ]
+      ],
+      "context_texts": [
+        "would apply mutatis mutandis in this case. 9.5 Violation of conditions laid down in section 143: As per the provisions contained in section 143 of the CGST Act, if the inputs or capital goods (other than moulds and dies, jigs and fixtures or tools) are neither received back by the principal nor supplied from the job worker\u2019s place of business within the specified time period, the inputs or capital goods (other than moulds and dies, jigs and fixtures or tools) would be deemed to have been supplied by the principal to the job worker on the day when such inputs or capital goods were sent out to the first job worker. 9.6 Thus, if the inputs or capital goods are neither returned nor supplied from the job worker\u2019s place of business/premises within the specified time period, the principal would issue an invoice for the same and declare such supplies in his return for that particular month in which the time period of one year/three years has expired. The date of supply shall be the date on which such inputs or capital goods were initially sent to the job worker and interest for the intervening period shall also be payable on the tax. If such goods are returned by the job worker after the stipulated time period, the same would be treated as a supply by the job worker to the principal and the job worker would be liable to pay GST if he is liable for registration in accordance with the provisions contained in the CGST Act read with the rules made thereunder. It may be noted that if the job worker is not registered, GST would be payable by the principal on reverse charge basis in terms of the provisions contained in section 9(4) of the CGST Act. However, the said provision has been kept in abeyance for the time being. Further,",
+        "job worker on the day when the said inputs were sent out: Provided that where the inputs are sent directly to a job worker, the period of one year shall be counted from the date of receipt of inputs by the job worker. Section 19(6) of CGST Act, where the capital goods sent for job work are not received back by the principal within a period of three years of being sent out, it shall be deemed that such capital goods had been supplied by the principal to the job worker on the day when the said capital goods were sent out: Provided that where the capital goods are sent directly to a job worker, the period of three years shall be counted from the date of receipt of capital goods by the job worker Section 19(7) Nothing contained in sub-section (3) or sub-section (6) shall apply to moulds and dies, jigs and fixtures, or tools sent out to a job worker for job work. 12. Conditions and restrictions in respect of inputs and capital goods sent to the job-worker Rule 45 of CGST Rules, 2017 provides conditions and restrictions in respect of inputs and capital goods sent to the job worker and the sub-rules as under (1) The inputs, semi - finished goods or capital goods shall be sent to the job worker under the cover of a challan issued by the principal, including where such goods are sent directly to a job-worker, and where the goods are sent from one job worker to another job worker, the challan may be issued either by the principal or the job worker sending the goods to another job worker: Provided that the challan issued by the principal may be endorsed by the job worker, indicating therein the quantity and description of goods where the goods are sent by one job worker to another or are returned to the principal:",
+        "worker\u2019s place of business/premises within the specified time period, the principal would issue an invoice for the same and declare such supplies in his return for that particular month in which the time period of one year/three years has expired. The date of supply shall be the date on which such inputs or capital goods were initially sent to the job worker and interest for the intervening period shall also be payable on the tax. If such goods are returned by the job worker after the stipulated time period, the same would be treated as a supply by the job worker to the principal and the job worker would be liable to pay GST if he is liable for registration in accordance with the provisions contained in the CGST Act read with the rules made thereunder. Further, there is no requirement of either returning back or supplying the goods from the job worker\u2019s place of business/premises as far as moulds and dies, jigs and fixtures, or tools are concerned. C.B.I & C, Circular No. 38/12/2018, dated 26-3-2018. Clarification on issues related to Job Work Various representations have been received regarding the procedures to be followed for sending goods for job work and the related compliance requirements for the principal and the job worker. In view of the difficulties being faced by the taxpayers and to ensure uniformity in the implementation of the provisions of the law across the field formations, the Board, in exercise of its powers conferred under section 168(1) of the Central Goods and Services Tax Act, 2017, (hereinafter referred to as the \u201cCGST Act\u201d) hereby clarifies the various issues raised as below: 2. As per clause (68) of section 2 of the CGST Act, 2017, \u201cjob work\u201d means any treatment or process undertaken by",
+        "the specified time period, the principal would issue an invoice for the same and declare such supplies in his return for that particular month in which the time period of one year/three years has expired. The date of supply shall be the date on which such inputs or capital goods were initially sent to the job worker and interest for the intervening period shall also be payable on the tax. If such goods are returned by the job worker after the stipulated time period, the same would be treated as a supply by the job worker to the principal and the job worker would be liable to pay GST if he is liable for registration in accordance with the provisions contained in the CGST Act read with the rules made thereunder. Further, there is no requirement of either returning back or supplying the goods from the job worker\u2019s place of business/premises as far as moulds and dies, jigs and fixtures, or tools are concerned. 17. Advance Rulings Supplies to job worker is exempted from payment of GST: AAR- Kerala In Re: Industrial Engineering Corporation \u2013 2019 (31) G.S.T.L. 345 (A.A.R. - GST). Held that the movement or supply of inputs and capital goods from the premises of a registered person to a job worker for job working, even though the said movement is qualifies as supply, is not liable to payment of GST as it is exempted in terms of Section 143(1) of the CGST/SGST Act, 2017. The job worker services for job working is qualify as supply in terms of Section 13 read with Section 31 of the CGST/SGST Act, 2017 and the supply of services by job worker is liable to pay GST. The job worker has to issue invoices not only for service charges but also the value of any goods or services used",
+        "goods is not adhered to, the activity of sending the goods for job work shall be deemed to be a supply by the principal on the day when the said inputs/capital goods were sent out by him. Thus, essentially, sending goods for job work is not a supply as such, but it acquires the character of supply only when the inputs/capital goods sent for job work are neither received back by the principal nor supplied further by the principal from the place of business/ premises of the job worker within one/three years of being sent out. It may be noted that the responsibility for sending the goods for job work as well as bringing them back or supplying them has been cast on the principal. Job Work under GST 4. With respect to the above legal requirements, various issues have been raised on the following aspects: (a) Scope/ambit of job work; (b) Requirement of registration for a principal/job worker; (c) Supply of goods by the principal from the job worker\u2019s place of business/ premises; (d) Movement of goods from the principal to the job worker and the documents and intimation required therefore. (e) Liability to issue invoice, determination of place of supply and payment of GST; and (f) Availability of input tax credit to the principal and the job worker. 5. Scope/ambit of job work: Doubts have been raised on the scope of job work and whether any inputs, other than the goods provided by the principal, can be used by the job worker for providing the services of job 3 work. It may be noted that the definition of job work, as contained in clause (68) of section 2 of the CGST Act, entails that the job work is a treatment or process undertaken by a person on goods belonging to another registered person. Thus, the job"
+      ],
+      "latency_ms": {
+        "route": 11.323200014885515,
+        "embed_query": 1038.212499988731,
+        "retrieval": 896.0640999721363,
+        "rerank": 2670.483299996704,
+        "generation": 1592.6016999874264,
+        "citation_validation": 0.004799978341907263,
+        "groundedness_check": 986.9679000112228
+      },
+      "tokens": {
+        "input": 0,
+        "output": 333
+      },
+      "error": null
+    },
+    {
+      "example_id": "29",
+      "question": "Under Section 22 of the CGST Act, in which States is the standard registration turnover threshold lower than in other States?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        193
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Under Section 22 of the CGST Act, the registration threshold is 10 lakh rupees (lower than the standard 20 lakh rupees) for States designated as \"special category States.\" These States, as specified in sub-clause (g) of clause (4) of Article 279A of the constitution, include: Arunachal Pradesh, Assam, Jammu and Kashmir, Manipur, Meghalaya, Mizoram, Nagaland, Sikkim, Tripura, Himachal Pradesh, and Uttarakhand.",
+      "citations": [
+        193,
+        957,
+        958
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          193,
+          194
+        ],
+        [
+          957,
+          958
+        ],
+        [
+          196,
+          197
+        ],
+        [
+          987,
+          988
+        ],
+        [
+          194,
+          195
+        ]
+      ],
+      "context_texts": [
+        "territory, other than special category States, from where he makes a taxable supply of goods or services or both, if his aggregate turnover in a financial year exceeds twenty lakh rupees\u201d. But the person makes taxable supplies of goods or services or both from any of the special category States; he shall be liable to be registered if his aggregate turnover in a financial year exceeds ten lakh rupees. As per decision of 28th meeting of GST Council, the threshold limit for registration in respect of States of Assam, Arunachal Pradesh, Himachal Pradesh, Meghalaya, Sikkim and Uttarakhand to be enhanced to \u20b920 lakhs from \u20b910 lakhs. Taxpayers may opt for multiple registrations within a States/Union territory in respect of multiple places of business located within the same State/Union territory. As per the Finance (No. 2) Act, 2019: in Section 22(1) of the CGST Act, 2017 inserted new proviso:\u2014 \u201cProvided also that the Government may, at the request of a State and on the recommendations of the Council, enhance the aggregate turnover from `20 lakh to such amount not exceeding \u20b940 lakh in case of supplier who is engaged exclusively in the supply of goods, subject to such conditions and limitations, as may be notified. Explanation.\u2014For the purpose of this sub-section, a person shall be considered to be engaged exclusively in the supply of goods even if he is engaged in exempt supply of services provided by way of extending deposits, loans or advances in so far as the consideration is represented by way of interest or discount.\u201d Notified Vide Notification No. 01/2020-Central Tax dated 1.1.2020. Registration 1.1 To sum up threshold limit of registration Every business entity engaged in exclusive supply of goods",
+        "exceeds ` 20 lakhs (` 10 lakhs for Special Category States) excluding the following services: (i) renting of immovable property; Taxability of Government Services under GST (ii) services by the Department of Posts by way of speed post, express parcel post, life insurance and agency services provided to a person other than Government; (iii) services in relation to an aircraft or a vessel, inside or outside the precincts of an airport or port; (iv) transport of goods or passengers. Thus, the recipient of supply of goods or services is liable to pay the entire amount of tax involved in such supply of services or goods or both. 12. Applicability of tax on services provided by Government or a local authority to a business entity located in a special category State The expression \u201cspecial category States\u201d provided in Explanation (iii) to section 22 of the CGST Act, shall mean the States as specified in sub-clause (g) of clause (4) of Article 279A of the constitution. As per the said clause, the States of Arunachal Pradesh, Assam, Jammu and Kashmir, Manipur, Meghalaya, Mizoram, Nagaland, Sikkim, Tripura, Himachal Pradesh and Uttarakhand have been given the status of special category States for the purpose of GST Acts. Notification No. 12/2017-C.T. (Rate), dated 28-6-2017 (Sl. No. 7 of the Table) provides for exemption from payment of tax in a special category State with a turnover up to ` 10 lakh rupees. However, this exemption is not be applicable to (a) services of the following: (i) by the Department of Posts by way of speed post, express parcel post, life insurance, and agency services provided to a person other than Government; (ii) in relation to an aircraft or a vessel, inside or outside the precincts",
+        "supply of goods- Enhanced to \u20b940 lacs \uf0d8 Except persons engaged in making intra-State supplies in the States of Arunachal Pradesh, Manipur, Meghalaya, Mizoram, Nagaland, Puducherry, Sikkim, Telangana, Tripura, Uttarakhand. \uf0d8 Except persons required to take compulsory registration under Section 24. \uf0d8 Except supplies of Ice cream and other edible ice, whether or not containing cocoa; Pan Masala; Tobacco and manufactured tobacco substitutes. \uf0d8 The threshold for registration for service providers would continue to be \u20b920 lakhs and in case of Special category States \u20b910 lakhs. 7. Process of Registration - Rule 8 Every person, other than a non-resident taxable person, a person required to deduct tax at source under Section 51, a person required to collect tax at source under Section 52 and a person supplying online information and database access or retrieval services from a place outside India to a non-taxable online recipient referred to in Section 14 of the Integrated Goods and Services Tax Act, 2017, every person seeking registration under sub-section-1 shall, before applying for registration, declare his Permanent Account Number, mobile number, e-mail address, State or Union territory in Part A of FORM GST REG-01 on the common portal, either directly or through a Facilitation Centre. Provided that every person being an Input Service Distributor shall make a separate application for registration as such Input Service Distributor. 1. Every person who is liable to be registered under sub-section (1) of section 25 and every person seeking registration under sub-section (3) of section 25 (hereafter in this Chapter referred to as \"the applicant\"), except\u2013 (i) a non-resident taxable person; (ii) a person required to deduct tax at source under section 51; (iii) a person required to",
+        "special category states of Nagaland, Manipur, Mizoram and Tripura). (ii) Persons involved in inter: State taxable supply of services only (not goods), if his aggregate turnover in a financial year does not exceed prescribed amount of threshold exemption limit i.e. `20 lakhs (`10 lakhs in case of the special category states of Nagaland, Manipur, Mizoram and Tripura). For inter-state suppliers of goods, registration under GST is a compulsory, even if their aggregate turnover in a financial year does not exceed the threshold limit. 7. Composition levy scheme Composition levy scheme in GST is an alternative method of levy of tax designed for micro, small and medium taxpayers whose turnover is upto the prescribed limit. It is very simple, hassle free compliance scheme for small taxpayers. It is a voluntary and optional scheme. A person opting to pay tax under composition levy scheme can neither take input tax credit nor it can collect any tax from the recipient. The salient features of composition levy scheme are: GST - MSME (i) A registered taxable person, whose aggregate turnover does not exceed `One Crore (`75 lakh for special category States except J & K and Uttarakhand) in the preceding financial year may opt for this scheme. (ii) Composition levy scheme is available for registered taxable person making supplies (aggregate turnover) upto `1 Crore (`75 lakh for special category States except J & K and Uttarakhand) during current financial year. (iii) A supplier of services, except a person engaged in supply of restaurant service, is currently not eligible for composition levy scheme. (iv) Ice cream, pan masala and tobacco manufacturers cannot opt for the GST composition levy scheme. (v) A taxpayer registered under composition levy scheme has to pay an amount equal to",
+        "Lakhs) Puducherry, Meghalaya, Mizoram, Tripura, Manipur, Sikkim, Nagaland, Arunachal Pradesh, Uttarakhand are the special Category States who opted for new limit of \u20b920 lakhs. Registration to remain temporarily suspended while cancellation of registration is under process, so that the taxpayer is relieved of continued compliance under the law. Every person who is holding a license or registration under the earlier laws shall be liable to be registered under this Act, with effect from 1-7-2017. When a business carried on by a taxable person registered under this Act is transferred on account of succession or otherwise, to another person as a going concern, the transferee or the successor as the case may be liable to be registered with effect from the date of such transfer or succession. In a case of transfer pursuant to sanction of a scheme or an arrangement for amalgamation or, as the case may be, demerger of two or more companies pursuant to an order of a High Court, Tribunal or otherwise, the transferee shall be liable to be registered, with effect from the date on which the Registrar of Companies issues a certificate of incorporation giving effect to such order of the High Court or Tribunal. For the purposes of this section there are certain points has been clarified as under,\u2013\u2013 (i) the expression \u201caggregate turnover\u201d shall include all supplies made by the taxable person, whether on his own account or made on behalf of all his principals; (ii) the supply of goods, after completion of job work, by a registered job worker shall be treated as the supply of goods by the principal referred to in Section 143, and the value of such goods shall not be included in the aggregate turnover of the registered job worker; (iii)"
+      ],
+      "latency_ms": {
+        "route": 8.333800011314452,
+        "embed_query": 1000.0686999992467,
+        "retrieval": 836.0238999594003,
+        "rerank": 1633.008700038772,
+        "generation": 4.471400054171681,
+        "citation_validation": 0.005100038833916187,
+        "groundedness_check": 9.772200020961463
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "31",
+      "question": "What is the difference between the First Appellate Authority and the Appellate Authority for Advance Ruling?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        561,
+        580
+      ],
+      "route": "multi_hop",
+      "abstained": false,
+      "degraded": false,
+      "answer": "The First Appellate Authority is an authority constituted under Section 107 of the CGST Act to adjudicate appeals arising from the order or decision of an adjudicating authority. The Appellate Authority for Advance Ruling is a separate authority constituted under Section 96 of the CGST Act, 2017, specifically to handle Advance Ruling matters.",
+      "citations": [
+        580
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          580,
+          580
+        ],
+        [
+          570,
+          570
+        ],
+        [
+          560,
+          561
+        ],
+        [
+          572,
+          573
+        ],
+        [
+          563,
+          564
+        ]
+      ],
+      "context_texts": [
+        "first appeal lies with the Commissioner (Appeals) and the second appeal lies with the Tribunal (i.e. CESTAT) or to the Joint Secretary (Revision Application) as the case may be, but under GST second appeal lies with National Appellate Tribunal. 2. Meaning of Appellate Authority Appellate Authority has been defined in Section 2(8) of the CGST Act, 2017 'Appellate Authority' means an authority appointed or authorised to hear appeals referred to in Section 107 of the CGST Act. The First Appellate Authority constituted under Section 107 of the CGST Act to adjudicate appeals arising out of the order or decision of the adjudicating authority of the CGST Act and Second Appellate Authority means the Appellate Tribunal constituted under Section 112 of the CGST Act, by the Central Government on the recommendation of the GST Council. Therefore, there are two types of Appellate Authorities under CGST Act, namely First Appellate Authority and Second Appellate Authority or Appellate Tribunal to adjudicate the appeals relating to disputes on CGST, SGST/UTGST. Apart from the said Appellate Authorities CGST Act, has made provision of separate Appellate Authority for Advance Ruling, constituted under Section 96 of the CGST Act, 2017. 3. Appeals under GST Law The Chapter-XVIII of the CGST, Act, 2017 deals with the provision of Appeals and Revision, where these provisions shall be applicable for appeals under CGST Act, SGST Act & UTGST Act. 4. First Appellate Authority Section 107 of the CGST Act, shall be applicable for appeals to First Appellate authority on disputes relating to CGST, SGST & UTGST Act. The details of sub-section as under: \uf0d8 Appeal to be filed within 3 months from the",
+        "Appellate Authority must pass an order after hearing the parties to the appeal within a period of 90 days of the filing of an appeal. (iv) If members of AAAR differ on any point referred to in appeal, it shall be deemed that no advance ruling is issued in respect of the question under appeal. 13. Orders of Appellate Authority \u2013 Section 101 of CGST Act (i) The Appellate Authority pass order after giving the parties to the appeal or reference an opportunity of being heard, pass such order as it thinks fit, confirming or modifying the ruling appealed against. (ii) If the members of the Appellate Authority differ on any point or points referred to in appeal or reference, it shall be deemed that no advance ruling can be issued in respect of the question under the appeal or reference. (iii) An order declaring advance ruling to be void can be passed only after hearing the applicant. (iv) A copy of the advance ruling pronounced by the Appellate Authority duly signed by the Members and certified in such manner as may be prescribed shall be sent to the applicant, the concerned officer, the jurisdictional officer and to the Authority after such pronouncement. (Sections 101 of the GST Act, 2017) (v) A copy of the advance ruling pronounced by the Appellate Authority for Advance Ruling shall be sent to - (Rule 107 of the CGST Rules, 2017) (a) the applicant and the appellant; (b) the concerned officer of Central Tax and State/Union Territory Tax; (c) the jurisdictional officer of Central Tax and State/Union Territory Tax; and (d) the Authority, in accordance with the provisions of sub-section (4) of Section 101 of the Act. 13.1 Rectification of advance ruling - Section 102",
+        "Section 103 of CGST Act 14. Procedure of Advance Ruling 14.1 Qualification and appointment of members of the Authority for Advance Ruling - Rule 103 of CGST Rules 14.2 Form and manner of application to the Authority for Advance Ruling - Rule 104 of CGST Rules 14.3 Certification of copies of advance rulings pronounced by the Authority - Rule 105 of CGST Rules 14.4 Form and manner of appeal to the Appellate Authority for Advance Ruling - Rule 106 of CGST Rules 14.5 Certification of copies of the advance rulings pronounced by the Appellate Authority - Rule 107 of CGST Rules 15. Manual filing and processing Application - Rule 107A of CGST Rules 16. Rectification of Advance Ruling 17. Void of Advance Ruling under certain circumstances 18. Powers of AAR and AAAR 19. Formation of AAR 20. National Appellate Authority for Advance Ruling 21. Constitution of National Appellate Authority for Advance Ruling: Section 101A of CGST Act 22. Appointment of President and Technical Members 23. Remunerations of the Members 24. Tenure of office 25. Procedure of resignation 26. Procedure of Removal 27. Order of Removal 28. Order of Suspension 29. Appearance before the Authority 30. Appeal to National Appellate Authority 31. Order of National Appellate Authority 32. Majority of opinion 33. Time period of Order 34. Disposal of Order 35. Rectification of Order 1. Introduction The concept of Advance Ruling is not new one and borrowed from erstwhile provision of Indirect Tax law. The advance ruling means decision passed by the Advance Ruling Authority. The said decision helps the applicant in planning their activities well in advance on GST issues. The scope of advance ruling is very wide and reduces the quantum of litigation between taxpayers and department. The decision of",
+        "Advance Ruling - Rule 106 of CGST Rules (1) An appeal against the advance ruling issued under sub-section (6) of section 98 shall be made by an applicant on the common portal in FORM GST ARA-02 and shall be accompanied by a fee of ten thousand rupees to be deposited in the manner specified in section 49. (2) An appeal against the advance ruling issued under sub-section (6) of section 98 shall be made by the concerned officer or the jurisdictional officer referred to in section 100 on the common portal in FORM GST ARA-03 and no fee shall be payable by the said officer for filing the appeal. (3) The appeal referred to in sub-rule (1) or sub-rule (2), the verification contained therein and all the relevant documents accompanying such appeal shall be signed,\u2014 (a) in the case of the concerned officer or jurisdictional officer, by an officer authorised in writing by such officer; and (b) in the case of an applicant, in the manner specified in rule 26. 14.5 Certification of copies of the advance rulings pronounced by the Appellate Authority - Rule 107 of CGST Rules A copy of the advance ruling pronounced by the Appellate Authority for Advance Ruling and duly signed by the Members shall be sent to\u2014 (a) the applicant and the appellant; (b) the concerned officer of central tax and State or Union territory tax; (c) the jurisdictional officer of central tax and State or Union territory tax; and (d) the Authority, in accordance with the provisions of sub-section (4) of section 101 of the Act. 15. Manual filing and processing Application - Rule 107A of CGST Rules Notwithstanding anything contained in this Chapter, in respect of any process or procedure prescribed herein, any",
+        "under this section shall be filed within a period of thirty days from the date on which the ruling sought to be appealed against is communicated to the concerned officer, the jurisdictional officer and the applicant: Provided that the Appellate Authority may, if it is satisfied that the appellant was prevented by a sufficient cause from presenting the appeal within the said period of thirty days, allow it to be presented within a further period not exceeding thirty days. (3) Every appeal under this section shall be in such form, accompanied by such fee and verified in such manner as may be prescribed. 7.2 Orders of Appellate Authority - Section 101 of CGST Act The Appellate Authority may, after giving the parties to the appeal or reference an opportunity of being heard, pass such order as it thinks fit, confirming or modifying the ruling appealed against or referred to. Advance Ruling \uf0d8 After giving an opportunity of hearing order to be passed within 90 days. (2) The order referred to in sub-section (1) shall be passed within a period of ninety days from the date of filing of the appeal under section 100 or a reference under sub-section (5) of section 98. (3) Where the members of the Appellate Authority differ on any point or points referred to in appeal or reference, it shall be deemed that no advance ruling can be issued in respect of the question under the appeal or reference. (4) A copy of the advance ruling pronounced by the Appellate Authority duly signed by the Members and certified in such manner as may be prescribed shall be sent to the applicant, the concerned officer, the jurisdictional officer and to the Authority after such pronouncement. 7.3 Constitution of National"
+      ],
+      "latency_ms": {
+        "route": 7.956899993587285,
+        "embed_query": 625.7014999864623,
+        "retrieval": 828.9525999571197,
+        "rerank": 2306.6098999697715,
+        "generation": 1436.388500034809,
+        "citation_validation": 0.004199973773211241,
+        "groundedness_check": 1316.2234000046737
+      },
+      "tokens": {
+        "input": 0,
+        "output": 178
+      },
+      "error": null
+    },
+    {
+      "example_id": "33",
+      "question": "What is a 'refund voucher' under the CGST Act, and when must it be issued?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        251
+      ],
+      "route": "multi_hop",
+      "abstained": true,
+      "degraded": false,
+      "answer": "I could not find a confident answer to this in Bharat's GST Smart Guide. Please rephrase the question or ask something covered by the manual.",
+      "citations": [],
+      "grounded": null,
+      "retrieved_page_spans": [
+        [
+          467,
+          468
+        ],
+        [
+          416,
+          416
+        ],
+        [
+          421,
+          422
+        ],
+        [
+          1105,
+          1105
+        ],
+        [
+          431,
+          432
+        ]
+      ],
+      "context_texts": [
+        "89(2)(m) of the CGST Rules, 2017 for not passing the incidence of tax to any other person is not required in cases of refund of excess balance in electronic cash ledger as unjust enrichment clause is not applicable in such cases Whether refund of TDS/TCS deposited in electronic cash ledger under the provisions of section 51/52 of the CGST Act can be refunded as excess balance in cash ledger? The amount deducted/collected as TDS/TCS by TDS/TCS deductors under the provisions of section 51/52 of the CGST Act, as the case may be, and credited to electronic cash ledger of the registered person, is equivalent to cash deposited in electronic cash ledger. It is not mandatory for the registered person to utilise the TDS/TCS amount credited to his electronic cash ledger only for the purpose for discharging tax liability. The registered person is at full liberty to discharge his tax liability in respect of the supplies made by him during a tax period, either through debit in electronic credit ledger or through debiting electronic cash ledger, as per his choice and availability of balance in the said ledgers. Any amount, which remains unutilized in electronic cash ledger, after discharge of tax dues and other dues payable under Refund under GST S.No Issue Clarification CGST Act and rules made thereunder, can be refunded to the registered person as excess balance in electronic cash ledger in accordance with the proviso to sub-section (1) of section 54, read with sub-section (6) of section 49 of CGST Act. Whether relevant date for the refund of tax paid on supplies regarded as deemed export by recipient is to be determined as per clause (b) of Explanation (2) under section 54 of CGST Act and if so, whether the date",
+        "Chapter 16 Refund under GST Synopsis 1. Introduction 2. Statutory Provision of Refund of Tax and Interest 3. Refund related to UNO agency 4. Refund of unutilized Input Tax Credit - Section 54 (3) of the CGST Act, 5. Documents requirement for Refund Claim - Section 54(4) CGST Act, 2017 6. Refund Credit to Consumer Welfare Fund - Section 54(5) of CGST Act, 7. Sanction of Provisional Refund - Section 54(6) of CGST Act, 2017 8. Time limit for sanction of Refund - Section 54(7) of CGST Act, 2017 9. Refundable amount to be sanctioned - Section 54(8) of CGST Act, 2017 10. Obligation to sanction Refund - Section 54(9) of CGST Act, 2017 11. Withhold of Refund - Section 54(10) of CGST Act, 2017 12. Refund in case of proceeding is pending before the Commissioner - Section 54(11) of CGST Act, 2017 13. Interest on Refund withhold - Section 54(12) of CGST Act, 2017 14. Refund of Advance Tax Deposited - Section 54(13) of CGST Act, 2017 15. Minimum Amount of Refund - Section 54(14) of CGST Act, 2017 16. Relevant date of Refund 17. List of UNO agencies for refund of tax - Section 55 of CGST Act, 2017 18. Time limits for payment of Refund - Section 56 of CGST Act, 2017 19. Refund Credited to the Fund - Section 57 of CGST Act, 2017 incorporated there shall be credited to the Fund 20. Utilization of Fund - Section 58 of CGST Act, 2017 prescribed for utilization of Fund 21. Refund Rules and Procedures 22. Application for refund of tax, interest, penalty, fees or any other",
+        "of CGST Act, 2017 The advance tax deposited by a casual taxable person or a non-resident taxable person under sub-section (2) of Section 27 shall not be refunded unless Refund under GST such person has, in respect of the entire period for which the certificate of registration granted to him had remained in force, furnished all the returns required under Section 39. 15. Minimum Amount of Refund - Section 54(14) of CGST Act, 2017 No refund under sub-section (5) or sub-section (6) shall be paid to an applicant, if the amount is less than \u20b91000/- It is further clarified that: (1) \u201crefund\u201d includes refund of tax paid on zero-rated supplies of goods or services or both or on inputs or input services used in making such zero-rated supplies, or refund of tax on the supply of goods regarded as deemed exports, or refund of unutilized input tax credit as provided under sub-section (3). 16. Relevant date of Refund Section 54(14) (2) of CGST Act, 2017 defines \u201crelevant date\u201d means \u2014 (a) in the case of goods exported out of India where a refund of tax paid is available in respect of goods themselves or, as the case may be, the inputs or input services used in such goods,\u2013\u2013 (i) if the goods are exported by sea or air, the date on which the ship or the aircraft in which such goods are loaded, leaves India; or (ii) if the goods are exported by land, the date on which such goods pass the frontier; or (iii) if the goods are exported by post, the date of despatch of goods by the Post Office concerned to a place outside India; (b) in the case of supply of goods regarded as deemed exports where a refund of tax paid is available",
+        "Appendix 5 Refund under GST Circular No. 24/24/2017-GST (F. No. 349/58/2017-GST), dated 21-12-2017 Subject: Manual filing and processing of refund claims on account of inverted duty structure, deemed exports and excess balance in electronic cash ledger \u2014 Regarding Due to the non-availability of the refund module on the common portal, it has been decided by the competent authority, on the recommendations of the Council, that the applications/documents/forms pertaining to refund claims on account of inverted duty structure (including supplies in terms of Notification Nos. 40/2017-C.T. (Rate) and 41/2017-I.T. (Rate) both dated 23-10-2017), deemed exports and excess balance in electronic cash ledger shall be filed and processed manually till further orders. In this regard, the Board, in exercise of its powers conferred under Section 168(1) of the Central Goods and Services Tax Act, 2017 hereby clarifies that the provisions of Circular No. 17/17/2017-GST, dated 15-11-2017 shall also be applicable to the following types of refund inasmuch as they pertain to the method of filing of the refund claim and its processing which is consistent with the relevant provisions of the CGST Act, 2017 (hereafter referred to as \u2018the CGST Act\u2019) and the CGST Rules, 2017 (hereafter referred to as \u2018the CGST Rules\u2019):\u2014 (i) refund of unutilized input tax credit where the credit has accumulated on account of rate of tax on inputs being higher than the rate of tax on output supplies (other than nil rated or fully exempt supplies) of goods or services or both except those supplies which are notified by the Government on the recommendations of the Council [Section 54(3) of the CGST Act refers]; (ii) refund of tax on the supply of",
+        "RFD-01, shall be credited back to the ledger from which such debit was made. 29. Grant of provisional refund - Rule 91 of CGST Rules, 2017 (1) The provisional refund shall be granted subject to the following conditions: Refund under GST (a) the claimant has no dispute or prosecution under any offence, during any period of 5 years immediately preceding the tax period or under an existing law where the amount of tax evaded exceeds ` 250 lakh. (b) the GST compliance rating, where available, of the applicant is not less than five on a scale of ten; (c) no proceedings of any appeal, review or revision is pending on any of the issues which form the basis of the refund and if pending, the same has not been stayed by the appropriate authority or court. (2) The proper officer, after due scrutiny of the claim, shall make an order in FORM GST RFD-04, sanctioning the amount of refund due to the said applicant on a provisional basis within a period not exceeding 7 days from the date of acknowledgement. Provided that the order issued in FORM GST RFD-04 shall not be required to be revalidated by the proper officer. (3) The proper officer shall issue a consolidated payment advice in FORM GST RFD-05 for the amount sanctioned and the same shall be electronically credited to any of the bank accounts of the applicant mentioned in his registration particulars and as specified in the application for refund on the basis of a consolidated payment advice: Provided that the payment order in FORM GST RFD-05 shall be required to be revalidated where the refund has not been disbursed within the same financial year in which the said payment order was issued. (4) The Central Government shall disburse the refund based on"
+      ],
+      "latency_ms": {
+        "route": 8.529199985787272,
+        "embed_query": 907.8987999819219,
+        "retrieval": 756.4243000233546,
+        "rerank": 1443.887299974449
+      },
+      "tokens": {},
+      "error": null
+    },
+    {
+      "example_id": "35",
+      "question": "What must the tax officer do with documents or books seized but not relied upon for issuing a notice?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        491
+      ],
+      "route": "procedure",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Documents, books, or other things that have not been relied upon for the issue of a notice under the Act must be returned to the person from whom they were obtained within a period not exceeding thirty days of the issuance of the notice.",
+      "citations": [
+        491
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          491,
+          492
+        ],
+        [
+          520,
+          520
+        ],
+        [
+          517,
+          518
+        ],
+        [
+          616,
+          617
+        ],
+        [
+          492,
+          492
+        ]
+      ],
+      "context_texts": [
+        "seized shall be retained by such officer only for so long as may be necessary for their examination and for any inquiry or proceedings under this Act. (3) The documents, books or things or any other documents, books or things produced by a taxable person or any other person, which have not been relied upon for the issue of notice under this Act or the rules made thereunder, shall be returned to such person within a period not exceeding thirty days of the issue of the said notice. Inspection, Search, Seizure and Arrest 5. Extraordinary power of search \uf0d8 For search of premises to break upon Almirha or concealed places: (4) The officer so authorised shall have the power to seal or break open the door of any premises or to break open any almirah, electronic devices, box, receptacle in which any goods, accounts, registers or documents of the person are suspected to be concealed, where access to such premises, almirah, electronic devices, box or receptacle is denied. \uf0d8 Owner seized goods may entrust upon for safe keep: (5) The proper officer or an authorised officer may entrust upon the owner or the custodian of goods, from whose custody such goods or things are seized, the custody of such goods or things for safe upkeep and the said person shall not remove, part with, or otherwise deal with the goods or things except with the previous permission of such officer. \uf0d8 Goods so seized shall be released upon execution bond: (6) The goods so seized under sub-section (2) shall be released, on a provisional basis, upon execution of a bond and furnishing of a security, in such manner and of such quantum, respectively, as may be prescribed or on payment of",
+        "******* GST: During search, proper officer cannot seize currency and other valuable assets in exercise of powers under sub-section (2) of Section 67; even if so done, same are required to be returned by virtue of sub-section (3) of Section 67 when assets and currency had not been relied upon in no- tice issued subsequently The Hon\u2019ble High Court of Delhi in the case of Deepak Khandelwal v Commissioner of CT & GST, reported in (2023) 9 Centax 244 (Del.) held that Search and seizure operations under section 67 are not for purpose of seizing unaccounted income or assets or ensuring that same are taxed; said field is covered by Income-tax Act, 1961 - Where currency or silver bars that were seized, could not be traced in species to any transaction which revenue re- quired to establish in any proceedings those silver bars and cash could not be seized only on ground that it was 'unaccounted wealth' and not as any material which was to be relied upon in any proceedings under Act - Even if, it is accept- ed, which should not be, that proper officer could seize currency and other valua- ble assets in exercise of powers under sub-section (2) of Section 67, ibid, same were required to be returned by virtue of sub-section (3) of Section 67. *******",
+        "S. S. Enterprises. The firm is in the business of Confectionery and Pan Masala items. Search operation was carried out at the business premises as well as residential premises by the Department and cash of around ` 66 lakhs were seized. The petitioner contended that the department is not competent to seize the cash under Section 67(2) of the Central Goods and Services Tax Act, 2017 (\u2018CGST Act\u2019) since cash cannot be treated as document, book or things. Therefore, the department should be directed to release the cash seized by it. The Hon\u2019ble Madras High Court on going through the provisions of Section 67(2) of the CGST Act observed that the said section provides that confiscation of any documents or books or things, secreted in any place, which in the opinion Inspection, Search, Seizure and Arrest of proper officer shall be useful for or relevant to any proceedings under CGST Act. The meaning of the word \u2018things\u2019 needs to be seen widely and would include \u2018money\u2019 as well. Further, interpretation of statute must be adopted in a way that anomaly is avoided and which suppresses the mischief and advances the remedy. Therefore, in view of interpretation of the word \u2018thing\u2019, money shall be included and hence, the cash has been rightly seized by the department from the petitioner. Further, unless and until the investigation is carried out and the matter is finally adjudicated, the question of releasing the amount does not arise. * * * Search not justified as officers stayed in assessee\u2019s premises for 8 days & restricted movement of family members: [Paresh Nathalal Chauhan v State of Gujarat [2020] 113 taxmann.com 462 (Gujarat)] Search was conducted at the residential premises of the",
+        "3. For seized goods, if a notice is not issued within six months of its seizure, goods shall be returned to the person from whose possession it was seized. This period of six months can be extended on justified grounds up to a further period of maximum six months; 4. An inventory of seized goods shall be made by the seizing officer; 5. Certain categories of goods to be specified under CGST Rules (such as perishable, hazardous etc.) can be disposed of immediately after seizure; 6. Provisions of Code of Criminal Procedure 1973 relating to search and seizure shall apply. 10.5 Statutory Provisions: Detention, seizure and release of goods and conveyances in transit Section 129 of the CGST Act, prescribed that the provisions of detention and seizure of goods in transit in the following situations: (1) where any person transports any goods or stores such goods while they are in transit in contravention of the provisions of this Act or the rules made thereunder, all such goods and conveyance shall liable to detention or seizure and after detention or seizure, shall be released by the proper officer. (a) on payment of penalty equal to two hundred per cent of the tax payable on such goods and, in case of exempted goods, on payment of an amount equal to two per cent of the value of goods or twenty- five thousand rupees, whichever is less, where the owner of the goods comes forward for payment of such penalty; (b) on payment of penalty equal to fifty per cent of the value of the goods or two hundred per cent of the tax payable on such goods, whichever is higher, and in case of exempted goods, on payment of an amount equal to five per cent of the",
+        "Goods so seized shall be released upon execution bond: (6) The goods so seized under sub-section (2) shall be released, on a provisional basis, upon execution of a bond and furnishing of a security, in such manner and of such quantum, respectively, as may be prescribed or on payment of applicable tax, interest and penalty payable, as the case may be. \uf0d8 Goods so seized shall be returned to the person within six months: (7) Where any goods are seized under sub-section (2) and no notice in respect thereof is given within six months of the seizure of the goods, the goods shall be returned to the person from whose possession they were seized: Provided that the period of six months may, on sufficient cause being shown, be extended by the proper officer for a further period not exceeding six months. \uf0d8 Perishable or hazardous goods may be disposed of: (8) The Government may, having regard to the perishable or hazardous nature of any goods, depreciation in the value of the goods with the passage of time, constraints of storage space for the goods or any other relevant considerations, by notification, specify the goods or class of goods which shall, as soon as may be after its seizure under sub-section (2), be disposed of by the proper officer in such manner as may be prescribed. \uf0d8 Preparation of an inventory of seized goods: (9) Where any goods, being goods specified under sub-section (8), have been seized by a proper officer, or any officer authorised by him under sub-section (2), he shall prepare an inventory of such goods in such manner as may be prescribed. \uf0d8 Criminal procedure is applicable to search and seizure: (10) The provisions of the Code of Criminal"
+      ],
+      "latency_ms": {
+        "route": 8.55630001751706,
+        "embed_query": 676.4830999891274,
+        "retrieval": 752.383999992162,
+        "rerank": 1828.7504999898374,
+        "generation": 11.822799977380782,
+        "citation_validation": 0.004399975296109915,
+        "groundedness_check": 8.580800029449165
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "37",
+      "question": "What is the consequence for a person who has paid GST on goods or services, under Section 49(9) of the CGST Act?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        367
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Under Section 49(9), every person who has paid tax on goods or services or both under the Act shall, unless the contrary is proved by them, be deemed to have passed on the full incidence of such tax to the recipient of those goods or services or both.",
+      "citations": [
+        366
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          366,
+          367
+        ],
+        [
+          531,
+          532
+        ],
+        [
+          1003,
+          1004
+        ],
+        [
+          367,
+          367
+        ],
+        [
+          1285,
+          1285
+        ]
+      ],
+      "context_texts": [
+        "any other amount payable under this Act or the rules made thereunder including the demand determined under Section 73 or Section 74. (9) Every person who has paid the tax on goods or services or both under this Act shall, unless the contrary is proved by him, be deemed to have passed on the full incidence of such tax to the recipient of such goods or services or both. (10) A registered person may, on the common portal, transfer any amount of tax, interest, penalty, fee or any other amount available in the electronic cash ledger under this Act, to the electronic cash ledger for,\u2013\u2013 (a) integrated tax, central tax, State tax, Union territory tax or cess; or (b) integrated tax or central tax of a distinct person as specified in sub- section (4) or, as the case may be, sub-section (5) of section 25, in such form and manner and subject to such conditions and restrictions as may be prescribed and such transfer shall be deemed to be a refund from the electronic cash ledger under this Act: Provided that no such transfer under clause (b) shall be allowed if the said registered person has any unpaid liability in his electronic liability register [Transfer of Balance in cash ledger to Distinct Person (b) vide Notification No. 09/2022-CT., dated 05.07.2022 (11) where any amount has been transferred to the electronic cash ledger under this Act, the same shall be deemed to be deposited in the said ledger as provided in sub-section (1).\u201d Notified vide Notification No.1/2020-Central Tax dated 1.1.2020. (12) Maximum payment of output taxes allowed from electronic ledger: The Government may specify the maximum proportion of output tax liability which may be discharged through the electronic credit ledger for specified class of registered persons. The balance",
+        "Notwithstanding anything to the contrary contained in any order or direction of any Appellate Authority or Appellate Tribunal or court or in any other provisions of this Act or the rules made thereunder or any other law for the time being in force, every person who has collected from any other person any amount as representing the tax under this Act, and has not paid the said amount to the Government, shall forthwith pay the said amount to the Government, irrespective of whether the supplies in respect of which such amount was collected are taxable or not. (2) Where any amount is required to be paid to the Government under sub- section (1), and which has not been so paid, the proper officer may serve on the person liable to pay such amount a notice requiring him to show cause as to why the said amount as specified in the notice, should not be paid by him to the Government and why a penalty equivalent to the amount specified in the notice should not be imposed on him under the provisions of this Act. (3) The proper officer shall, after considering the representation, if any, made by the person on whom the notice is served under sub-section (2), determine the amount due from such person and thereupon such person shall pay the amount so determined. (4) The person referred to in sub-section (1) shall in addition to paying the amount referred to in sub-section (1) or sub-section (3) also be liable to pay interest thereon at the rate specified under section 50 from the date such amount was collected by him to the date such amount is paid by him to the Government. (5) An opportunity of hearing shall be granted to the person whom the notice was issued to show cause. Demand and Recovery (6) The proper officer",
+        "tax credit chain and avail credit of tax that he has paid on his inputs/goods lying in stock on the day he crosses over. Question 37: For the purpose of availing composition how will aggregate turnover be computed for the purpose of composition? Answer: Aggregate turnover shall be computed on the basis of turnover on all India basis, it includes aggregate value of all taxable supplies (excluding the GST - MSME value of inward supplies on which tax is payable by a person on reverse charge basis), exempt supplies, exports of goods or services or both and inter-State supplies of persons having the same Permanent Account Number but excludes GST and cess. Question 38: Can a person who has opted to pay tax under the composition scheme avail Input Tax Credit on his inward supplies? Answer: No, a taxable person opting to pay tax under the composition scheme is out of the credit chain. He cannot take input tax credit on the supplies received. Question 39: How is a manufacturer under the composition scheme required to bill his supply? Can a registered person, who purchases goods from a composition manufacturer take Input tax credit? Answer: A manufacturer opting to pay tax under the composition scheme cannot issue a tax invoice to his buyer but would issue a Bill of Supply. He cannot collect any tax on the supplies made by him on his Bill of Supply and is required to show only the price charged for the supply. Consequently, the registered person buying goods from a composition manufacturer cannot take input tax credit. Question 40: How would a manufacturer under the composition scheme who receives inputs or input services from an unregistered person pay GST? What will be the tax rate if the purchase is from a person availing composition? Answer: Till September, 2019, no tax is required to be paid by manufacturer under the composition scheme who",
+        "(1).\u201d Notified vide Notification No.1/2020-Central Tax dated 1.1.2020. (12) Maximum payment of output taxes allowed from electronic ledger: The Government may specify the maximum proportion of output tax liability which may be discharged through the electronic credit ledger for specified class of registered persons. The balance has to be paid through the electronic cash ledger. Vide Notification No. 18/2022-Central Tax, dated 28.09.2022. 3. Utilisation of input tax credit subject to certain conditions - Section 49A of CGST Act Notwithstanding anything contained in section 49, the input tax credit on account of central tax, State tax or Union territory tax shall be utilised towards payment of integrated tax, central tax, State tax or Union territory tax, as the case may be, only after the input tax credit available on account of integrated tax has first been utilised fully towards such payment 4. Order of utilisation of input tax credit - Section 49B of CGST Act. (1) Notwithstanding anything contained in this Chapter and subject to the provisions of clause (e) and clause (f) of subsection (5) of section 49, the Government may, on the recommendations of the Council, prescribe the order and manner of utilisation of the input tax credit on account of integrated tax, central tax, State tax or Union territory tax, as the case may be, towards payment of any such tax. 5. Interest on delayed payment of tax - Section 50 of the CGST Act (1) Every person who is liable to pay tax in accordance with the provisions of this Act or the rules made thereunder, but fails to pay the tax or any part thereof to the Government within the period prescribed, shall for the period for which the tax or any part thereof remains unpaid, pay, on his own, interest",
+        "on his Bill of Supply and is required to show only the price charged for the supply. Consequently, the registered person buying goods from a composition manufacturer cannot take input tax credit. Question 40: How would a manufacturer under the composition scheme who receives inputs or input services from an unregistered person pay GST? What will be the tax rate if the purchase is from a person availing composition? Answer: Till September, 2019 no tax is required to be paid by manufacturer under composition scheme who receives inputs services from unregistered person. Question 41: In case a person has registration in multiple States, can he opt for payment of tax under composition levy only in one State and not in other States? Answer: No. An intimation that composition scheme has been availed in one State shall be deemed to be an intimation in respect of all other places of business registered on the same Permanent Account Number in other States. Question 42: What is the effective date of composition levy? Answer: There can be three situations with respective effective dates as shown below: Situation Effective date of composition levy Persons who have been granted provisional registration and who opt for composition levy (Intimation is filed under Rule 3(1) in FORM GST CMP-01) 1st July, 2017. Persons opting for composition levy at the time of making application for new registration in the same registration application itself (The intimation under Rule 3(2) in FORM GST REG-01) Effective date of registration; Intimation shall be considered only after the grant of registration and his option to pay tax under composition scheme shall be effective from the effective date of registration. Persons opting for composition levy after obtaining registration (The intimation is filed under Rule 3(3) in FORM GST CMP- 02). The beginning of the next financial year. Question 43: What is the validity"
+      ],
+      "latency_ms": {
+        "route": 8.075700025074184,
+        "embed_query": 1105.1290999748744,
+        "retrieval": 826.8985999748111,
+        "rerank": 2089.521899993997,
+        "generation": 7.601499964948744,
+        "citation_validation": 0.004799978341907263,
+        "groundedness_check": 8.355199999641627
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    },
+    {
+      "example_id": "39",
+      "question": "Under the CGST Act, what document is issued by a registered person on receipt of an advance payment for a future supply?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        251
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Under the CGST Act (Rule 50 of the CGST Rules), a registered person is required to issue a receipt voucher upon the receipt of an advance payment for goods or services or both.",
+      "citations": [
+        258
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          258,
+          259
+        ],
+        [
+          259,
+          259
+        ],
+        [
+          76,
+          77
+        ],
+        [
+          248,
+          248
+        ],
+        [
+          250,
+          250
+        ]
+      ],
+      "context_texts": [
+        "in the case of issuance of an electronic bill of supply in accordance with the provisions of the Information Technology Act, 2000 (21 of 2000). Provided also that the Government may, by notification, on the recommendations of the Council, and subject to such conditions and restrictions as mentioned therein, specify that the bill of supply shall have Quick Response (QR) code. 17. Receipt voucher - Rule 50 of CGST Rules The registered person on receipt of advance payment of goods and services or both shall issue receipt voucher and receipt voucher shall contain the following particulars, namely,\u2014 (a) name, address and Goods and Services Tax Identification Number of the supplier; (b) a consecutive serial number not exceeding sixteen characters, in one or multiple series, containing alphabets or numerals or special characters hyphen or dash and slash symbolized as \u201c-\u201d and \u201c/\u201d respectively, and any combination thereof, unique for a financial year; (c) date of its issue; (d) name, address and Goods and Services Tax Identification Number or Unique Identity Number, if registered, of the recipient; (e) description of goods or services; (f) amount of advance taken; (g) rate of tax (Central tax, State tax, Integrated tax, Union territory tax or cess); (h) amount of tax charged in respect of taxable goods or services (Central tax, State tax, Integrated tax, Union territory tax or cess); (i) place of supply along with the name of State and its code, in case of a supply in the course of inter-State trade or commerce; (j) whether the tax is payable on reverse charge basis; and (k) signature or digital signature of the supplier or his authorised representative: Provided that where at the time of receipt of advance, - (i) the rate of tax is not determinable, the tax shall be paid at the rate of",
+        "or commerce; (j) whether the tax is payable on reverse charge basis; and (k) signature or digital signature of the supplier or his authorised representative: Provided that where at the time of receipt of advance, - (i) the rate of tax is not determinable, the tax shall be paid at the rate of eighteen per cent.; (ii) the nature of supply is not determinable, the same shall be treated as inter-State supply. 18. Refund Voucher - Rule 51 of CGST Rules, 2017 When no supply is made against advance payment then a registered person shall issue a refund voucher and refund voucher shall contain the following particulars, namely:\u2014 (a) name, address and Goods and Services Tax Identification Number of the supplier; (b) a consecutive serial number not exceeding sixteen characters, in one or multiple series, containing alphabets or numerals or special characters hyphen or dash and slash symbolized as \u201c-\u201d and \u201c/\u201d respectively, and any combination thereof, unique for a financial year; (c) date of its issue; (d) name, address and Goods and Services Tax Identification Number or Unique Identity Number, if registered, of the recipient; (e) number and date of receipt voucher issued in accordance with the provisions of Rule 50; (f) description of goods or services in respect of which refund is made; (g) amount of refund made; (h) rate of tax (Central tax, State tax, Integrated tax, Union territory tax or cess); (i) amount of tax paid in respect of such goods or services (Central tax, State tax, Integrated tax, Union territory tax or cess); (j) whether the tax is payable on reverse charge basis; and (k) signature or digital signature of the supplier or his authorised representative. 19. Payment Voucher - Rule 52 of CGST Rules, 2017 When the registered person receives supply services from",
+        "crores shall not be required to pay GST at the time of receipt of advances on account of supply of goods. The GST on such supplies shall be payable only when the supply of goods is made. Notification No. 66/2017-CT, dated 15-11-2017. 38. Scope of mixed supply and composite supply \u201cSupply\u201d is the taxable event under GST; the GST system is based on the supply of goods and services to levy tax. The nature of supply, time of supply and place of supply of goods and services determines the tax liability under GST. Therefore, the GST law maker has incorporated the concept of \u201cMixed supply\u201d and \u201cComposite supply\u201d under GST to eliminate confusion to levy of tax under GST. The concept of \u201ccomposite supply\u201d under GST is similar to the concept of \u201cbundled service\u201d was under erstwhile Service Tax Law. The concept of mixed supply is completely new provision under GST. 39. Concept of \u201cBundled service\u201d in pre-GST era The concept of Bundled service was brought as Rule of interpretation for charging Service Tax in the Union Budget-2012. There are two kinds of bundled service explained as under: A. Naturally bundled:- > Meals and air/rail travel: air travel > Breakfast and hotel accommodation: hotel accommodation > Boarding school: education. B. Unnatural bundles:- > Unnaturally segregated: Dry cleaning billed as electricity, chemicals, ironing. > Unnaturally joined: Construction and club membership. 40. Tax liability on \u2018composite\u2019 and \u2018mixed\u2019 supplies Section 8 of the CGST Act, defines the tax liability on a composite or a mixed supply shall be determined in the following manner, namely\u2014 (a) Composite Supply comprising two or more supplies one of which, is a principal supply, shall be treated as supply of such principal supply.",
+        "Chapter 10 Tax Invoice, Credit and Debit Notes Synopsis 1. Provision of Tax Invoice - Section 31 of CGST Act, 2017 2. Various Situations of issuance of Invoice 3. Facility of digital payment to recipient - Section 31A of CGST Act 4. Prohibition of unauthorized collection of tax: (Tax not to be collected by unregistered taxable person) - Section 32 of CGST Act 5. Amount of tax to be indicated in tax invoice and other documents - Section 33 of CGST Act 6. Provision of Credit and Debit Notes - Section 34 of CGST Act 7. Good and Services Tax Invoice Rules 8. Tax invoice 9. Quick Response (QR) Code on B2C invoices 10. Revised/supplementary Invoice 11. Export Invoice 12. Invoice-cum-bill of supply - Rule 46A of CGST Rules 13. Tax Invoice 14. Time limit for issuing tax invoice - Rule 47 of CGST Rules, 2017 15. Manner of Issuing Invoice - Rule 48 of CGST Rules, 2017 16. Bill of Supply - Rule 49 of CGST Rules, 2017 17. Receipt voucher - Rule 50 of CGST Rules 18. Refund Voucher - Rule 51 of CGST Rules, 2017 19. Payment Voucher - Rule 52 of CGST Rules, 2017 20. Revised tax invoice, Debit Note and credit Note - Rule 53 of CGST Rules, 21. Tax invoice in special cases - Rule 54 of CGST Rules, 2017 22. Transportation of goods without issue of invoice - Rule 55 of CGST Rules, 23. Tax Invoice or bill of supply to accompany for transport of goods - Rule 55A CGST Rules, 2017 24. Provisions of Credit and Debit Notes 25. Requirement of Credit Note 26. Meaning of Credit Note 27. Format and particulars of Credit Note 28. Principles of Adjustment of tax liability 29. Preservation",
+        "No supply goods/services supplied can take place without the support of a Tax invoice. Thus invoice is the pre-requisite of all transaction of goods or services. Section 31 to 34 of the CGST Act, prescribes the various provisions of Tax invoice system as well as the utility of credit and debit notes relating to supply of goods and/or services. There is separate provisions has been incorporated as GST invoice Rules relating to Tax invoice, credit and debit notes shall be issued by the supplier for transaction of goods and services under GST System. 1. Provision of Tax Invoice - Section 31 of CGST Act, 2017 (1) A registered person supplying taxable goods shall, before or at the time of,\u2014 (a) removal of goods for supply to the recipient, where the supply involves movement of goods; or (b) delivery of goods or making available thereof to the recipient, in any other case, issue a tax invoice showing the description, quantity and value of goods, the tax charged thereon and such other particulars as may be prescribed; (2) A registered person supplying taxable services shall, before or after the provision of service within a prescribed period, issue a tax invoice, showing the description, value, tax charged thereon and such other particulars as may be prescribed. 2. Various Situations of issuance of Invoice (3) (a) registered person may, within one month from the date of issuance of certificate of registration and issue a revised invoice against the invoice already issued during the period beginning with the effective date of registration till the date of issuance of certificate of registration to him; (b) a registered person may not issue a tax invoice if the value of the goods or services or both supplied is less than two hundred rupees subject to such conditions and in such manner as may be"
+      ],
+      "latency_ms": {
+        "route": 8.612099976744503,
+        "embed_query": 1092.438600026071,
+        "retrieval": 833.3199000335298,
+        "rerank": 1927.4429000215605,
+        "generation": 975.9070999571122,
+        "citation_validation": 0.004699977580457926,
+        "groundedness_check": 1360.030799987726
+      },
+      "tokens": {
+        "input": 0,
+        "output": 106
+      },
+      "error": null
+    },
+    {
+      "example_id": "41",
+      "question": "Under Section 96 of the CGST Act, which authority is deemed the Authority for Advance Ruling in respect of a State?",
+      "category": "lookup",
+      "answerable": true,
+      "gold_pages": [
+        562
+      ],
+      "route": "lookup",
+      "abstained": false,
+      "degraded": false,
+      "answer": "Under Section 96 of the CGST Act, the Authority for Advance Ruling constituted under the provisions of a State Goods and Services Tax Act or Union Territory Goods and Services Tax Act is deemed to be the Authority for Advance Ruling in respect of that State or Union territory.",
+      "citations": [
+        561
+      ],
+      "grounded": true,
+      "retrieved_page_spans": [
+        [
+          561,
+          562
+        ],
+        [
+          560,
+          560
+        ],
+        [
+          568,
+          569
+        ],
+        [
+          574,
+          574
+        ],
+        [
+          560,
+          561
+        ]
+      ],
+      "context_texts": [
+        "hearing of the applicant; 7. With transparent decision attract Foreign Direct Investment (FDI). Advance Ruling 4. Authority for Advance Ruling (AAR) - Section 96 of CGST Act Section 96 of CGST Act, 2017 has prescribed, the Authority for advance ruling constituted under the provisions of a State Goods and Services Tax Act or Union Territory Goods and Services Tax Act shall be deemed to be the Authority for advance ruling in respect of that State or Union territory. 5. Questions Specified for Advance Ruling - Section 97 of CGST Act. Sub-section (2) of Section 97 of the CGST Act, 2017 has prescribed the questions, on which the advance ruling is sought under this Act, shall be in respect of,\u2013\u2013 (a) Classification of any goods or services or both; (b) Applicability of a notification issued under the provisions of this Act; (c) Determination of time and value of supply of goods or services or both; (d) Admissibility of input tax credit of tax paid or deemed to have been paid; (e) Determination of the liability to pay tax on any goods or services or both; (f) Whether applicant is required to be registered; (g) Whether any particular thing done by the applicant with respect to any goods or services or both amounts to or results in a supply of goods or services or both, within the meaning of that term. 6. Procedure on receipt of application - Section 98 of CGST Act (1) On receipt of an application, the Authority shall cause a copy thereof to be forwarded to the concerned officer and, if necessary, call upon him to furnish the relevant records: Provided that where any records have been called for by the Authority in any case, such records shall, as soon as possible, be returned to the said concerned officer. (2)",
+        "Chapter 21 Advance Ruling Synopsis 1. Introduction 2. Definition of Advance Ruling - Section 95 of CGST Act 3. Advantages of Advance Ruling 4. Authority for Advance Ruling (AAR) - Section 96 of CGST Act 5. Questions Specified for Advance Ruling - Section 97 of CGST Act. 6. Procedure on receipt of application - Section 98 of CGST Act 7. Appellate Authority for Advance Ruling - Section 99 of CGST Act 7.1 Appeal to Appellate Authority - Section 100 of CGST Act 7.2 Orders of Appellate Authority - Section 101 of CGST Act 7.3 Constitution of National Appellate Authority for Advance Ruling - Section 101A of CGST Act 7.4 Appeal to National Appellate Authority - Section 101B of CGST Act 8. Order of National Appellate Authority - Section 101C of CGST Act 9. Applicability of Advance Ruling \u2013 Section 103 of the CGST Act, 2017 10. Time period of Validity - Void of Advance Ruling - Section 104 of the CGST Act, 2017 10.1 Powers of Authority and Appellate Authority - Section 105 of CGST Act 551 10.2 Procedure of Authority and Appellate Authority - Section 106 of CGST Act 11. Procedure for obtaining Advance Ruling 12. Remedies against order of AAR - Section 100 of the CGST Act, 2017 13. Orders of Appellate Authority \u2013 Section 101 of CGST Act 13.1 Rectification of advance ruling - Section 102 of CGST Act 13.2 Applicability of advance ruling - Section 103 of CGST Act 14. Procedure of Advance Ruling 14.1 Qualification and appointment of members of the Authority for Advance Ruling - Rule 103 of CGST Rules 14.2 Form and manner of application to the Authority for Advance Ruling - Rule 104 of CGST Rules 14.3 Certification of copies of advance",
+        "Authority and Appellate Authority - Section 105 of CGST Act The Authority or the Appellate Authority or the National Appellate Authority shall, for the purpose of exercising its powers regarding\u2014 (a) discovery and inspection; (b) enforcing the attendance of any person and examining him on oath; (c) issuing commissions and compelling production of books of account and other records, have all the powers of a civil court under the Code of Civil Procedure, 1908. (2) The Authority or the Appellate Authority or the National Appellate Authority shall be deemed to be a civil court for the purposes of section 195, but not for the purposes of Chapter XXVI of the Code of Criminal Procedure, 1973, and every proceeding before the Authority or the Appellate Authority shall be deemed to be a judicial proceedings within the meaning of sections 193 and 228, and for the purpose of section 196 of the Indian Penal Code. 10.2 Procedure of Authority and Appellate Authority - Section 106 of CGST Act The Authority or the Appellate Authority or the National Appellate Authority shall, subject to the provisions of this Chapter, have power to regulate its own procedure. 11. Procedure for obtaining Advance Ruling (i) The registered persons or an applicant desirous of obtaining an advance ruling may make an application to Advance Ruling Authority in FORM GST ARA-01 along with filing fee of `5,000/- (sub-section (1) of Section 97 of CGST Act, 2017). For CGST `5000/- + SGST `5000/- as fees for advance ruling. (ii) Upon receipt of an application, the Authority shall send a copy of application to the concerned officer in whose jurisdiction the applicant falls and call for relevant records. The Authority may, after examining the application and the records called for and after hearing",
+        "IRS (C&CE) officers as Member and Appellate Authority in Authority for Advance Ruling under GST to be constituted in the States Consequent upon receipt of references from State Governments for nomination of IRS(C&CE) officers as Member and Appellate Authority in Authority for Advance Ruling to be constituted in the States, the C.B.I.& C, has decided that the principal Chief Commissioner/Chief Commissioner of the zone will be the nominated officer who will function as the Appellate Authority of their respective States\u2019 Authority for Advance Ruling, - C.B.E.&C. Letter D.O. No.C-50/94/2017-Ad.II, dated 28-8-2017. 20. National Appellate Authority for Advance Ruling The provision of National Appellate Authority has been created by virtue of Section 104 of the Finance (No. 2) Act, 2019 and in section 95 (a) of the CGST Act, 2017 after the words \u201cAppellate Authority\u201d, the words \u201cor the National Appellate Authority\u201d has been inserted. The \u201cNational Appellate Authority\u201d means the National Appellate Authority for Advance Ruling. Section 105 of the Finance (No. 2) Act, 2019 has inserted new sections 101A, 101B and 101C after 101 of the CGST Act, 2017. The objective of the formation of National Appellate Authority for Advance Ruling to decide the conflicting Advance Rulings are given by the Appellate Authorities of two or more States or Union territories or both. 21. Constitution of National Appellate Authority for Advance Ruling: Section 101A of CGST Act Section 101A of CGST Act, 2017 prescribes that the Government shall, on the recommendations of the Council, constitute an authority known as the National Appellate Authority for Advance Ruling for hearing appeals made under section 101B. The National Appellate Authority shall consist of\u2014 (i) the",
+        "Section 103 of CGST Act 14. Procedure of Advance Ruling 14.1 Qualification and appointment of members of the Authority for Advance Ruling - Rule 103 of CGST Rules 14.2 Form and manner of application to the Authority for Advance Ruling - Rule 104 of CGST Rules 14.3 Certification of copies of advance rulings pronounced by the Authority - Rule 105 of CGST Rules 14.4 Form and manner of appeal to the Appellate Authority for Advance Ruling - Rule 106 of CGST Rules 14.5 Certification of copies of the advance rulings pronounced by the Appellate Authority - Rule 107 of CGST Rules 15. Manual filing and processing Application - Rule 107A of CGST Rules 16. Rectification of Advance Ruling 17. Void of Advance Ruling under certain circumstances 18. Powers of AAR and AAAR 19. Formation of AAR 20. National Appellate Authority for Advance Ruling 21. Constitution of National Appellate Authority for Advance Ruling: Section 101A of CGST Act 22. Appointment of President and Technical Members 23. Remunerations of the Members 24. Tenure of office 25. Procedure of resignation 26. Procedure of Removal 27. Order of Removal 28. Order of Suspension 29. Appearance before the Authority 30. Appeal to National Appellate Authority 31. Order of National Appellate Authority 32. Majority of opinion 33. Time period of Order 34. Disposal of Order 35. Rectification of Order 1. Introduction The concept of Advance Ruling is not new one and borrowed from erstwhile provision of Indirect Tax law. The advance ruling means decision passed by the Advance Ruling Authority. The said decision helps the applicant in planning their activities well in advance on GST issues. The scope of advance ruling is very wide and reduces the quantum of litigation between taxpayers and department. The decision of"
+      ],
+      "latency_ms": {
+        "route": 10.561099974438548,
+        "embed_query": 649.816200020723,
+        "retrieval": 824.0762000204995,
+        "rerank": 2059.7235999885015,
+        "generation": 5.214800010435283,
+        "citation_validation": 0.004100031219422817,
+        "groundedness_check": 11.043199978303164
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "error": null
+    }
+  ],
+  "model_ids": {
+    "task_model": "gemini-3.1-flash-lite",
+    "judge_model": "gemini-3.1-flash-lite",
+    "embed_model": "gemini-embedding-2"
+  },
+  "git_commit": "e5ef54b",
+  "timestamp": "20260804T175849Z"
+}

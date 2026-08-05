@@ -5,10 +5,6 @@ __pycache__/
 data/manual.pdf
 data/pages.jsonl
 data/chunks.jsonl
-eval/results/*
-!eval/results/.gitkeep
-artifacts/*
-!artifacts/.gitkeep
 *.egg-info/
 .pytest_cache/
 data/

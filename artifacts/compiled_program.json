@@ -1,0 +1,63 @@
+{
+  "route": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "Classify a question about Indian GST (Goods and Services Tax) law into a route.\n\nThe reference manual covers GST rates, procedures, input tax credit, registration,\nreturns, and related circulars. route is out_of_scope when the question is not\nabout GST or Indian tax law at all, for example general history, other countries'\ntax systems, or unrelated topics. route is multi_hop only when answering requires\ncombining information from more than one distinct sub-topic, and in that case\nsub_questions must contain the decomposed sub-questions. sub_questions is empty for\nevery other route.",
+      "fields": [
+        {
+          "prefix": "Question:",
+          "description": "${question}"
+        },
+        {
+          "prefix": "Route:",
+          "description": "${route}"
+        },
+        {
+          "prefix": "Sub Questions:",
+          "description": "${sub_questions}"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "answer.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "Answer the question using only the provided context from a GST reference manual.\n\nThe answer must come only from the context. If the context does not contain the\nanswer, say plainly that the manual does not cover this rather than guessing or\nusing outside knowledge. citations must list only page numbers that actually\nappear in the context.",
+      "fields": [
+        {
+          "prefix": "Context:",
+          "description": "${context}"
+        },
+        {
+          "prefix": "Question:",
+          "description": "${question}"
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Answer:",
+          "description": "${answer}"
+        },
+        {
+          "prefix": "Citations:",
+          "description": "${citations}"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}

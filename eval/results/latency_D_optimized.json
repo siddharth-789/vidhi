@@ -1,0 +1,29 @@
+{
+  "mode": "warm",
+  "n": 5,
+  "ttft_p50_ms": 0.0,
+  "ttft_p95_ms": 0.0,
+  "total_p50_ms": 3483.378300035838,
+  "total_p95_ms": 4598.177659977227,
+  "per_stage_mean_ms": {
+    "generation": 3.6026400048285723,
+    "retrieval": 810.1170799927786,
+    "citation_validation": 0.004379998426884413,
+    "embed_query": 732.0117999915965,
+    "groundedness_check": 238.77266000490636,
+    "rerank": 1566.775159991812,
+    "route": 10.087419988121837
+  },
+  "per_stage_p95_ms": {
+    "generation": 4.430800001136959,
+    "retrieval": 861.6164000006393,
+    "citation_validation": 0.004579976666718721,
+    "embed_query": 943.0864799884148,
+    "groundedness_check": 926.9534999970344,
+    "rerank": 1699.601659970358,
+    "route": 11.691879958380014
+  },
+  "tokens_per_second_mean": 0.0,
+  "input_tokens_mean": 0.0,
+  "output_tokens_mean": 0.0
+}

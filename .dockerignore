@@ -1,5 +1,7 @@
 data/
 eval/
+!eval/results/
+eval/results/.gitkeep
 ingest/
 tests/
 scripts/

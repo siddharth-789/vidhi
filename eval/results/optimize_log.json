@@ -1,0 +1,66 @@
+{
+  "auto": "light",
+  "trainset_size": 45,
+  "estimated_requests": 450,
+  "timestamp": "20260803T193439Z",
+  "original_instruction": "Answer the question using only the provided context from a GST reference manual.\n\nThe answer must come only from the context. If the context does not contain the\nanswer, say plainly that the manual does not cover this rather than guessing or\nusing outside knowledge. citations must list only page numbers that actually\nappear in the context.",
+  "winning_instruction": "Answer the question using only the provided context from a GST reference manual.\n\nThe answer must come only from the context. If the context does not contain the\nanswer, say plainly that the manual does not cover this rather than guessing or\nusing outside knowledge. citations must list only page numbers that actually\nappear in the context.",
+  "demo_count": 0,
+  "score_curve": [
+    {
+      "trial": 1,
+      "mb_score": null,
+      "full_eval_score": 80.28
+    },
+    {
+      "trial": 2,
+      "mb_score": null,
+      "full_eval_score": 0.0
+    },
+    {
+      "trial": 3,
+      "mb_score": null,
+      "full_eval_score": 80.07
+    },
+    {
+      "trial": 4,
+      "mb_score": null,
+      "full_eval_score": 0.0
+    },
+    {
+      "trial": 5,
+      "mb_score": null,
+      "full_eval_score": 0.0
+    },
+    {
+      "trial": 6,
+      "mb_score": null,
+      "full_eval_score": 0.0
+    },
+    {
+      "trial": 7,
+      "mb_score": null,
+      "full_eval_score": 80.07
+    },
+    {
+      "trial": 8,
+      "mb_score": null,
+      "full_eval_score": 0.0
+    },
+    {
+      "trial": 9,
+      "mb_score": null,
+      "full_eval_score": 0.0
+    },
+    {
+      "trial": 10,
+      "mb_score": null,
+      "full_eval_score": 0.0
+    },
+    {
+      "trial": 11,
+      "mb_score": null,
+      "full_eval_score": 80.28
+    }
+  ]
+}

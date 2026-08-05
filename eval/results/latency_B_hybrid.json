@@ -1,0 +1,29 @@
+{
+  "mode": "warm",
+  "n": 5,
+  "ttft_p50_ms": 4603.906400036067,
+  "ttft_p95_ms": 4811.1561200232245,
+  "total_p50_ms": 6253.031100030057,
+  "total_p95_ms": 13805.48554001143,
+  "per_stage_mean_ms": {
+    "rerank": 1855.6651199818589,
+    "route": 0.0017000013031065464,
+    "generation": 1367.7834799862467,
+    "citation_validation": 0.007800001185387373,
+    "embed_query": 697.2012199927121,
+    "retrieval": 733.468239987269,
+    "groundedness_check": 2896.257160010282
+  },
+  "per_stage_p95_ms": {
+    "rerank": 2192.9941399605013,
+    "route": 0.0022600172087550163,
+    "generation": 1629.7168799559586,
+    "citation_validation": 0.016000017058104277,
+    "embed_query": 741.6893999907188,
+    "retrieval": 795.7474399823695,
+    "groundedness_check": 8658.985360048244
+  },
+  "tokens_per_second_mean": 4.891417594649118,
+  "input_tokens_mean": 2163.8,
+  "output_tokens_mean": 122.8
+}
